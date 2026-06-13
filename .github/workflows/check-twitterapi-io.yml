@@ -22,7 +22,9 @@ jobs:
 
       - name: Run TwitterAPI.io check
         env:
-          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          env:
+  TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           python scripts/check_x_api.py
 
