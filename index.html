@@ -144,6 +144,7 @@
   const articleMeta = document.getElementById('articleMeta');
   const marketStatus = document.getElementById('marketStatus');
   let currentMarkdown = '';
+  let displayMarkdown = '';
 
   function escapeHtml(str){return str.replace(/[&<>\"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
   function inlineFormat(s){
@@ -161,6 +162,22 @@
       .trim();
   }
   function isFooterLine(line){return line.includes('גילוי נאות') || line.includes('פותח ע');}
+  function stripDuplicateHeaderLines(md, title){
+    const lines = md.replace(/\r/g,'').split('\n');
+    const out = [];
+    let removedTitle = false;
+    let removedContext = false;
+    const cleanTitle = (title || '').trim();
+    for(const raw of lines){
+      const line = raw.trim();
+      if(!line) { out.push(raw); continue; }
+      if(line.startsWith('# ')){ continue; }
+      if(!removedContext && cleanTitle && line === cleanTitle){ removedContext = true; continue; }
+      if(!removedTitle && (line === 'טעימת וול סטריט' || line === '🌅 טעימת וול סטריט')){ removedTitle = true; continue; }
+      out.push(raw);
+    }
+    return out.join('\n').replace(/\n{3,}/g,'\n\n').trim();
+  }
 
   function sectionCard(title, bodyHtml, index){
     const collapsed = window.matchMedia('(max-width: 760px)').matches && index > 0;
@@ -242,7 +259,8 @@
     articleTitle.textContent = subTitle || firstHeading.replace(/^🌅\s*/,'');
     articleMeta.textContent = dateMatch ? `עודכן: ${dateMatch[1]}` : (source || 'סקירה נטענה');
     setMarketStatus(currentMarkdown);
-    contentEl.innerHTML = mdToHtml(currentMarkdown);
+    displayMarkdown = stripDuplicateHeaderLines(currentMarkdown, articleTitle.textContent);
+    contentEl.innerHTML = mdToHtml(displayMarkdown);
     wireSections();
     statusEl.textContent = 'הסקירה נטענה';
     document.getElementById('summaryBox').style.display='none';
@@ -262,7 +280,7 @@
 
   function makeSummary(){
     if(!currentMarkdown){statusEl.textContent='אין סקירה לקיצור'; return;}
-    const bullets = currentMarkdown.split('\n').map(x=>x.trim()).filter(x=>x.startsWith('• ') || x.startsWith('- ')).slice(0,5);
+    const bullets = (displayMarkdown || currentMarkdown).split('\n').map(x=>x.trim()).filter(x=>x.startsWith('• ') || x.startsWith('- ')).slice(0,5);
     const list = document.getElementById('summaryList');
     list.innerHTML = bullets.map(b=>`<li>${inlineFormat(b.replace(/^[-•]\s*/,''))}</li>`).join('');
     document.getElementById('summaryBox').style.display='block';
@@ -296,7 +314,7 @@
     if(!currentMarkdown){statusEl.textContent='אין סקירה לשליחה'; return;}
     const title = (currentMarkdown.match(/^#\s+(.+)$/m)||[])[1]?.replace(/^🌅\s*/,'') || 'טעימת וול סטריט';
     const dateMatch = currentMarkdown.match(/(20\d{2}-\d{2}-\d{2})/);
-    const points = extractFiveShortPoints(currentMarkdown);
+    const points = extractFiveShortPoints(displayMarkdown || currentMarkdown);
     if(points.length === 0){statusEl.textContent='לא נמצאו נקודות לשליחה'; return;}
     const lines = [];
     lines.push(rtlLine(`🌅 ${title}${dateMatch ? ' | ' + dateMatch[1] : ''}`));
@@ -310,8 +328,8 @@
   }
   function searchTerm(term){
     if(!currentMarkdown) return;
-    if(!term){contentEl.innerHTML = mdToHtml(currentMarkdown); wireSections(); return;}
-    let html = mdToHtml(currentMarkdown);
+    if(!term){contentEl.innerHTML = mdToHtml(displayMarkdown || currentMarkdown); wireSections(); return;}
+    let html = mdToHtml(displayMarkdown || currentMarkdown);
     const safe = term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
     html = html.replace(new RegExp(safe,'gi'), m => `<mark>${m}</mark>`);
     contentEl.innerHTML = html;
