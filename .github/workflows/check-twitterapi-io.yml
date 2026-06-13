@@ -1,19 +1,31 @@
-name: Check TwitterAPI.io
+name: Generate Market Review
 
 on:
   workflow_dispatch:
+    inputs:
+      review_type:
+        description: "איזו סקירה ליצור"
+        required: true
+        default: "wallstreet"
+        type: choice
+        options:
+          - wallstreet
+          - israel
+          - trump
 
 permissions:
   contents: write
 
 jobs:
-  check-twitterapi-io:
+  generate-review:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -25,24 +37,25 @@ jobs:
 
       - name: Run review
         env:
+          REVIEW_TYPE: ${{ github.event.inputs.review_type }}
           TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
           OPENAI_MODEL: gpt-5.5
-          MAX_TWEETS_FOR_REVIEW: "10"
+          MAX_TWEETS_FOR_REVIEW: "12"
           MAX_TWEETS_PER_ACCOUNT: "4"
         run: python scripts/check_x_api.py
 
-      - name: Commit latest review to website
+      - name: Commit latest review to repository
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add output/
-          git diff --cached --quiet && echo "No review changes to commit" || git commit -m "Update latest Wall Street review"
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add output/ || true
+          git commit -m "Update market review" || echo "No changes to commit"
           git push
 
       - name: Upload output artifact
         uses: actions/upload-artifact@v4
         with:
-          name: wallstreet-review-output
+          name: market-review-output
           path: output/
