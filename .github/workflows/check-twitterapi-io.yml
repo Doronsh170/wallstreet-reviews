@@ -2,6 +2,9 @@ name: Check TwitterAPI.io
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   check-twitterapi-io:
@@ -20,16 +23,16 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Run TwitterAPI.io check
+      - name: Run TwitterAPI.io and OpenAI review
         env:
-          env:
-  TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
-  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: gpt-5.5
         run: |
           python scripts/check_x_api.py
 
       - name: Upload output artifact
         uses: actions/upload-artifact@v4
         with:
-          name: twitterapi-io-output
+          name: wallstreet-review-output
           path: output/
