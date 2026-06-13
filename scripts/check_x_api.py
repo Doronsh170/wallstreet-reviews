@@ -288,7 +288,7 @@ def call_openai(system_prompt: str, user_prompt: str) -> str:
             "Content-Type": "application/json",
         },
         json=payload,
-        timeout=180,
+        timeout=600,
     )
 
     try:
