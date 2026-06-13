@@ -1,11 +1,19 @@
-# Wall Street Reviews - TwitterAPI.io v2
+# Wall Street Reviews - TwitterAPI.io v3
 
-This version first resolves each username to a userId, then fetches latest tweets by userId.
+This version checks twitterapi.io using the GitHub secret:
 
-Required GitHub Secret:
+```text
+TWITTER_API_KEY
+```
 
-`TWITTER_API_KEY`
+It tests several endpoints:
 
-Run manually:
+1. `/twitter/user/info`
+2. `/twitter/user/last_tweets` by `userName`
+3. `/twitter/user/last_tweets` by `userId`
+4. `/twitter/user/tweet_timeline` by `userId`
+5. `/twitter/tweet/advanced_search` as fallback
 
-Actions -> Check TwitterAPI.io v2 -> Run workflow
+The output is saved as an artifact under `output/`.
+
+Do not upload API keys to GitHub files. Use Repository Secrets only.
