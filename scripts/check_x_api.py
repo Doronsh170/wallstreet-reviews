@@ -313,6 +313,148 @@ def build_market_context_text(context: Dict[str, Any]) -> str:
 
     return "\n".join(lines)
 
+
+def hebrew_weekday(dt: datetime) -> str:
+    names = {
+        0: "יום שני",
+        1: "יום שלישי",
+        2: "יום רביעי",
+        3: "יום חמישי",
+        4: "יום שישי",
+        5: "שבת",
+        6: "יום ראשון",
+    }
+    return names.get(dt.weekday(), "")
+
+
+def observed_date(month: int, day: int, year: int):
+    d = datetime(year, month, day).date()
+    # NYSE observation rule used for federal market holidays:
+    # Saturday holidays are usually observed on the prior Friday;
+    # Sunday holidays are observed on the following Monday.
+    if d.weekday() == 5:
+        return d - timedelta(days=1)
+    if d.weekday() == 6:
+        return d + timedelta(days=1)
+    return d
+
+
+def nth_weekday(year: int, month: int, weekday: int, n: int):
+    d = datetime(year, month, 1).date()
+    days_until = (weekday - d.weekday()) % 7
+    return d + timedelta(days=days_until + 7 * (n - 1))
+
+
+def last_weekday(year: int, month: int, weekday: int):
+    if month == 12:
+        d = datetime(year + 1, 1, 1).date() - timedelta(days=1)
+    else:
+        d = datetime(year, month + 1, 1).date() - timedelta(days=1)
+    return d - timedelta(days=(d.weekday() - weekday) % 7)
+
+
+def easter_date(year: int):
+    # Gregorian Easter algorithm.
+    a = year % 19
+    b = year // 100
+    c = year % 100
+    d = b // 4
+    e = b % 4
+    f = (b + 8) // 25
+    g = (b - f + 1) // 3
+    h = (19 * a + b - d - g + 15) % 30
+    i = c // 4
+    k = c % 4
+    l = (32 + 2 * e + 2 * i - h - k) % 7
+    m = (a + 11 * h + 22 * l) // 451
+    month = (h + l - 7 * m + 114) // 31
+    day = ((h + l - 7 * m + 114) % 31) + 1
+    return datetime(year, month, day).date()
+
+
+def nyse_holiday_name(d) -> Optional[str]:
+    year = d.year
+    holidays = {
+        observed_date(1, 1, year): "ראש השנה האזרחית",
+        nth_weekday(year, 1, 0, 3): "יום מרטין לותר קינג",
+        nth_weekday(year, 2, 0, 3): "יום הנשיאים",
+        easter_date(year) - timedelta(days=2): "Good Friday",
+        last_weekday(year, 5, 0): "Memorial Day",
+        observed_date(6, 19, year): "Juneteenth",
+        observed_date(7, 4, year): "יום העצמאות האמריקאי",
+        nth_weekday(year, 9, 0, 1): "Labor Day",
+        nth_weekday(year, 11, 3, 4): "חג ההודיה",
+        observed_date(12, 25, year): "חג המולד",
+    }
+    return holidays.get(d)
+
+
+def is_trading_day_nyse(d) -> bool:
+    return d.weekday() < 5 and nyse_holiday_name(d) is None
+
+
+def next_trading_day_nyse(d):
+    nd = d + timedelta(days=1)
+    while not is_trading_day_nyse(nd):
+        nd += timedelta(days=1)
+    return nd
+
+
+def get_review_context(now_il: datetime) -> Dict[str, str]:
+    now_ny = now_il.astimezone(ZoneInfo("America/New_York"))
+    date_str = now_il.strftime("%Y-%m-%d")
+    day_il = hebrew_weekday(now_il)
+    ny_date = now_ny.date()
+
+    # Weekend handling by Israel day, because the site is operated from Israel.
+    if now_il.weekday() == 5:  # Saturday
+        return {
+            "mode": "weekly_weekend",
+            "title": f"סיכום שבוע בוול סטריט והיערכות לפתיחת השבוע, {day_il} {date_str}",
+            "editorial_focus": "סקירת סוף שבוע: חבר בין האירועים המרכזיים לשאלה מה חשוב לקראת פתיחת השבוע. אל תכתוב כאילו המסחר פתוח עכשיו.",
+        }
+
+    if now_il.weekday() == 6:  # Sunday
+        return {
+            "mode": "week_start_prep",
+            "title": f"היערכות לפתיחת שבוע המסחר בוול סטריט, {day_il} {date_str}",
+            "editorial_focus": "סקירת הכנה לפתיחת שבוע: התמקד בנושאים שיכולים ללוות את פתיחת המסחר הקרובה. אל תכתוב כאילו המסחר פתוח היום.",
+        }
+
+    # Monday-Friday according to New York market calendar and market hours.
+    holiday = nyse_holiday_name(ny_date)
+    if holiday:
+        next_trade = next_trading_day_nyse(ny_date).isoformat()
+        return {
+            "mode": "market_holiday",
+            "title": f"יום ללא מסחר בוול סטריט, {day_il} {date_str}",
+            "editorial_focus": f"היום אין מסחר רגיל בארה״ב בגלל {holiday}. כתוב סקירת רקע והיערכות ליום המסחר הבא ({next_trade}). אל תכתוב 'לקראת פתיחת המסחר היום', 'בזמן מסחר' או 'סיכום יום המסחר'.",
+        }
+
+    market_open = now_ny.replace(hour=9, minute=30, second=0, microsecond=0)
+    market_close = now_ny.replace(hour=16, minute=0, second=0, microsecond=0)
+
+    if now_ny < market_open:
+        return {
+            "mode": "premarket",
+            "title": f"נקודות חשובות לקראת פתיחת המסחר בוול סטריט, {day_il} {date_str}",
+            "editorial_focus": "סקירת טרום מסחר: התמקד במה שיכול להשפיע על הפתיחה, חוזים, טיקרים, דוחות, זרימות וסנטימנט.",
+        }
+
+    if market_open <= now_ny <= market_close:
+        return {
+            "mode": "intraday",
+            "title": f"עדכון בזמן מסחר בוול סטריט, {day_il} {date_str}",
+            "editorial_focus": "סקירה בזמן מסחר: כתוב כאילו המסחר פעיל עכשיו. התמקד במה שזז, אילו טיקרים/סקטורים במוקד, ומה מסביר את הסנטימנט תוך כדי יום המסחר. אל תכתוב 'לקראת פתיחה' או 'סיכום יום'.",
+        }
+
+    return {
+        "mode": "postmarket",
+        "title": f"סיכום יום המסחר בוול סטריט, {day_il} {date_str}",
+        "editorial_focus": "סקירת אחרי נעילה: התמקד במה שהוביל את היום, אילו טיקרים וסקטורים בלטו, ומה נשאר חשוב להמשך.",
+    }
+
+
 def extract_openai_text(data: Dict[str, Any]) -> str:
     if isinstance(data.get("output_text"), str):
         return data["output_text"]
@@ -331,7 +473,10 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
     market_context_text = build_market_context_text(market_context)
 
     now_il = datetime.now(ZoneInfo("Asia/Jerusalem"))
-    generated_date = now_il.strftime("%Y-%m-%d")
+    review_context = get_review_context(now_il)
+    review_context_title = review_context["title"]
+    review_context_mode = review_context["mode"]
+    review_editorial_focus = review_context["editorial_focus"]
 
     prompt = f"""
 אתה עורך סקירת וול סטריט בעברית עבור איש שוק הון מנוסה.
@@ -340,7 +485,7 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
 אל תוסיף ידע חיצוני, אל תשלים פערים, אל תיתן המלצת השקעה, ואל תיצור קשר סיבתי שלא מופיע בקלט.
 
 המטרה:
-להפיק דף קריא, חד ומקצועי בסגנון "הכנה ליום מסחר". לא סיכום ציוצים, לא דוח ציות, ולא רשימת הסתייגויות.
+להפיק דף קריא, חד ומקצועי שמתאים לזמן ההרצה. לא סיכום ציוצים, לא דוח ציות, ולא רשימת הסתייגויות.
 
 כללי עריכה חשובים:
 1. אל תכתוב "לפי הציוצים שנאספו".
@@ -354,6 +499,7 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
 9. שמור טיקרים בדיוק כפי שהם מופיעים, למשל $TSLA, $IBIT, $SPCX. לעולם אל תחליף טיקר ל-$1.
 10. אם הנתון נשמע טכני מדי, למשל מדד תנודתיות, הסבר במשפט אחד למה זה חשוב. אם אין הסבר ברור, השמט אותו.
 11. אם יש יותר מדי נקודות, תעדיף מיקרו: חברות, ETFים, סקטורים, זרימות ואירועי חברה.
+12. התאם את השפה לזמן ההרצה. אם זו סקירה בזמן מסחר, אל תכתוב "לקראת פתיחה" או "אחרי נעילה". אם זו שבת, אל תכתוב כאילו יש מסחר פתוח. אם זו סקירת סיום יום, אל תכתוב כאילו היום עוד לפנינו.
 
 איך להשתמש בנתוני השוק:
 - השתמש בהם רק כשכבת בדיקה ורקע, לא כתוכן עצמאי.
@@ -378,9 +524,12 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
 
 # 🌅 טעימת וול סטריט
 
-נקודות חשובות לקראת/אחרי המסחר בוול סטריט, {generated_date}
+{review_context_title}
 
-פתיח קצר של 2 משפטים בלבד. הפתיח יציג את מוקדי העניין המרכזיים. בלי הביטוי "לפי הציוצים", בלי הסבר על מקורות, ובלי משפטי הגנה.
+הקשר זמן הסקירה: {review_context_mode}
+הנחיית עריכה לזמן ההרצה: {review_editorial_focus}
+
+פתיח קצר של 2 משפטים בלבד. הפתיח יציג את מוקדי העניין המרכזיים בהתאם לזמן ההרצה. בלי הביטוי "לפי הציוצים", בלי הסבר על מקורות, ובלי משפטי הגנה.
 
 ## נקודות מרכזיות
 
@@ -422,6 +571,7 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
 - ודא שאין יותר מ-7 נקודות מרכזיות.
 - ודא שכל סעיף זורם כסקירת שוק ולא כסיכום ציוץ.
 - ודא שלא נוצר סעיף בשם "מה דורש מעקב".
+- ודא שכותרת המשנה והפתיח תואמים לזמן ההרצה: טרום מסחר, זמן מסחר, אחרי נעילה, שבת, ראשון או חג/יום ללא מסחר.
 
 ציוצים:
 {tweets_text}
@@ -496,6 +646,7 @@ def main() -> None:
         "finnhub_enabled": bool(FINNHUB_API_KEY),
         "finnhub_symbols_checked": symbols,
         "finnhub_context": market_context,
+        "review_context": get_review_context(datetime.now(ZoneInfo("Asia/Jerusalem"))),
     }
 
     timestamped_input_path = Path(f"output/review_input_{run_ts}.json")
