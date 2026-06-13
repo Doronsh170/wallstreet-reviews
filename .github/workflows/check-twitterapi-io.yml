@@ -3,10 +3,10 @@ name: Check TwitterAPI.io
 on:
   workflow_dispatch:
 
-
 jobs:
   check-twitterapi-io:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
@@ -18,19 +18,16 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
-      - name: Run TwitterAPI.io and OpenAI review
+      - name: Run review
         env:
-          env:
-  TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
-  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  OPENAI_MODEL: gpt-5.5
-  MAX_TWEETS_FOR_REVIEW: 30
-  MAX_TWEETS_PER_ACCOUNT: 10
-        run: |
-          python scripts/check_x_api.py
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: gpt-5.5
+          MAX_TWEETS_FOR_REVIEW: "30"
+          MAX_TWEETS_PER_ACCOUNT: "10"
+        run: python scripts/check_x_api.py
 
       - name: Upload output artifact
         uses: actions/upload-artifact@v4
