@@ -12,9 +12,40 @@ TWITTER_BASE = "https://api.twitterapi.io"
 OPENAI_BASE = "https://api.openai.com/v1/responses"
 FINNHUB_BASE = "https://finnhub.io/api/v1"
 
-ACCOUNTS_FILE = Path("accounts.txt")
-OUTPUT_DIR = Path("output")
-OUTPUT_DIR.mkdir(exist_ok=True)
+REVIEW_TYPE = os.environ.get("REVIEW_TYPE", "wallstreet").strip().lower()
+
+REVIEW_CONFIGS = {
+    "wallstreet": {
+        "label": "טעימת וול סטריט",
+        "sources_file": Path("sources/wallstreet.txt"),
+        "legacy_sources_file": Path("accounts.txt"),
+        "output_dir": Path("output/wallstreet"),
+        "legacy_latest": True,
+    },
+    "israel": {
+        "label": "טעימת השוק בישראל",
+        "sources_file": Path("sources/israel.txt"),
+        "legacy_sources_file": None,
+        "output_dir": Path("output/israel"),
+        "legacy_latest": False,
+    },
+    "trump": {
+        "label": "ציוצי טראמפ",
+        "sources_file": Path("sources/trump.txt"),
+        "legacy_sources_file": None,
+        "output_dir": Path("output/trump"),
+        "legacy_latest": False,
+    },
+}
+
+if REVIEW_TYPE not in REVIEW_CONFIGS:
+    raise SystemExit(f"Unsupported REVIEW_TYPE: {REVIEW_TYPE}. Use one of: {', '.join(REVIEW_CONFIGS)}")
+
+REVIEW_CONFIG = REVIEW_CONFIGS[REVIEW_TYPE]
+OUTPUT_ROOT = Path("output")
+OUTPUT_ROOT.mkdir(exist_ok=True)
+OUTPUT_DIR = REVIEW_CONFIG["output_dir"]
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 TWITTER_API_KEY = os.environ.get("TWITTER_API_KEY", "").strip()
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "").strip()
@@ -35,11 +66,25 @@ if not OPENAI_API_KEY:
 
 
 def read_accounts() -> List[str]:
+    sources_file = REVIEW_CONFIG["sources_file"]
+    legacy = REVIEW_CONFIG.get("legacy_sources_file")
+
+    if sources_file.exists():
+        source_path = sources_file
+    elif legacy and legacy.exists():
+        source_path = legacy
+    else:
+        raise SystemExit(f"Missing sources file for {REVIEW_TYPE}: {sources_file}")
+
     accounts = []
-    for line in ACCOUNTS_FILE.read_text(encoding="utf-8").splitlines():
+    for line in source_path.read_text(encoding="utf-8").splitlines():
         account = line.strip().lstrip("@")
         if account and not account.startswith("#"):
             accounts.append(account)
+
+    if not accounts:
+        raise SystemExit(f"No X accounts configured in {source_path}")
+
     return accounts
 
 
@@ -468,24 +513,144 @@ def extract_openai_text(data: Dict[str, Any]) -> str:
     return "\n".join(parts)
 
 
+def get_israel_review_context(now_il: datetime) -> Dict[str, str]:
+    date_str = now_il.strftime("%Y-%m-%d")
+    day_il = hebrew_weekday(now_il)
+
+    if now_il.weekday() == 5:
+        return {
+            "mode": "israel_weekend",
+            "title": f"סיכום שבוע בבורסה בתל אביב והיערכות לשבוע הקרוב, {day_il} {date_str}",
+            "editorial_focus": "סקירת סוף שבוע לשוק הישראלי: חבר בין האירועים המקומיים למה שחשוב לקראת השבוע הקרוב. אל תכתוב כאילו המסחר פתוח עכשיו.",
+        }
+    if now_il.weekday() == 6:
+        return {
+            "mode": "israel_week_start",
+            "title": f"היערכות לפתיחת שבוע המסחר בתל אביב, {day_il} {date_str}",
+            "editorial_focus": "סקירת הכנה לפתיחת השבוע בשוק הישראלי: התמקד במדדים, סקטורים, שקל/דולר, אג״ח, בנקים, נדל״ן, ביטחוניות ואירועים מקומיים.",
+        }
+    if now_il.hour < 9 or (now_il.hour == 9 and now_il.minute < 30):
+        return {
+            "mode": "israel_premarket",
+            "title": f"נקודות חשובות לקראת פתיחת המסחר בתל אביב, {day_il} {date_str}",
+            "editorial_focus": "סקירת טרום מסחר לשוק הישראלי: התמקד במה שיכול להשפיע על הפתיחה, מדדים, מניות, אג״ח, שקל/דולר וסנטימנט מקומי.",
+        }
+    if (now_il.hour, now_il.minute) <= (17, 35):
+        return {
+            "mode": "israel_intraday",
+            "title": f"עדכון בזמן מסחר בבורסה בתל אביב, {day_il} {date_str}",
+            "editorial_focus": "סקירה בזמן מסחר בישראל: כתוב כאילו המסחר פעיל עכשיו. התמקד במה שזז ובסקטורים/מניות במוקד.",
+        }
+    return {
+        "mode": "israel_postmarket",
+        "title": f"סיכום יום המסחר בבורסה בתל אביב, {day_il} {date_str}",
+        "editorial_focus": "סקירת אחרי נעילה בשוק הישראלי: התמקד במה שהוביל את היום ומה חשוב להמשך.",
+    }
+
+
+def get_trump_review_context(now_il: datetime) -> Dict[str, str]:
+    base = get_review_context(now_il)
+    date_str = now_il.strftime("%Y-%m-%d")
+    day_il = hebrew_weekday(now_il)
+    base_mode = base["mode"]
+    mode = "trump_" + base_mode
+
+    if base_mode == "weekly_weekend":
+        title = f"ציוצי טראמפ והשפעה אפשרית על השווקים, סיכום שבוע והיערכות לפתיחה, {day_il} {date_str}"
+        focus = "סקירת סוף שבוע: חבר בין אמירות טראמפ לבין סקטורים, טיקרים, סחורות או רגולציה שיכולים להיות רלוונטיים לפתיחת השבוע. אל תכתוב פוליטיקה כללית."
+    elif base_mode == "week_start_prep":
+        title = f"ציוצי טראמפ והיערכות לפתיחת שבוע המסחר, {day_il} {date_str}"
+        focus = "סקירת הכנה לפתיחת שבוע: התמקד באמירות עם פוטנציאל השפעה על סקטורים, מניות, סחורות, דולר, אג״ח או סנטימנט."
+    elif base_mode == "market_holiday":
+        title = f"ציוצי טראמפ ביום ללא מסחר בארה״ב, {day_il} {date_str}"
+        focus = "יום ללא מסחר: כתוב רק נקודות רקע עם פוטנציאל שוקי ליום המסחר הבא."
+    elif base_mode == "premarket":
+        title = f"ציוצי טראמפ לקראת פתיחת המסחר בוול סטריט, {day_il} {date_str}"
+        focus = "טרום מסחר: התמקד באמירות שעלולות להשפיע על פתיחת המסחר, סקטורים, טיקרים או סנטימנט."
+    elif base_mode == "intraday":
+        title = f"עדכון ציוצי טראמפ בזמן מסחר, {day_il} {date_str}"
+        focus = "זמן מסחר: התמקד באמירות שעלולות להזיז סקטורים/טיקרים תוך כדי יום המסחר."
+    else:
+        title = f"ציוצי טראמפ וסיכום השפעה אפשרית על השוק, {day_il} {date_str}"
+        focus = "אחרי נעילה: התמקד באמירות שיכולות להשפיע על המשך השבוע או על פתיחת המסחר הבאה."
+
+    return {"mode": mode, "title": title, "editorial_focus": focus}
+
+
+def get_active_review_context(now_il: datetime) -> Dict[str, str]:
+    if REVIEW_TYPE == "israel":
+        return get_israel_review_context(now_il)
+    if REVIEW_TYPE == "trump":
+        return get_trump_review_context(now_il)
+    return get_review_context(now_il)
+
+
+def get_review_prompt_header() -> str:
+    if REVIEW_TYPE == "israel":
+        return """אתה עורך סקירת שוק ההון בישראל בעברית עבור איש שוק הון מנוסה.
+
+מקורות הקלט שלך הם ציוצים וידיעות ממקורות שהוגדרו לשוק הישראלי. השתמש בהם בלבד.
+המטרה היא להפיק סקירה קצרה, קריאה ומקצועית על הבורסה בתל אביב והשוק המקומי.
+
+התמקד רק במה שיש לו ערך שוקי ברור:
+- מדדי ת״א 35 / ת״א 90 / בנקים / נדל״ן / ביטחוניות / אנרגיה / טכנולוגיה מקומית.
+- אג״ח ממשלתי וקונצרני, תשואות, מרווחים, הנפקות.
+- שקל/דולר ושקל/אירו, רק אם יש קשר ברור לשוק.
+- רגולציה, מאקרו ישראלי, בנק ישראל, אינפלציה, תקציב, דירוג אשראי.
+- אירועים ביטחוניים/פוליטיים רק אם יש להם חיבור ברור למניות, אג״ח, מט״ח, סקטור או סנטימנט.
+
+אל תכניס פוליטיקה כללית, כותרות ביטחוניות כלליות או חדשות צרכניות אם אין להן חיבור שוקי ברור.
+אל תנסה להמציא סימבולים ישראליים אם לא הופיעו בקלט. אם אין טיקר ברור, כתוב שם חברה או סקטור בלבד.
+"""
+    if REVIEW_TYPE == "trump":
+        return """אתה עורך סקירת השפעה אפשרית של ציוצי טראמפ על שוק ההון, בעברית, עבור איש שוק הון מנוסה.
+
+מקורות הקלט שלך הם ציוצים מחשבונות שהוגדרו לערוץ טראמפ. השתמש בהם בלבד.
+המטרה אינה לסכם פוליטיקה ואינה להביע עמדה פוליטית. המטרה היא לזהות רק אמירות עם פוטנציאל השפעה שוקי.
+
+התמקד רק כאשר יש קשר ברור לאחד מהתחומים הבאים:
+- מניות, ETFים, מדדים או סקטורים ציבוריים.
+- מכסים, סין, סחר חוץ, תעשייה, רכב, שבבים, ביטחון, אנרגיה, קריפטו, בנקים, ריבית, דולר, אג״ח או רגולציה.
+- חברה ציבורית שהוזכרה במפורש או סקטור ציבורי שעלול להיות מושפע.
+
+אל תכניס:
+- פוליטיקה כללית בלי קשר ברור לשוק.
+- עלבונות, בחירות, סקרים או משפטים אם אין להם השלכה שוקית ברורה.
+- ניתוח אישי על טראמפ.
+- טיקרים שלא הופיעו בקלט או שלא קשורים באופן ברור לאמירה.
+
+כל סעיף צריך לענות על:
+1. מה נאמר או מה בלט.
+2. איזה סקטור/נכס/טיקר עשוי להיות רלוונטי.
+3. למה זה חשוב עכשיו לשוק.
+אם אין השלכה שוקית ברורה, השמט את הסעיף.
+"""
+
+    return """אתה עורך סקירת וול סטריט בעברית עבור איש שוק הון מנוסה.
+
+מקורות הקלט שלך הם ציוצים שנאספו ונתוני שוק שנשלפו עבור חלק מהטיקרים. השתמש בהם בלבד.
+אל תוסיף ידע חיצוני, אל תשלים פערים, אל תיתן המלצת השקעה, ואל תיצור קשר סיבתי שלא מופיע בקלט.
+"""
+
+
 def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) -> str:
     tweets_text = build_tweets_text(tweets)
     market_context_text = build_market_context_text(market_context)
 
     now_il = datetime.now(ZoneInfo("Asia/Jerusalem"))
-    review_context = get_review_context(now_il)
+    review_context = get_active_review_context(now_il)
     review_context_title = review_context["title"]
     review_context_mode = review_context["mode"]
     review_editorial_focus = review_context["editorial_focus"]
 
-    if review_context_mode == "weekly_weekend":
+    if review_context_mode.endswith("weekly_weekend"):
         forward_section_title = "לקראת השבוע הקרוב"
         forward_section_instruction = (
             "חובה להוסיף אחרי נקודות מרכזיות סעיף בשם 'לקראת השבוע הקרוב'. "
             "כתוב בו 4 עד 5 בולטים קצרים שמתרגמים את הסקירה לשאלות/מוקדי מעקב לשבוע הבא. "
             "זה צריך להיות מבט קדימה, לא חזרה על מה שכבר נכתב."
         )
-    elif review_context_mode in {"week_start_prep", "market_holiday"}:
+    elif review_context_mode.endswith("week_start_prep") or review_context_mode.endswith("market_holiday") or review_context_mode in {"week_start_prep", "market_holiday"}:
         forward_section_title = "לקראת יום המסחר הבא"
         forward_section_instruction = (
             "חובה להוסיף אחרי נקודות מרכזיות סעיף בשם 'לקראת יום המסחר הבא'. "
@@ -499,11 +664,7 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
         )
 
     prompt = f"""
-אתה עורך סקירת וול סטריט בעברית עבור איש שוק הון מנוסה.
-
-מקורות הקלט שלך הם ציוצים שנאספו ונתוני שוק שנשלפו עבור חלק מהטיקרים. השתמש בהם בלבד.
-אל תוסיף ידע חיצוני, אל תשלים פערים, אל תיתן המלצת השקעה, ואל תיצור קשר סיבתי שלא מופיע בקלט.
-
+{get_review_prompt_header()}
 המטרה:
 להפיק דף קריא, חד ומקצועי שמתאים לזמן ההרצה. לא סיכום ציוצים, לא דוח ציות, ולא רשימת הסתייגויות.
 הסקירה צריכה לתת ערך מוסף לקורא: לא רק מה קרה, אלא למה זה חשוב עכשיו.
@@ -570,7 +731,7 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
 
 מבנה פלט חובה:
 
-# 🌅 טעימת וול סטריט
+# 🌅 {REVIEW_CONFIG["label"]}
 
 {review_context_title}
 
@@ -791,11 +952,12 @@ def main() -> None:
         "finnhub_enabled": bool(FINNHUB_API_KEY),
         "finnhub_symbols_checked": symbols,
         "finnhub_context": market_context,
-        "review_context": get_review_context(datetime.now(ZoneInfo("Asia/Jerusalem"))),
+        "review_type": REVIEW_TYPE,
+        "review_context": get_active_review_context(datetime.now(ZoneInfo("Asia/Jerusalem"))),
     }
 
-    timestamped_input_path = Path(f"output/review_input_{run_ts}.json")
-    timestamped_review_path = Path(f"output/wallstreet_review_{run_ts}.md")
+    timestamped_input_path = OUTPUT_DIR / f"review_input_{run_ts}.json"
+    timestamped_review_path = OUTPUT_DIR / f"{REVIEW_TYPE}_review_{run_ts}.md"
 
     timestamped_input_path.write_text(
         json.dumps(input_json, ensure_ascii=False, indent=2),
@@ -807,19 +969,30 @@ def main() -> None:
         encoding="utf-8",
     )
 
-    Path("output/latest.json").write_text(
+    (OUTPUT_DIR / "latest.json").write_text(
         json.dumps(input_json, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
 
-    Path("output/latest.md").write_text(
+    (OUTPUT_DIR / "latest.md").write_text(
         review,
         encoding="utf-8",
     )
 
+    # Backward compatibility for the existing website path.
+    if REVIEW_CONFIG.get("legacy_latest"):
+        Path("output/latest.json").write_text(
+            json.dumps(input_json, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        Path("output/latest.md").write_text(
+            review,
+            encoding="utf-8",
+        )
+
     print("Review created successfully.")
     print(f"Wrote {timestamped_review_path}")
-    print("Wrote output/latest.md for the website.")
+    print(f"Wrote {OUTPUT_DIR / 'latest.md'} for the website.")
     print(review[:1200])
 
 
