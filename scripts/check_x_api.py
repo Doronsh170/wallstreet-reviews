@@ -230,10 +230,9 @@ def call_openai(tweets: List[Dict[str, Any]]) -> str:
 להפוך זרם ציוצים ממקורות X לסקירה מקצועית, קריאה, עניינית וממוקדת שוק.
 
 הדגש האנליטי:
-- כ-30% מאקרו
-- כ-70% מיקרו: חברות, סקטורים, טיקרים, אירועים נקודתיים
-- המיקרו הוא מרכז הסקירה
-- המאקרו יופיע רק אם הוא רלוונטי למניות, סקטורים או סנטימנט שוק
+- מרכז הסקירה הוא מיקרו: חברות, סקטורים, טיקרים ואירועים נקודתיים
+- מאקרו יופיע רק כאשר הוא רלוונטי למניות, סקטורים או סנטימנט שוק
+- אל תייצר חלוקה מלאכותית בין מאקרו למיקרו; תן משקל למה שעלה בפועל בציוצים
 
 כללי אמינות:
 1. אל תוסיף מידע שלא מופיע בציוצים.
@@ -426,17 +425,33 @@ def main() -> None:
         ),
     }
 
-    Path(f"output/review_input_{run_ts}.json").write_text(
+    timestamped_input_path = Path(f"output/review_input_{run_ts}.json")
+    timestamped_review_path = Path(f"output/wallstreet_review_{run_ts}.md")
+
+    timestamped_input_path.write_text(
         json.dumps(input_json, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
 
-    Path(f"output/wallstreet_review_{run_ts}.md").write_text(
+    timestamped_review_path.write_text(
+        review,
+        encoding="utf-8",
+    )
+
+    # Files used by GitHub Pages. The website fetches these automatically.
+    Path("output/latest.json").write_text(
+        json.dumps(input_json, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+    Path("output/latest.md").write_text(
         review,
         encoding="utf-8",
     )
 
     print("Review created successfully.")
+    print(f"Wrote {timestamped_review_path}")
+    print("Wrote output/latest.md for the website.")
     print(review[:1000])
 
 

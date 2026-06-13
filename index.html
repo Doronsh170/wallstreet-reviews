@@ -156,12 +156,13 @@
         <div class="logo">WS</div>
         <div>
           <h1>טעימת וול סטריט</h1>
-          <div class="subtitle">מרכז צפייה מקצועי לסקירות לפי דרישה</div>
+          <div class="subtitle">מרכז צפייה מקצועי לסקירות, נטען אוטומטית מהאתר</div>
         </div>
       </div>
       <div class="actions">
         <a class="link-button primary" href="https://github.com/Doronsh170/wallstreet-reviews/actions/workflows/check-twitterapi-io.yml" target="_blank" rel="noopener">יצירת סקירה חדשה בגיטהאב</a>
-        <label class="file-label" for="fileInput">טעינת סקירות Markdown</label>
+        <button id="refreshLatestBtn" class="primary">טעינת הסקירה האחרונה</button>
+        <label class="file-label" for="fileInput">טעינה ידנית</label>
         <input id="fileInput" type="file" accept=".md,.txt" multiple />
         <button id="themeBtn">מצב כהה</button>
         <button id="clearBtn">ניקוי סקירות מקומיות</button>
@@ -178,11 +179,11 @@
         <div id="reviewList" class="review-list"></div>
         <div class="github-panel">
           <strong>יצירת סקירה חדשה</strong><br>
-          לחץ על הקישור לגיטהאב, הפעל <b>Run workflow</b>, הורד את ה־Artifact, ואז טען כאן את קובץ <b>wallstreet_review_*.md</b>.
+          לחץ על הקישור לגיטהאב והפעל <b>Run workflow</b>. בסיום ההרצה, האתר יטען את <b>output/latest.md</b> אוטומטית. אם לא התעדכן מיד, לחץ על <b>טעינת הסקירה האחרונה</b> אחרי דקה.
           <a class="link-button primary" href="https://github.com/Doronsh170/wallstreet-reviews/actions/workflows/check-twitterapi-io.yml" target="_blank" rel="noopener">פתיחת GitHub Actions</a>
         </div>
         <div class="footer-note">
-          הסקירות נשמרות מקומית בדפדפן בלבד, אלא אם העלית אותן בעצמך למקום אחר.
+          הסקירה האחרונה נטענת אוטומטית מקובץ <b>output/latest.md</b> בריפו. טעינה ידנית נשארה כאפשרות גיבוי.
         </div>
       </aside>
 
@@ -201,12 +202,12 @@
               <button id="downloadBtn" class="primary">הורדת HTML</button>
             </div>
           </div>
-          <div id="dropZone" class="drop">גרור לכאן קבצי Markdown של סקירות, או לחץ על “טעינת סקירות Markdown”.</div>
+          <div id="statusBox" class="drop">האתר ינסה לטעון אוטומטית את הסקירה האחרונה מתוך output/latest.md. להרצה חדשה: לחץ “סקירה חדשה”, הפעל Run workflow בגיטהאב, וחזור לרענן כאן אחרי דקה.</div>
         </div>
 
         <article id="reader" class="card reader">
           <div class="empty">
-            עדיין לא נטענה סקירה. טען קובץ Markdown מתוך ה־Artifact של GitHub כדי לצפות בו כאן.
+            עדיין לא נטענה סקירה. האתר מנסה לטעון את output/latest.md. אם יצרת סקירה חדשה עכשיו, המתן דקה ולחץ “טעינת הסקירה האחרונה”.
           </div>
         </article>
       </main>
@@ -221,6 +222,7 @@
 
   <script>
     const STORAGE_KEY = 'ws_reviews_v1';
+    const LATEST_REVIEW_URL = 'output/latest.md';
     let reviews = loadReviews();
     let activeId = reviews[0]?.id || null;
 
@@ -237,6 +239,8 @@
       copyBtn: document.getElementById('copyBtn'),
       printBtn: document.getElementById('printBtn'),
       downloadBtn: document.getElementById('downloadBtn'),
+      refreshLatestBtn: document.getElementById('refreshLatestBtn'),
+      statusBox: document.getElementById('statusBox'),
     };
 
     function loadReviews() {
@@ -258,13 +262,29 @@
       const gen = md.match(/Generated UTC:\s*([^\n]+)/i);
       return gen ? gen[1].trim() : new Date().toLocaleDateString('he-IL');
     }
-    function addReview(filename, md) {
-      const id = `${filename}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    function addReview(filename, md, options = {}) {
+      const id = options.id || `${filename}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
       const review = { id, filename, title: extractTitle(md, filename), date: extractDate(filename, md), tickers: extractTickers(md), md };
-      reviews = [review, ...reviews.filter(r => r.filename !== filename || r.md !== md)];
+      reviews = [review, ...reviews.filter(r => r.id !== id && (r.filename !== filename || r.md !== md))];
       activeId = id;
       saveReviews();
       render();
+    }
+
+    async function loadLatestReview() {
+      if (els.statusBox) els.statusBox.textContent = 'טוען את הסקירה האחרונה מתוך output/latest.md...';
+      try {
+        const url = `${LATEST_REVIEW_URL}?v=${Date.now()}`;
+        const response = await fetch(url, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const md = await response.text();
+        if (!md.trim() || md.trim().startsWith('<!doctype')) throw new Error('latest.md לא נמצא או אינו קובץ Markdown תקין');
+        addReview('latest.md', md, { id: 'latest-review' });
+        if (els.statusBox) els.statusBox.textContent = 'הסקירה האחרונה נטענה אוטומטית. להרצה חדשה: הפעל Run workflow בגיטהאב וחזור לרענן כאן אחרי דקה.';
+      } catch (err) {
+        if (els.statusBox) els.statusBox.textContent = 'עדיין אין סקירה אוטומטית זמינה. אחרי הרצת GitHub Actions, ודא שנוצר הקובץ output/latest.md ואז רענן כאן.';
+        console.warn('Could not load latest review:', err);
+      }
     }
 
     function escapeHtml(s) {
@@ -317,10 +337,8 @@
     }
 
     els.fileInput.addEventListener('change', e => handleFiles(e.target.files));
-    els.dropZone.addEventListener('dragover', e => { e.preventDefault(); els.dropZone.style.borderColor = 'var(--accent)'; });
-    els.dropZone.addEventListener('dragleave', () => { els.dropZone.style.borderColor = ''; });
-    els.dropZone.addEventListener('drop', e => { e.preventDefault(); els.dropZone.style.borderColor = ''; handleFiles(e.dataTransfer.files); });
     els.search.addEventListener('input', render);
+    els.refreshLatestBtn.addEventListener('click', loadLatestReview);
     els.themeBtn.addEventListener('click', () => {
       const body = document.body;
       const next = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -347,6 +365,7 @@
     });
 
     render();
+    loadLatestReview();
   </script>
 </body>
 </html>
