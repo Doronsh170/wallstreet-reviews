@@ -174,10 +174,46 @@
     document.getElementById('summaryBox').style.display='block';
     document.getElementById('summaryBox').scrollIntoView({behavior:'smooth',block:'start'});
   }
+  function getFullReviewUrl(){
+    const base = window.location.origin + window.location.pathname;
+    return base.replace(/index\.html$/,'');
+  }
+
+  function extractFiveShortPoints(md){
+    const bullets = md
+      .split('\n')
+      .map(x => x.trim())
+      .filter(x => x.startsWith('• ') || x.startsWith('- '))
+      .map(x => x.replace(/^[-•]\s*/, '').replace(/\*\*/g, '').replace(/`/g, ''))
+      .filter(x => !x.includes('גילוי נאות') && !x.includes('פותח ע'))
+      .slice(0,5);
+
+    return bullets.map(x => {
+      const cleaned = x.replace(/\s+/g, ' ').trim();
+      if(cleaned.length <= 155) return cleaned;
+      const cut = cleaned.slice(0,155);
+      const lastSpace = cut.lastIndexOf(' ');
+      return (lastSpace > 80 ? cut.slice(0,lastSpace) : cut).trim() + '...';
+    });
+  }
+
   function sendWhatsApp(){
     if(!currentMarkdown){statusEl.textContent='אין סקירה לשליחה'; return;}
-    const text = currentMarkdown.replace(/\n{3,}/g,'\n\n').slice(0,6000);
-    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+    const title = (currentMarkdown.match(/^#\s+(.+)$/m)||[])[1]?.replace(/^🌅\s*/,'') || 'טעימת וול סטריט';
+    const dateMatch = currentMarkdown.match(/(20\d{2}-\d{2}-\d{2})/);
+    const points = extractFiveShortPoints(currentMarkdown);
+    if(points.length === 0){statusEl.textContent='לא נמצאו נקודות לשליחה'; return;}
+
+    const lines = [];
+    lines.push(`🌅 ${title}${dateMatch ? ' | ' + dateMatch[1] : ''}`);
+    lines.push('');
+    lines.push('5 נקודות קצרות:');
+    points.forEach((p,i) => lines.push(`${i+1}. ${p}`));
+    lines.push('');
+    lines.push('לסקירה המלאה:');
+    lines.push(getFullReviewUrl());
+
+    window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
   }
   function searchTerm(term){
     if(!currentMarkdown) return;
