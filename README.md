@@ -1,44 +1,25 @@
-# Wallstreet Reviews, X API Check
+# Wall Street Reviews - TwitterAPI.io test
 
-גרסת בדיקה ראשונה לפרויקט סקירות וול סטריט.
+This repository checks that the TwitterAPI.io key works and fetches recent tweets from the configured X accounts.
 
-המטרה בשלב הזה: לבדוק ש-GitHub מצליח למשוך פוסטים מחמשת חשבונות X שהוגדרו.
+## GitHub Secret required
 
-## קבצים חשובים
+Create one repository secret:
 
-- `accounts.txt`, רשימת חשבונות X למעקב.
-- `scripts/check_x_api.py`, סקריפט בדיקה שמושך פוסטים מה-X API.
-- `.github/workflows/check-x-api.yml`, פעולה של GitHub Actions להרצה ידנית.
-- `requirements.txt`, ספריות Python נדרשות.
+`TWITTER_API_KEY`
 
-## Secret נדרש
+Paste your twitterapi.io key as the value.
 
-ב-GitHub יש להוסיף Secret בשם:
+## Accounts
 
-```text
-X_BEARER_TOKEN
-```
+Edit `accounts.txt` to add or remove X accounts. Use names without `@`.
 
-הנתיב:
+## Run
 
-```text
-Settings → Secrets and variables → Actions → New repository secret
-```
+GitHub → Actions → Check TwitterAPI.io → Run workflow
 
-לא להעלות API key לקבצים בריפו.
+The output is uploaded as an artifact named `twitterapi-io-output` and includes:
 
-## איך מריצים
-
-1. להיכנס ל-Repository.
-2. ללחוץ על `Actions`.
-3. לבחור `Check X API`.
-4. ללחוץ `Run workflow`.
-5. לפתוח את תוצאת ההרצה ולבדוק אם נוצר קובץ בתיקיית `output`.
-
-## מה הבדיקה עושה
-
-- קוראת את רשימת החשבונות מתוך `accounts.txt`.
-- ממירה כל username ל-user id דרך X API.
-- מושכת עד 10 פוסטים אחרונים לכל חשבון.
-- שומרת קובץ JSON בתיקיית `output`.
-
+- raw JSON
+- markdown summary
+- detected cashtags

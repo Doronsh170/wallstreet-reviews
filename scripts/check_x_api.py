@@ -1,120 +1,148 @@
 import json
 import os
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 import requests
 
-BASE_URL = "https://api.twitter.com/2"
-ROOT = Path(__file__).resolve().parents[1]
-ACCOUNTS_FILE = ROOT / "accounts.txt"
-OUTPUT_DIR = ROOT / "output"
+API_URL = "https://api.twitterapi.io/twitter/user/last_tweets"
+ACCOUNTS_FILE = Path("accounts.txt")
+OUTPUT_DIR = Path("output")
+MAX_TWEETS_PER_ACCOUNT = 10
+
+CASHTAG_RE = re.compile(r"(?<![A-Za-z0-9_])\$([A-Z]{1,6})(?![A-Za-z0-9_])")
 
 
-def fail(message: str, status_code: int = 1) -> None:
-    print(f"ERROR: {message}", file=sys.stderr)
-    sys.exit(status_code)
-
-
-def get_bearer_token() -> str:
-    token = os.getenv("X_BEARER_TOKEN", "").strip()
-    if not token:
-        fail("Missing X_BEARER_TOKEN. Add it in GitHub Secrets, not in the code.")
-    return token
-
-
-def headers(token: str) -> Dict[str, str]:
-    return {"Authorization": f"Bearer {token}"}
-
-
-def read_accounts() -> List[str]:
+def load_accounts() -> List[str]:
     if not ACCOUNTS_FILE.exists():
-        fail("accounts.txt not found.")
-
-    accounts: List[str] = []
+        raise FileNotFoundError("accounts.txt not found")
+    accounts = []
     for line in ACCOUNTS_FILE.read_text(encoding="utf-8").splitlines():
-        item = line.strip().replace("@", "")
-        if item and not item.startswith("#"):
-            accounts.append(item)
-
-    if not accounts:
-        fail("accounts.txt is empty.")
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        accounts.append(line.lstrip("@"))
     return accounts
 
 
-def x_get(url: str, token: str, params: Dict[str, Any] | None = None) -> Dict[str, Any]:
-    response = requests.get(url, headers=headers(token), params=params, timeout=30)
-    if response.status_code >= 400:
-        print("X API response:", response.text[:1000], file=sys.stderr)
-        fail(f"X API request failed: {response.status_code} {response.reason}")
-    return response.json()
+def fetch_last_tweets(api_key: str, username: str) -> Dict[str, Any]:
+    headers = {"X-API-Key": api_key}
+    params = {"userName": username, "includeReplies": "false"}
+    response = requests.get(API_URL, headers=headers, params=params, timeout=30)
+    try:
+        payload = response.json()
+    except Exception:
+        payload = {"raw_text": response.text}
+    if response.status_code != 200:
+        raise RuntimeError(
+            f"TwitterAPI.io request failed for @{username}: "
+            f"HTTP {response.status_code}: {json.dumps(payload, ensure_ascii=False)[:1000]}"
+        )
+    if payload.get("status") == "error":
+        raise RuntimeError(
+            f"TwitterAPI.io returned error for @{username}: "
+            f"{json.dumps(payload, ensure_ascii=False)[:1000]}"
+        )
+    return payload
 
 
-def get_user(token: str, username: str) -> Dict[str, Any]:
-    url = f"{BASE_URL}/users/by/username/{username}"
-    params = {"user.fields": "id,name,username,verified,verified_type"}
-    data = x_get(url, token, params)
-    if "data" not in data:
-        fail(f"No user data returned for @{username}: {data}")
-    return data["data"]
-
-
-def get_tweets(token: str, user_id: str) -> List[Dict[str, Any]]:
-    url = f"{BASE_URL}/users/{user_id}/tweets"
-    params = {
-        "max_results": 10,
-        "tweet.fields": "created_at,public_metrics,lang,entities,referenced_tweets,context_annotations",
-        "exclude": "replies",
+def simplify_tweet(tweet: Dict[str, Any], fallback_username: str) -> Dict[str, Any]:
+    text = tweet.get("text") or ""
+    author = tweet.get("author") or {}
+    username = author.get("userName") or fallback_username
+    return {
+        "id": tweet.get("id"),
+        "url": tweet.get("url"),
+        "createdAt": tweet.get("createdAt"),
+        "author": username,
+        "text": text,
+        "cashtags": sorted(set(CASHTAG_RE.findall(text.upper()))),
+        "likeCount": tweet.get("likeCount"),
+        "retweetCount": tweet.get("retweetCount"),
+        "replyCount": tweet.get("replyCount"),
+        "viewCount": tweet.get("viewCount"),
     }
-    data = x_get(url, token, params)
-    return data.get("data", [])
 
 
-def main() -> None:
-    token = get_bearer_token()
-    accounts = read_accounts()
+def write_outputs(results: Dict[str, Any]) -> None:
     OUTPUT_DIR.mkdir(exist_ok=True)
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    json_path = OUTPUT_DIR / f"twitterapi_check_{stamp}.json"
+    md_path = OUTPUT_DIR / f"twitterapi_check_{stamp}.md"
 
-    results = {
-        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "accounts_checked": accounts,
-        "sources": [],
-    }
+    json_path.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    lines = []
+    lines.append("# TwitterAPI.io Check")
+    lines.append("")
+    lines.append(f"Generated UTC: {results['generated_utc']}")
+    lines.append(f"Accounts checked: {len(results['accounts'])}")
+    lines.append(f"Total tweets collected: {results['total_tweets']}")
+    lines.append("")
+
+    all_tickers = sorted({t for item in results["tweets"] for t in item.get("cashtags", [])})
+    lines.append("## Detected cashtags")
+    lines.append(", ".join(f"${t}" for t in all_tickers) if all_tickers else "No cashtags detected.")
+    lines.append("")
+
+    lines.append("## Tweets")
+    for item in results["tweets"]:
+        tickers = ", ".join(f"${t}" for t in item.get("cashtags", [])) or "no cashtags"
+        lines.append(f"### @{item['author']} | {item.get('createdAt') or 'no date'} | {tickers}")
+        lines.append(item.get("text", "").replace("\n", " "))
+        if item.get("url"):
+            lines.append(f"URL: {item['url']}")
+        lines.append("")
+
+    md_path.write_text("\n".join(lines), encoding="utf-8")
+    print(f"Wrote {json_path}")
+    print(f"Wrote {md_path}")
+
+
+def main() -> int:
+    api_key = os.environ.get("TWITTER_API_KEY")
+    if not api_key:
+        print("ERROR: Missing GitHub Secret named TWITTER_API_KEY")
+        return 1
+
+    accounts = load_accounts()
+    if not accounts:
+        print("ERROR: accounts.txt is empty")
+        return 1
+
+    all_tweets: List[Dict[str, Any]] = []
+    raw_status: Dict[str, Any] = {}
 
     for username in accounts:
         print(f"Checking @{username}...")
-        try:
-            user = get_user(token, username)
-            tweets = get_tweets(token, user["id"])
-            results["sources"].append({
-                "username": username,
-                "user": user,
-                "tweet_count": len(tweets),
-                "tweets": tweets,
-            })
-            print(f"OK @{username}: {len(tweets)} tweets")
-        except Exception as exc:
-            results["sources"].append({
-                "username": username,
-                "error": str(exc),
-                "tweet_count": 0,
-                "tweets": [],
-            })
-            print(f"FAILED @{username}: {exc}", file=sys.stderr)
+        payload = fetch_last_tweets(api_key, username)
+        tweets = payload.get("tweets") or []
+        raw_status[username] = {
+            "status": payload.get("status"),
+            "message": payload.get("message"),
+            "tweet_count_received": len(tweets),
+            "has_next_page": payload.get("has_next_page"),
+        }
+        for tweet in tweets[:MAX_TWEETS_PER_ACCOUNT]:
+            all_tweets.append(simplify_tweet(tweet, username))
+        print(f"OK @{username}: received {len(tweets)} tweets")
 
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-    output_file = OUTPUT_DIR / f"x_api_check_{timestamp}.json"
-    output_file.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
-
-    total = sum(source.get("tweet_count", 0) for source in results["sources"])
-    print(f"Saved: {output_file}")
-    print(f"Total tweets fetched: {total}")
-
-    if total == 0:
-        fail("No tweets fetched. Check token permissions, plan limits, or account access.")
+    results = {
+        "generated_utc": datetime.now(timezone.utc).isoformat(),
+        "accounts": accounts,
+        "source_api": "twitterapi.io",
+        "endpoint": API_URL,
+        "total_tweets": len(all_tweets),
+        "status_by_account": raw_status,
+        "tweets": all_tweets,
+    }
+    write_outputs(results)
+    print("SUCCESS: TwitterAPI.io connection works.")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
