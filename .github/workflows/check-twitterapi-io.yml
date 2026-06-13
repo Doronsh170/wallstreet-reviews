@@ -3,6 +3,9 @@ name: Check TwitterAPI.io
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   check-twitterapi-io:
     runs-on: ubuntu-latest
@@ -28,6 +31,14 @@ jobs:
           MAX_TWEETS_FOR_REVIEW: "10"
           MAX_TWEETS_PER_ACCOUNT: "4"
         run: python scripts/check_x_api.py
+
+      - name: Commit latest review to website
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output/
+          git diff --cached --quiet && echo "No review changes to commit" || git commit -m "Update latest Wall Street review"
+          git push
 
       - name: Upload output artifact
         uses: actions/upload-artifact@v4
