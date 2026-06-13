@@ -179,22 +179,47 @@
     return base.replace(/index\.html$/,'');
   }
 
+  function cleanForWhatsApp(text){
+    return text
+      .replace(/\*\*/g, '')
+      .replace(/`/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function shortenPoint(text){
+    let cleaned = cleanForWhatsApp(text);
+
+    // אם יש כותרת לפני נקודתיים, שומרים אותה ומקצרים את ההסבר אחריה.
+    const parts = cleaned.split(':');
+    if(parts.length > 1){
+      const title = parts.shift().trim();
+      const body = parts.join(':').trim();
+      const sentence = (body.match(/^(.{35,120}?[.!?]|.{35,120}?[\.׃]|.{35,120}?)(\s|$)/) || [body])[1] || body;
+      cleaned = `${title}: ${sentence}`.trim();
+    }
+
+    if(cleaned.length <= 125) return cleaned;
+    const cut = cleaned.slice(0,125);
+    const lastSpace = cut.lastIndexOf(' ');
+    return (lastSpace > 70 ? cut.slice(0,lastSpace) : cut).trim() + '...';
+  }
+
   function extractFiveShortPoints(md){
     const bullets = md
       .split('\n')
       .map(x => x.trim())
       .filter(x => x.startsWith('• ') || x.startsWith('- '))
-      .map(x => x.replace(/^[-•]\s*/, '').replace(/\*\*/g, '').replace(/`/g, ''))
+      .map(x => x.replace(/^[-•]\s*/, ''))
       .filter(x => !x.includes('גילוי נאות') && !x.includes('פותח ע'))
       .slice(0,5);
 
-    return bullets.map(x => {
-      const cleaned = x.replace(/\s+/g, ' ').trim();
-      if(cleaned.length <= 155) return cleaned;
-      const cut = cleaned.slice(0,155);
-      const lastSpace = cut.lastIndexOf(' ');
-      return (lastSpace > 80 ? cut.slice(0,lastSpace) : cut).trim() + '...';
-    });
+    return bullets.map(shortenPoint);
+  }
+
+  function rtlLine(text){
+    // RLE + RLM מכריחים יישור/כיוון מימין לשמאל גם כשיש טיקר או מילה באנגלית בתחילת המשפט.
+    return '\u202B\u200F' + text + '\u202C';
   }
 
   function sendWhatsApp(){
@@ -205,12 +230,12 @@
     if(points.length === 0){statusEl.textContent='לא נמצאו נקודות לשליחה'; return;}
 
     const lines = [];
-    lines.push(`🌅 ${title}${dateMatch ? ' | ' + dateMatch[1] : ''}`);
+    lines.push(rtlLine(`🌅 ${title}${dateMatch ? ' | ' + dateMatch[1] : ''}`));
     lines.push('');
-    lines.push('5 נקודות קצרות:');
-    points.forEach((p,i) => lines.push(`${i+1}. ${p}`));
+    lines.push(rtlLine('5 נקודות קצרות:'));
+    points.forEach((p,i) => lines.push(rtlLine(`נקודה ${i+1}: ${p}`)));
     lines.push('');
-    lines.push('לסקירה המלאה:');
+    lines.push(rtlLine('לסקירה המלאה:'));
     lines.push(getFullReviewUrl());
 
     window.open('https://wa.me/?text=' + encodeURIComponent(lines.join('\n')), '_blank');
