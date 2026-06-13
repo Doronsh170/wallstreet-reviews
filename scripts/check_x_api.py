@@ -522,6 +522,10 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
 11. התאם את השפה לזמן ההרצה. אם זו סקירה בזמן מסחר, אל תכתוב "לקראת פתיחה" או "אחרי נעילה". אם זו שבת, אל תכתוב כאילו יש מסחר פתוח. אם זו סקירת סיום יום, אל תכתוב כאילו היום עוד לפנינו.
 12. עקביות תאריכים: אל תכתוב תאריך פנימי מתוך ציוץ אם הוא יוצר בלבול מול תאריך הסקירה. בסקירת סוף שבוע, אם ציוץ מציין למשל "week ended" או תאריך ביניים, כתוב בדרך כלל "בדיווח הזרימות האחרון" או "בשבוע האחרון". ציין תאריך פנימי רק אם הוא חיוני להבנת האירוע.
 13. חברות פרטיות: אם חברה פרטית מופיעה בקלט, אל תציג אותה כאילו יש לה טיקר ציבורי ואל תהפוך אותה לאירוע מנייתי ישיר. אם המידע חשוב לשוק, הצג אותו כנושא סקטוריאלי/רגולטורי. אין צורך לכתוב בסקירה שהחברה פרטית או שאינה נסחרת בבורסה. במקום זאת, נסח את המשמעות דרך הסקטור הרלוונטי, למשל רגולציית AI, ענן, שבבים, תשתיות AI או ביטחון לאומי. אל תקשור חברה פרטית לטיקר ציבורי מסוים אם הקשר לא מופיע בקלט.
+14. שימוש בסימבולים: אל תרבה בסימבולים בתוך הטקסט. השתמש בסימבול רק כאשר הוא הכרחי לזיהוי נייר הערך או כאשר יש כמה חברות דומות. אם שם החברה ברור, כתוב את שם החברה בלבד. כאשר סימבול כן מופיע, הצג אותו בסוגריים אחרי שם החברה, לדוגמה: SpaceX ($SPCX). אל תפתח סעיף או משפט בסימבול אם אפשר לפתוח בשם החברה. אל תחזור על אותו סימבול יותר מפעם אחת באותו סעיף. אל תכתוב סימבולים בצורת SPCX$ או TSLA$; אם סימבול נשאר, הוא חייב להיות בצורת $SPCX בלבד.
+15. כותרות סעיפים: אל תפתח כותרת בוליט בסימבול בלבד. העדף שם חברה/נושא בעברית, למשל "SpaceX כאירוע מגה־קאפ" ולא "$SPCX משנה את מפת המגה־קאפ".
+16. אם יש צורך להזכיר כמה סימבולים יחד, עשה זאת פעם אחת בסוגריים, למשל "מוצרי המינוף על SpaceX ($SPCH, $SSPC)". לאחר מכן המשך בשם החברה או בשם המוצר בלי לחזור על הסימבולים.
+17. סימני פיסוק: אל תשתמש במקפים כפולים כמו -- או ״––״. אם צריך הפרדה במשפט, השתמש בפסיק, נקודה, נקודתיים או נקודה־פסיק. אל תשתמש גם במקף ארוך/Em dash. בעברית הכתיבה צריכה להיות נקייה, בלי סימני הפרדה אמריקאיים.
 
 איזון נושאים:
 - אל תאפשר לנושא אחד להשתלט על הסקירה, גם אם הוא הופיע בכמה ציוצים.
@@ -622,7 +626,10 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
 - ודא שכותרת המשנה והפתיח תואמים לזמן ההרצה: טרום מסחר, זמן מסחר, אחרי נעילה, שבת, ראשון או חג/יום ללא מסחר.
 - אם הכותרת כוללת היערכות לשבוע/יום הבא, ודא שקיים סעיף מבט קדימה מתאים.
 - ודא שנושא אחד, כולל SpaceX, לא השתלט על יותר מדי נקודות.
+- ודא שהסימבולים לא מופיעים שלא לצורך: לא בתחילת כותרות, לא יותר מפעם אחת באותו סעיף, ולא במקום שם חברה ברור.
+- ודא שסימבול שנשאר מופיע בסוגריים אחרי שם החברה או הנושא, למשל SpaceX ($SPCX), ולא כפתיחת משפט.
 - ודא שלא הדפסת הוראות פנימיות או שמות מצב כמו weekly_weekend, premarket, intraday, postmarket או market_holiday.
+- ודא שאין מקפים כפולים כמו -- או ״––״, ואין מקף ארוך/Em dash. החלף אותם בפסיק, נקודה או נקודתיים.
 
 ציוצים:
 {tweets_text}
@@ -665,6 +672,92 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
     return text.strip()
 
 
+
+TICKER_NAME_MAP = {
+    "SPCX": "SpaceX",
+    "TSLA": "Tesla",
+    "PYPL": "PayPal",
+    "AMZN": "Amazon",
+    "IBIT": "IBIT",
+    "SOXX": "קרן השבבים",
+    "SPXL": "קרן ה-S&P הממונפת",
+    "VXN": "מדד התנודתיות",
+    "SPCH": "מוצר הלונג",
+    "SSPC": "מוצר השורט",
+}
+
+IMPORTANT_KEEP_SYMBOLS = {"SPCX", "TSLA", "IBIT", "SOXX", "SPCH", "SSPC"}
+
+
+def normalize_cashtag_direction(text: str) -> str:
+    # Fix RTL artifacts such as SPCX$ or VXN,$ back to a normal ticker form.
+    text = re.sub(r"\b([A-Z]{1,6}),\$", r"$\1", text)
+    text = re.sub(r"\b([A-Z]{1,6})\$", r"$\1", text)
+    text = re.sub(r"\$([A-Z]{1,6})\s*,", r"$\1,", text)
+    text = re.sub(r"\$([A-Z]{1,6})\s*\.", r"$\1.", text)
+    return text
+
+
+def replace_repeated_symbols_in_segment(segment: str) -> str:
+    # Each paragraph/bullet may keep a symbol once at most. Repeated mentions become plain names.
+    seen = set()
+
+    def repl(match: re.Match) -> str:
+        raw = match.group(0)
+        symbol = match.group(1).upper()
+        name = TICKER_NAME_MAP.get(symbol, symbol)
+        if symbol in seen:
+            return name
+        seen.add(symbol)
+        # Avoid starting a segment with a bare ticker. Prefer name + ticker in parentheses.
+        before = segment[: match.start()].strip()
+        if not before or before.endswith(("**", "•", "-", ":")):
+            return f"{name} (${symbol})" if symbol in IMPORTANT_KEEP_SYMBOLS else name
+        # If name already appears immediately before the ticker, keep ticker in parentheses.
+        return f"${symbol}" if symbol in IMPORTANT_KEEP_SYMBOLS else name
+
+    return re.sub(r"\$([A-Z]{1,6})(?![A-Z0-9])", repl, segment)
+
+
+def reduce_ticker_noise(text: str) -> str:
+    text = normalize_cashtag_direction(text)
+    parts = re.split(r"(\n\n+|\n(?=•\s)|\n(?=-\s)|\n(?=##\s))", text)
+    out = []
+    for part in parts:
+        if part.startswith("\n") and part.strip() == "":
+            out.append(part)
+        else:
+            out.append(replace_repeated_symbols_in_segment(part))
+    text = "".join(out)
+    # Clean common awkward patterns from ticker replacement.
+    text = re.sub(r"SpaceX \(\$SPCX\) \(\$SPCX\)", "SpaceX ($SPCX)", text)
+    text = re.sub(r"Tesla \(\$TSLA\) \(\$TSLA\)", "Tesla ($TSLA)", text)
+    return text
+
+
+def normalize_review_text(text: str) -> str:
+    """Final cleanup before writing the review.
+
+    Keeps Hebrew financial text clean and prevents punctuation artifacts
+    such as double hyphens from leaking into the website/PDF/WhatsApp.
+    """
+    replacements = {
+        "---": ",",
+        "--": ",",
+        "––": ",",
+        "—": ",",
+        "–": ",",
+    }
+    for old, new in replacements.items():
+        text = text.replace(old, new)
+
+    # Clean repeated commas/spaces created by replacements, without harming newlines.
+    text = re.sub(r"[ \t]+,", ",", text)
+    text = re.sub(r",[ \t]*,", ",", text)
+    text = re.sub(r"[ \t]{2,}", " ", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
+
 def main() -> None:
     run_ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
 
@@ -684,7 +777,7 @@ def main() -> None:
     print(f"Detected symbols for Finnhub: {', '.join(symbols) or 'None'}")
     print(f"Finnhub enabled: {bool(FINNHUB_API_KEY)}")
 
-    review = call_openai(selected, market_context)
+    review = normalize_review_text(call_openai(selected, market_context))
 
     input_json = {
         "generated_utc": datetime.now(timezone.utc).isoformat(),
