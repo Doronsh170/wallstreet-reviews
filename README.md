@@ -1,25 +1,11 @@
-# Wall Street Reviews - TwitterAPI.io test
+# Wall Street Reviews - TwitterAPI.io v2
 
-This repository checks that the TwitterAPI.io key works and fetches recent tweets from the configured X accounts.
+This version first resolves each username to a userId, then fetches latest tweets by userId.
 
-## GitHub Secret required
-
-Create one repository secret:
+Required GitHub Secret:
 
 `TWITTER_API_KEY`
 
-Paste your twitterapi.io key as the value.
+Run manually:
 
-## Accounts
-
-Edit `accounts.txt` to add or remove X accounts. Use names without `@`.
-
-## Run
-
-GitHub → Actions → Check TwitterAPI.io → Run workflow
-
-The output is uploaded as an artifact named `twitterapi-io-output` and includes:
-
-- raw JSON
-- markdown summary
-- detected cashtags
+Actions -> Check TwitterAPI.io v2 -> Run workflow
