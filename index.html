@@ -294,7 +294,7 @@
       return escapeHtml(s)
         .replace(/`([^`]+)`/g, '<code>$1</code>')
         .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-        .replace(/\$([A-Z]{1,6})\b/g, '<code>\$$1</code>');
+        .replace(/\$([A-Z]{1,6})\b/g, (match, ticker) => '<code>$' + ticker + '</code>');
     }
     function markdownToHtml(md) {
       const lines = md.split(/\r?\n/);
