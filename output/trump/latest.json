@@ -1,0 +1,72 @@
+{
+  "generated_utc": "2026-06-13T22:19:42.763796+00:00",
+  "model": "gpt-5.5",
+  "total_raw_tweets": 4,
+  "selected_tweets": [
+    {
+      "account": "JustTrumpTruth",
+      "author": "JustTrumpTruth",
+      "id": "2065871644321878153",
+      "url": "https://x.com/JustTrumpTruth/status/2065871644321878153",
+      "createdAt": "Sat Jun 13 18:59:16 +0000 2026",
+      "text": "I am pleased to announce my intent to appoint James M. McDonald as the United States Attorney for the Southern District of New York. A native of the Great State of Oklahoma, Jamie is a former Assistant U.S. Attorney in the Southern District of New York, and served as Director of Enforcement at the U.S. Commodity Futures Trading Commission during my First Term. Jamie is currently a Senior Partner at the Highly Respected Law Firm of Sullivan & Cromwell, a former Law Clerk to Chief Justice John G. Roberts, Jr., and a distinguished Graduate of the University of Virginia School of Law, and Harvard College. I am confident that Jamie will deliver strong results for our Country as the next United States Attorney for the Southern District of New York, as he has the respect of, and will work fantastically with, our Law Enforcement Patriots, the Legal Community, and the Judicial Bench. Good luck Jamie. I have no doubt about your future greatness! President DONALD J. TRUMP",
+      "likeCount": 5,
+      "retweetCount": 0,
+      "viewCount": 317,
+      "cashtags": [],
+      "is_retweet": false
+    },
+    {
+      "account": "JustTrumpTruth",
+      "author": "JustTrumpTruth",
+      "id": "2065855286703976682",
+      "url": "https://x.com/JustTrumpTruth/status/2065855286703976682",
+      "createdAt": "Sat Jun 13 17:54:16 +0000 2026",
+      "text": "Posted by President Trump on Truth Social https://t.co/RgHKYN3zbd",
+      "likeCount": 5,
+      "retweetCount": 0,
+      "viewCount": 190,
+      "cashtags": [],
+      "is_retweet": false
+    },
+    {
+      "account": "JustTrumpTruth",
+      "author": "JustTrumpTruth",
+      "id": "2065855037465911788",
+      "url": "https://x.com/JustTrumpTruth/status/2065855037465911788",
+      "createdAt": "Sat Jun 13 17:53:17 +0000 2026",
+      "text": "Posted by President Trump on Truth Social https://t.co/X0zXBTGQxX",
+      "likeCount": 3,
+      "retweetCount": 0,
+      "viewCount": 191,
+      "cashtags": [],
+      "is_retweet": false
+    },
+    {
+      "account": "JustTrumpTruth",
+      "author": "JustTrumpTruth",
+      "id": "2065838675519582427",
+      "url": "https://x.com/JustTrumpTruth/status/2065838675519582427",
+      "createdAt": "Sat Jun 13 16:48:16 +0000 2026",
+      "text": "The Obama Library ten years from now will be a “Mecca” for those who hate America! President DJT https://t.co/F9QwdLJED4",
+      "likeCount": 5,
+      "retweetCount": 1,
+      "viewCount": 247,
+      "cashtags": [],
+      "is_retweet": false
+    }
+  ],
+  "detected_cashtags": [],
+  "finnhub_enabled": true,
+  "finnhub_symbols_checked": [],
+  "finnhub_context": {
+    "enabled": true,
+    "symbols": {}
+  },
+  "review_type": "trump",
+  "review_context": {
+    "mode": "trump_week_start_prep",
+    "title": "ציוצי טראמפ והיערכות לפתיחת שבוע המסחר, יום ראשון 2026-06-14",
+    "editorial_focus": "סקירת הכנה לפתיחת שבוע: התמקד באמירות עם פוטנציאל השפעה על סקטורים, מניות, סחורות, דולר, אג״ח או סנטימנט."
+  }
+}
