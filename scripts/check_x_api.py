@@ -1,206 +1,324 @@
-import json
 import os
 import re
-import sys
+import json
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import requests
 
-USER_INFO_URL = "https://api.twitterapi.io/twitter/user/info"
-LAST_TWEETS_URL = "https://api.twitterapi.io/twitter/user/last_tweets"
+BASE = "https://api.twitterapi.io"
 ACCOUNTS_FILE = Path("accounts.txt")
 OUTPUT_DIR = Path("output")
-MAX_TWEETS_PER_ACCOUNT = 10
+OUTPUT_DIR.mkdir(exist_ok=True)
 
-CASHTAG_RE = re.compile(r"(?<![A-Za-z0-9_])\$([A-Z]{1,6})(?![A-Za-z0-9_])")
+API_KEY = os.environ.get("TWITTER_API_KEY", "").strip()
+if not API_KEY:
+    raise SystemExit("Missing GitHub secret: TWITTER_API_KEY")
+
+HEADERS = {"X-API-Key": API_KEY}
+TIMEOUT = 30
+
+CASHTAG_RE = re.compile(r"(?<![A-Za-z0-9_])\$[A-Z]{1,6}(?![A-Za-z0-9_])")
 
 
-def load_accounts() -> List[str]:
+def read_accounts() -> List[str]:
     if not ACCOUNTS_FILE.exists():
-        raise FileNotFoundError("accounts.txt not found")
-    accounts: List[str] = []
+        raise SystemExit("accounts.txt not found")
+
+    accounts = []
     for line in ACCOUNTS_FILE.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        accounts.append(line.lstrip("@"))
+        account = line.strip().lstrip("@")
+        if account and not account.startswith("#"):
+            accounts.append(account)
     return accounts
 
 
-def api_get(api_key: str, url: str, params: Dict[str, Any]) -> Dict[str, Any]:
-    headers = {"X-API-Key": api_key}
-    response = requests.get(url, headers=headers, params=params, timeout=30)
+def get_json(path: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    url = f"{BASE}{path}"
+    response = requests.get(url, headers=HEADERS, params=params, timeout=TIMEOUT)
+
     try:
         payload = response.json()
     except Exception:
-        payload = {"raw_text": response.text}
-    if response.status_code != 200:
-        raise RuntimeError(
-            f"Request failed: HTTP {response.status_code}: "
-            f"{json.dumps(payload, ensure_ascii=False)[:1500]}"
-        )
-    if payload.get("status") == "error":
-        raise RuntimeError(
-            f"API returned error: {json.dumps(payload, ensure_ascii=False)[:1500]}"
-        )
+        payload = {"_raw_text": response.text[:1000]}
+
+    payload["_http_status"] = response.status_code
+    payload["_requested_url"] = response.url
     return payload
 
 
-def get_user_info(api_key: str, username: str) -> Dict[str, Any]:
-    payload = api_get(api_key, USER_INFO_URL, {"userName": username})
+def compact(obj: Any, max_chars: int = 2200) -> Any:
+    text = json.dumps(obj, ensure_ascii=False, default=str)
+    if len(text) <= max_chars:
+        return obj
+    return text[:max_chars] + "... [truncated]"
+
+
+def extract_user_info(payload: Dict[str, Any]) -> Dict[str, Any]:
     data = payload.get("data") or {}
+
+    if isinstance(data, dict) and isinstance(data.get("data"), dict):
+        data = data["data"]
+
     return {
         "status": payload.get("status"),
         "msg": payload.get("msg") or payload.get("message"),
-        "id": data.get("id"),
-        "userName": data.get("userName") or username,
-        "name": data.get("name"),
-        "followers": data.get("followers"),
-        "statusesCount": data.get("statusesCount"),
+        "http_status": payload.get("_http_status"),
+        "id": data.get("id") if isinstance(data, dict) else None,
+        "userName": data.get("userName") if isinstance(data, dict) else None,
+        "name": data.get("name") if isinstance(data, dict) else None,
+        "followers": data.get("followers") if isinstance(data, dict) else None,
+        "statusesCount": data.get("statusesCount") if isinstance(data, dict) else None,
         "raw_keys": sorted(list(payload.keys())),
     }
 
 
-def fetch_last_tweets(api_key: str, username: str, user_id: Optional[str]) -> Dict[str, Any]:
-    # userId is recommended by TwitterAPI.io as more stable/faster than userName.
-    params: Dict[str, Any] = {"cursor": "", "includeReplies": False}
-    if user_id:
-        params["userId"] = user_id
-    else:
-        params["userName"] = username
+def looks_like_tweet(item: Any) -> bool:
+    if not isinstance(item, dict):
+        return False
 
-    payload = api_get(api_key, LAST_TWEETS_URL, params)
-    return payload
+    text = item.get("text") or item.get("fullText") or item.get("content")
+    return isinstance(text, str) and bool(text.strip())
 
 
-def simplify_tweet(tweet: Dict[str, Any], fallback_username: str) -> Dict[str, Any]:
-    text = tweet.get("text") or ""
-    author = tweet.get("author") or {}
-    username = author.get("userName") or fallback_username
+def find_tweets(obj: Any) -> List[Dict[str, Any]]:
+    found: List[Dict[str, Any]] = []
+
+    if looks_like_tweet(obj):
+        found.append(obj)
+
+    elif isinstance(obj, list):
+        for item in obj:
+            found.extend(find_tweets(item))
+
+    elif isinstance(obj, dict):
+        for key in ("tweets", "data", "items", "results", "timeline", "list"):
+            if key in obj:
+                found.extend(find_tweets(obj[key]))
+
+        if not found:
+            for value in obj.values():
+                found.extend(find_tweets(value))
+
+    dedup = {}
+    for tweet in found:
+        key = str(
+            tweet.get("id")
+            or tweet.get("tweetId")
+            or tweet.get("url")
+            or tweet.get("text")
+            or tweet.get("fullText")
+            or tweet.get("content")
+        )
+        dedup[key] = tweet
+
+    return list(dedup.values())
+
+
+def normalize_tweet(tweet: Dict[str, Any], account: str, endpoint_used: str) -> Dict[str, Any]:
+    author = tweet.get("author") if isinstance(tweet.get("author"), dict) else {}
+
+    text = (
+        tweet.get("text")
+        or tweet.get("fullText")
+        or tweet.get("content")
+        or ""
+    )
+
     return {
-        "id": tweet.get("id"),
+        "account_requested": account,
+        "author_userName": author.get("userName") or account,
+        "id": tweet.get("id") or tweet.get("tweetId"),
         "url": tweet.get("url"),
-        "createdAt": tweet.get("createdAt"),
-        "author": username,
+        "createdAt": tweet.get("createdAt") or tweet.get("created_at"),
         "text": text,
-        "cashtags": sorted(set(CASHTAG_RE.findall(text.upper()))),
         "likeCount": tweet.get("likeCount"),
         "retweetCount": tweet.get("retweetCount"),
         "replyCount": tweet.get("replyCount"),
+        "quoteCount": tweet.get("quoteCount"),
         "viewCount": tweet.get("viewCount"),
-        "isReply": tweet.get("isReply"),
+        "endpoint_used": endpoint_used,
+        "cashtags": sorted(set(CASHTAG_RE.findall(text or ""))),
     }
 
 
-def compact_raw_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
-    # Keep enough debug info without dumping every tweet twice.
-    return {
-        "keys": sorted(list(payload.keys())),
-        "status": payload.get("status"),
-        "message": payload.get("message") or payload.get("msg"),
-        "has_next_page": payload.get("has_next_page"),
-        "next_cursor_present": bool(payload.get("next_cursor")),
-        "tweet_count": len(payload.get("tweets") or []),
-        "first_tweet_keys": sorted(list((payload.get("tweets") or [{}])[0].keys())) if payload.get("tweets") else [],
-    }
+def try_tweet_endpoints(account: str, user_id: Optional[str]) -> Dict[str, Any]:
+    endpoint_calls = [
+        (
+            "last_tweets_by_userName",
+            "/twitter/user/last_tweets",
+            {"userName": account, "cursor": "", "includeReplies": "false"},
+        ),
+        (
+            "advanced_search_from_user",
+            "/twitter/tweet/advanced_search",
+            {"query": f"from:{account}", "queryType": "Latest"},
+        ),
+    ]
 
+    if user_id:
+        endpoint_calls.insert(
+            1,
+            (
+                "last_tweets_by_userId",
+                "/twitter/user/last_tweets",
+                {"userId": user_id, "cursor": "", "includeReplies": "false"},
+            ),
+        )
+        endpoint_calls.insert(
+            2,
+            (
+                "tweet_timeline_by_userId",
+                "/twitter/user/tweet_timeline",
+                {"userId": user_id, "cursor": "", "includeReplies": "false"},
+            ),
+        )
 
-def write_outputs(results: Dict[str, Any]) -> None:
-    OUTPUT_DIR.mkdir(exist_ok=True)
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-    json_path = OUTPUT_DIR / f"twitterapi_check_v2_{stamp}.json"
-    md_path = OUTPUT_DIR / f"twitterapi_check_v2_{stamp}.md"
-
-    json_path.write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding="utf-8")
-
-    lines: List[str] = []
-    lines.append("# TwitterAPI.io Check v2")
-    lines.append("")
-    lines.append(f"Generated UTC: {results['generated_utc']}")
-    lines.append(f"Accounts checked: {len(results['accounts'])}")
-    lines.append(f"Total tweets collected: {results['total_tweets']}")
-    lines.append("")
-
-    lines.append("## Account status")
-    for acc, st in results["status_by_account"].items():
-        info = st.get("user_info", {})
-        lines.append(f"- @{acc}: userId={info.get('id')}, tweets={st.get('tweet_count_received')}, message={st.get('message')}")
-    lines.append("")
-
-    all_tickers = sorted({t for item in results["tweets"] for t in item.get("cashtags", [])})
-    lines.append("## Detected cashtags")
-    lines.append(", ".join(f"${t}" for t in all_tickers) if all_tickers else "No cashtags detected.")
-    lines.append("")
-
-    lines.append("## Tweets")
-    for item in results["tweets"]:
-        tickers = ", ".join(f"${t}" for t in item.get("cashtags", [])) or "no cashtags"
-        lines.append(f"### @{item['author']} | {item.get('createdAt') or 'no date'} | {tickers}")
-        lines.append(item.get("text", "").replace("\n", " "))
-        if item.get("url"):
-            lines.append(f"URL: {item['url']}")
-        lines.append("")
-
-    md_path.write_text("\n".join(lines), encoding="utf-8")
-    print(f"Wrote {json_path}")
-    print(f"Wrote {md_path}")
-
-
-def main() -> int:
-    api_key = os.environ.get("TWITTER_API_KEY")
-    if not api_key:
-        print("ERROR: Missing GitHub Secret named TWITTER_API_KEY")
-        return 1
-
-    accounts = load_accounts()
-    if not accounts:
-        print("ERROR: accounts.txt is empty")
-        return 1
-
+    attempts = []
     all_tweets: List[Dict[str, Any]] = []
-    raw_status: Dict[str, Any] = {}
 
-    for username in accounts:
-        print(f"Checking @{username}...")
-        user_info = get_user_info(api_key, username)
-        print(f"Resolved @{username}: id={user_info.get('id')}, followers={user_info.get('followers')}")
+    for label, path, params in endpoint_calls:
+        payload = get_json(path, params)
+        tweets = find_tweets(payload)
 
-        payload = fetch_last_tweets(api_key, username, user_info.get("id"))
-        tweets = payload.get("tweets") or []
-        raw_status[username] = {
-            "user_info": user_info,
-            "status": payload.get("status"),
-            "message": payload.get("message") or payload.get("msg"),
-            "tweet_count_received": len(tweets),
-            "has_next_page": payload.get("has_next_page"),
-            "next_cursor_present": bool(payload.get("next_cursor")),
-            "raw_debug": compact_raw_payload(payload),
-        }
-        for tweet in tweets[:MAX_TWEETS_PER_ACCOUNT]:
-            all_tweets.append(simplify_tweet(tweet, username))
-        print(f"OK @{username}: received {len(tweets)} tweets")
+        attempts.append(
+            {
+                "label": label,
+                "path": path,
+                "params_used": params,
+                "http_status": payload.get("_http_status"),
+                "status": payload.get("status"),
+                "msg": payload.get("msg") or payload.get("message"),
+                "root_keys": sorted([k for k in payload.keys() if not k.startswith("_")]),
+                "tweet_count_detected": len(tweets),
+                "raw_sample": compact(payload, 1800),
+            }
+        )
 
-    results = {
+        if tweets:
+            all_tweets.extend([normalize_tweet(t, account, label) for t in tweets])
+            break
+
+        time.sleep(0.4)
+
+    dedup = {}
+    for tweet in all_tweets:
+        key = str(tweet.get("id") or tweet.get("url") or tweet.get("text"))
+        dedup[key] = tweet
+
+    return {"attempts": attempts, "tweets": list(dedup.values())}
+
+
+def main() -> None:
+    accounts = read_accounts()
+    run_ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+
+    result = {
         "generated_utc": datetime.now(timezone.utc).isoformat(),
         "accounts": accounts,
         "source_api": "twitterapi.io",
-        "endpoints": {"user_info": USER_INFO_URL, "last_tweets": LAST_TWEETS_URL},
-        "total_tweets": len(all_tweets),
-        "status_by_account": raw_status,
-        "tweets": all_tweets,
+        "endpoints_tested": [
+            "/twitter/user/info",
+            "/twitter/user/last_tweets",
+            "/twitter/user/tweet_timeline",
+            "/twitter/tweet/advanced_search",
+        ],
+        "total_tweets": 0,
+        "status_by_account": {},
+        "tweets": [],
     }
-    write_outputs(results)
 
-    if len(all_tweets) == 0:
-        print("WARNING: Connection worked, but zero tweets were returned. Check output JSON debug fields.")
-        # Do not fail the GitHub Action. We want the artifact for debugging.
-        return 0
+    for account in accounts:
+        print(f"Checking @{account}...")
 
-    print("SUCCESS: TwitterAPI.io connection works and tweets were collected.")
-    return 0
+        info_payload = get_json("/twitter/user/info", {"userName": account})
+        user_info = extract_user_info(info_payload)
+        user_id = user_info.get("id")
+
+        fetch = try_tweet_endpoints(account, user_id)
+
+        result["status_by_account"][account] = {
+            "user_info": user_info,
+            "attempts": fetch["attempts"],
+            "tweet_count_received": len(fetch["tweets"]),
+        }
+
+        result["tweets"].extend(fetch["tweets"])
+        time.sleep(0.5)
+
+    dedup = {}
+    for tweet in result["tweets"]:
+        key = str(tweet.get("id") or tweet.get("url") or tweet.get("text"))
+        dedup[key] = tweet
+
+    result["tweets"] = list(dedup.values())
+    result["total_tweets"] = len(result["tweets"])
+
+    cashtags = sorted(
+        set(tag for tweet in result["tweets"] for tag in tweet.get("cashtags", []))
+    )
+    result["detected_cashtags"] = cashtags
+
+    json_path = OUTPUT_DIR / f"twitterapi_check_v3_{run_ts}.json"
+    md_path = OUTPUT_DIR / f"twitterapi_check_v3_{run_ts}.md"
+
+    json_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    lines = [
+        "# TwitterAPI.io Check v3",
+        "",
+        f"Generated UTC: {result['generated_utc']}",
+        f"Accounts checked: {len(accounts)}",
+        f"Total tweets collected: {result['total_tweets']}",
+        "",
+        "## Account status",
+    ]
+
+    for account, status in result["status_by_account"].items():
+        user_info = status.get("user_info", {})
+        attempt_summary = ", ".join(
+            [
+                f"{attempt['label']}={attempt['tweet_count_detected']}"
+                for attempt in status.get("attempts", [])
+            ]
+        )
+        lines.append(
+            f"- @{account}: userId={user_info.get('id')}, "
+            f"tweets={status.get('tweet_count_received')}, "
+            f"attempts: {attempt_summary}"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Detected cashtags",
+            ", ".join(cashtags) if cashtags else "No cashtags detected.",
+            "",
+            "## Tweets",
+        ]
+    )
+
+    for tweet in result["tweets"][:50]:
+        lines.append(
+            f"### @{tweet.get('author_userName')} | "
+            f"{tweet.get('createdAt')} | {tweet.get('endpoint_used')}"
+        )
+        if tweet.get("url"):
+            lines.append(str(tweet.get("url")))
+        lines.append(str(tweet.get("text") or "").replace("\n", " "))
+        lines.append("")
+
+    md_path.write_text("\n".join(lines), encoding="utf-8")
+
+    print(f"Saved {json_path}")
+    print(f"Saved {md_path}")
+    print(f"Total tweets collected: {result['total_tweets']}")
+
+    if result["total_tweets"] == 0:
+        print("No tweets found. Download the JSON artifact and inspect attempts.raw_sample.")
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
