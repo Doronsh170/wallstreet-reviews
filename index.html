@@ -198,11 +198,14 @@
             <div class="toolbar">
               <a class="link-button" href="https://github.com/Doronsh170/wallstreet-reviews/actions/workflows/check-twitterapi-io.yml" target="_blank" rel="noopener">סקירה חדשה</a>
               <button id="copyBtn">העתקת סקירה</button>
-              <button id="printBtn">הדפסה / PDF</button>
-              <button id="downloadBtn" class="primary">הורדת HTML</button>
+              <button id="summaryBtn" class="primary">קיצור ל-5 נקודות</button>
+              <button id="fullBtn" style="display:none">חזרה לסקירה מלאה</button>
+              <button id="whatsappBtn">שליחה בווטסאפ</button>
+              <button id="printBtn">שמירה ל-PDF</button>
+              <button id="downloadBtn">הורדת HTML</button>
             </div>
           </div>
-          <div id="statusBox" class="drop">האתר ינסה לטעון אוטומטית את הסקירה האחרונה מתוך output/latest.md. להרצה חדשה: לחץ “סקירה חדשה”, הפעל Run workflow בגיטהאב, וחזור לרענן כאן אחרי דקה.</div>
+          <div id="statusBox" class="drop">האתר ינסה לטעון אוטומטית את הסקירה האחרונה מתוך output/latest.md. לאחר טעינה ניתן לשמור ל-PDF, לשלוח בווטסאפ, או ליצור תקציר בן 5 נקודות.</div>
         </div>
 
         <article id="reader" class="card reader">
@@ -241,6 +244,9 @@
       downloadBtn: document.getElementById('downloadBtn'),
       refreshLatestBtn: document.getElementById('refreshLatestBtn'),
       statusBox: document.getElementById('statusBox'),
+      summaryBtn: document.getElementById('summaryBtn'),
+      fullBtn: document.getElementById('fullBtn'),
+      whatsappBtn: document.getElementById('whatsappBtn'),
     };
 
     function loadReviews() {
@@ -313,6 +319,69 @@
       return html;
     }
 
+
+
+    function cleanForSummary(line) {
+      return line
+        .replace(/^[-•]\s*/, '')
+        .replace(/[#*_`]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function shortenSentence(text, max = 210) {
+      if (text.length <= max) return text;
+      const cut = text.slice(0, max);
+      const lastStop = Math.max(cut.lastIndexOf('.'), cut.lastIndexOf('!'), cut.lastIndexOf('?'));
+      if (lastStop > 80) return cut.slice(0, lastStop + 1).trim();
+      const lastSpace = cut.lastIndexOf(' ');
+      return (lastSpace > 80 ? cut.slice(0, lastSpace) : cut).trim() + '…';
+    }
+
+    function buildFivePointSummary(md) {
+      const lines = md.split(/\r?\n/);
+      const bullets = [];
+      let inMainPoints = false;
+      for (const raw of lines) {
+        const line = raw.trim();
+        if (/^##\s+נקודות מרכזיות/.test(line)) { inMainPoints = true; continue; }
+        if (inMainPoints && /^##\s+/.test(line)) break;
+        if (inMainPoints && /^[-•]\s+/.test(line)) bullets.push(cleanForSummary(line));
+      }
+      if (!bullets.length) {
+        for (const raw of lines) {
+          const line = raw.trim();
+          if (/^[-•]\s+/.test(line) && !line.includes('גילוי נאות')) bullets.push(cleanForSummary(line));
+        }
+      }
+      const selected = bullets.slice(0, 5).map(b => '• ' + shortenSentence(b));
+      if (!selected.length) return '# תקציר ב-5 נקודות\n\nלא נמצאו נקודות מרכזיות לקיצור.';
+      return '# תקציר ב-5 נקודות\n\n' + selected.join('\n\n');
+    }
+
+    function showFivePointSummary() {
+      const active = reviews.find(r => r.id === activeId);
+      if (!active) return alert('אין סקירה פעילה לקיצור.');
+      const summary = buildFivePointSummary(active.md);
+      els.reader.innerHTML = markdownToHtml(summary);
+      els.fullBtn.style.display = 'inline-flex';
+      if (els.statusBox) els.statusBox.textContent = 'מוצג תקציר בן 5 נקודות. לחץ “חזרה לסקירה מלאה” להצגת הסקירה המקורית.';
+    }
+
+    function showFullReview() {
+      render();
+      if (els.fullBtn) els.fullBtn.style.display = 'none';
+    }
+
+    function shareWhatsApp() {
+      const active = reviews.find(r => r.id === activeId);
+      if (!active) return alert('אין סקירה פעילה לשליחה.');
+      let text = active.md;
+      if (text.length > 3500) text = text.slice(0, 3500).trim() + '\n\n...המשך הסקירה באתר';
+      const url = 'https://wa.me/?text=' + encodeURIComponent(text);
+      window.open(url, '_blank', 'noopener');
+    }
+
     function render() {
       const q = els.search.value.trim().toLowerCase();
       const filtered = reviews.filter(r => !q || `${r.title} ${r.filename} ${r.md}`.toLowerCase().includes(q));
@@ -325,6 +394,7 @@
       els.reviewList.querySelectorAll('.review-item').forEach(btn => btn.addEventListener('click', () => { activeId = btn.dataset.id; render(); }));
       const active = reviews.find(r => r.id === activeId);
       els.reader.innerHTML = active ? markdownToHtml(active.md) : '<div class="empty">בחר סקירה מהרשימה או טען קובץ Markdown.</div>';
+      if (els.fullBtn) els.fullBtn.style.display = 'none';
       els.countReviews.textContent = String(reviews.length);
       els.countTickers.textContent = String(new Set(reviews.flatMap(r => r.tickers)).size);
     }
@@ -354,6 +424,9 @@
       await navigator.clipboard.writeText(active.md);
       alert('הסקירה הועתקה.');
     });
+    els.summaryBtn.addEventListener('click', showFivePointSummary);
+    els.fullBtn.addEventListener('click', showFullReview);
+    els.whatsappBtn.addEventListener('click', shareWhatsApp);
     els.printBtn.addEventListener('click', () => window.print());
     els.downloadBtn.addEventListener('click', () => {
       const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
