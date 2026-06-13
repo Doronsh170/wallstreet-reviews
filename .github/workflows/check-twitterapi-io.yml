@@ -25,9 +25,12 @@ jobs:
 
       - name: Run TwitterAPI.io and OpenAI review
         env:
-          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: gpt-5.5
+          env:
+  TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  OPENAI_MODEL: gpt-5.5
+  MAX_TWEETS_FOR_REVIEW: 30
+  MAX_TWEETS_PER_ACCOUNT: 10
         run: |
           python scripts/check_x_api.py
 
