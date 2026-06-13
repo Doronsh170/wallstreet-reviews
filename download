@@ -1,0 +1,33 @@
+name: Check TwitterAPI.io v3
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check-twitterapi-io-v3:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run TwitterAPI.io v3 check
+        env:
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+        run: |
+          python scripts/check_x_api.py
+
+      - name: Upload output artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: twitterapi-io-v3-output
+          path: output/

@@ -1,1 +1,245 @@
-requests==2.32.3
+import os
+import re
+import json
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import requests
+
+BASE = "https://api.twitterapi.io"
+ACCOUNTS_FILE = Path("accounts.txt")
+OUTPUT_DIR = Path("output")
+OUTPUT_DIR.mkdir(exist_ok=True)
+
+API_KEY = os.environ.get("TWITTER_API_KEY", "").strip()
+if not API_KEY:
+    raise SystemExit("Missing GitHub secret: TWITTER_API_KEY")
+
+HEADERS = {"X-API-Key": API_KEY}
+TIMEOUT = 30
+
+CASHTAG_RE = re.compile(r"(?<![A-Za-z0-9_])\$[A-Z]{1,6}(?![A-Za-z0-9_])")
+
+def read_accounts() -> List[str]:
+    if not ACCOUNTS_FILE.exists():
+        raise SystemExit("accounts.txt not found")
+    out = []
+    for line in ACCOUNTS_FILE.read_text(encoding="utf-8").splitlines():
+        x = line.strip().lstrip("@")
+        if x and not x.startswith("#"):
+            out.append(x)
+    return out
+
+
+def get_json(path: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    url = f"{BASE}{path}"
+    r = requests.get(url, headers=HEADERS, params=params, timeout=TIMEOUT)
+    try:
+        payload = r.json()
+    except Exception:
+        payload = {"_raw_text": r.text[:1000]}
+    payload["_http_status"] = r.status_code
+    payload["_requested_url"] = r.url.replace(API_KEY, "***")
+    return payload
+
+
+def compact(obj: Any, max_chars: int = 2200) -> Any:
+    s = json.dumps(obj, ensure_ascii=False, default=str)
+    if len(s) <= max_chars:
+        return obj
+    return s[:max_chars] + "... [truncated]"
+
+
+def extract_user_info(payload: Dict[str, Any]) -> Dict[str, Any]:
+    data = payload.get("data") or {}
+    if isinstance(data, dict) and "data" in data and isinstance(data["data"], dict):
+        data = data["data"]
+    return {
+        "status": payload.get("status"),
+        "msg": payload.get("msg") or payload.get("message"),
+        "http_status": payload.get("_http_status"),
+        "id": data.get("id") if isinstance(data, dict) else None,
+        "userName": data.get("userName") if isinstance(data, dict) else None,
+        "name": data.get("name") if isinstance(data, dict) else None,
+        "followers": data.get("followers") if isinstance(data, dict) else None,
+        "statusesCount": data.get("statusesCount") if isinstance(data, dict) else None,
+        "raw_keys": sorted(list(payload.keys())),
+    }
+
+
+def looks_like_tweet(x: Any) -> bool:
+    return isinstance(x, dict) and isinstance(x.get("text"), str) and (x.get("id") or x.get("url") or x.get("createdAt"))
+
+
+def find_tweets(obj: Any) -> List[Dict[str, Any]]:
+    found: List[Dict[str, Any]] = []
+    if looks_like_tweet(obj):
+        found.append(obj)
+    elif isinstance(obj, list):
+        for item in obj:
+            found.extend(find_tweets(item))
+    elif isinstance(obj, dict):
+        # Prefer fields usually used for tweet arrays.
+        for key in ("tweets", "data", "items", "results"):
+            if key in obj:
+                found.extend(find_tweets(obj[key]))
+        # Also scan all other fields if nothing was found at standard keys.
+        if not found:
+            for v in obj.values():
+                found.extend(find_tweets(v))
+    # Deduplicate by id/url/text
+    dedup = {}
+    for t in found:
+        k = str(t.get("id") or t.get("url") or t.get("text"))
+        dedup[k] = t
+    return list(dedup.values())
+
+
+def normalize_tweet(t: Dict[str, Any], account: str, endpoint_used: str) -> Dict[str, Any]:
+    author = t.get("author") if isinstance(t.get("author"), dict) else {}
+    text = t.get("text", "")
+    return {
+        "account_requested": account,
+        "author_userName": author.get("userName") or account,
+        "id": t.get("id"),
+        "url": t.get("url"),
+        "createdAt": t.get("createdAt"),
+        "text": text,
+        "lang": t.get("lang"),
+        "likeCount": t.get("likeCount"),
+        "retweetCount": t.get("retweetCount"),
+        "replyCount": t.get("replyCount"),
+        "quoteCount": t.get("quoteCount"),
+        "viewCount": t.get("viewCount"),
+        "isReply": t.get("isReply"),
+        "endpoint_used": endpoint_used,
+        "cashtags": sorted(set(CASHTAG_RE.findall(text or ""))),
+    }
+
+
+def try_tweet_endpoints(account: str, user_id: Optional[str]) -> Dict[str, Any]:
+    attempts = []
+
+    endpoint_calls = []
+    # Official docs: last_tweets supports userName or userId. timeline supports userId.
+    endpoint_calls.append(("last_tweets_by_userName", "/twitter/user/last_tweets", {"userName": account, "cursor": "", "includeReplies": "false"}))
+    if user_id:
+        endpoint_calls.append(("last_tweets_by_userId", "/twitter/user/last_tweets", {"userId": user_id, "cursor": "", "includeReplies": "false"}))
+        endpoint_calls.append(("tweet_timeline_by_userId", "/twitter/user/tweet_timeline", {"userId": user_id, "cursor": "", "includeReplies": "false", "includeParentTweet": "false"}))
+    # Fallback: advanced search by author. Kept narrow to avoid high cost.
+    endpoint_calls.append(("advanced_search_from_user", "/twitter/tweet/advanced_search", {"query": f"from:{account}", "queryType": "Latest"}))
+
+    all_tweets: List[Dict[str, Any]] = []
+    for label, path, params in endpoint_calls:
+        payload = get_json(path, params)
+        tweets = find_tweets(payload)
+        attempts.append({
+            "label": label,
+            "path": path,
+            "params_used": {k: ("***" if k.lower().endswith("key") else v) for k, v in params.items()},
+            "http_status": payload.get("_http_status"),
+            "status": payload.get("status"),
+            "msg": payload.get("msg") or payload.get("message"),
+            "root_keys": sorted([k for k in payload.keys() if not k.startswith("_")]),
+            "has_next_page": payload.get("has_next_page") or (payload.get("data") or {}).get("has_next_page") if isinstance(payload.get("data"), dict) else payload.get("has_next_page"),
+            "next_cursor_present": bool(payload.get("next_cursor") or ((payload.get("data") or {}).get("next_cursor") if isinstance(payload.get("data"), dict) else None)),
+            "tweet_count_detected": len(tweets),
+            "raw_sample": compact(payload, 1800),
+        })
+        if tweets:
+            all_tweets.extend([normalize_tweet(t, account, label) for t in tweets])
+            # Enough for diagnostic, don't burn more endpoints after success.
+            break
+        time.sleep(0.4)
+
+    dedup = {}
+    for t in all_tweets:
+        k = str(t.get("id") or t.get("url") or t.get("text"))
+        dedup[k] = t
+
+    return {"attempts": attempts, "tweets": list(dedup.values())}
+
+
+def main():
+    accounts = read_accounts()
+    run_ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+
+    result = {
+        "generated_utc": datetime.now(timezone.utc).isoformat(),
+        "accounts": accounts,
+        "source_api": "twitterapi.io",
+        "endpoints_tested": [
+            "/twitter/user/info",
+            "/twitter/user/last_tweets",
+            "/twitter/user/tweet_timeline",
+            "/twitter/tweet/advanced_search",
+        ],
+        "total_tweets": 0,
+        "status_by_account": {},
+        "tweets": [],
+    }
+
+    for account in accounts:
+        print(f"Checking @{account}...")
+        info_payload = get_json("/twitter/user/info", {"userName": account})
+        user_info = extract_user_info(info_payload)
+        user_id = user_info.get("id")
+        fetch = try_tweet_endpoints(account, user_id)
+        result["status_by_account"][account] = {
+            "user_info": user_info,
+            "attempts": fetch["attempts"],
+            "tweet_count_received": len(fetch["tweets"]),
+        }
+        result["tweets"].extend(fetch["tweets"])
+        time.sleep(0.5)
+
+    # Deduplicate globally.
+    dedup = {}
+    for t in result["tweets"]:
+        k = str(t.get("id") or t.get("url") or t.get("text"))
+        dedup[k] = t
+    result["tweets"] = list(dedup.values())
+    result["total_tweets"] = len(result["tweets"])
+
+    cashtags = sorted(set(tag for t in result["tweets"] for tag in t.get("cashtags", [])))
+    result["detected_cashtags"] = cashtags
+
+    json_path = OUTPUT_DIR / f"twitterapi_check_v3_{run_ts}.json"
+    md_path = OUTPUT_DIR / f"twitterapi_check_v3_{run_ts}.md"
+    json_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    lines = []
+    lines.append("# TwitterAPI.io Check v3")
+    lines.append("")
+    lines.append(f"Generated UTC: {result['generated_utc']}")
+    lines.append(f"Accounts checked: {len(accounts)}")
+    lines.append(f"Total tweets collected: {result['total_tweets']}")
+    lines.append("")
+    lines.append("## Account status")
+    for account, st in result["status_by_account"].items():
+        ui = st.get("user_info", {})
+        attempt_summary = ", ".join([f"{a['label']}={a['tweet_count_detected']}" for a in st.get("attempts", [])])
+        lines.append(f"- @{account}: userId={ui.get('id')}, tweets={st.get('tweet_count_received')}, attempts: {attempt_summary}")
+    lines.append("")
+    lines.append("## Detected cashtags")
+    lines.append(", ".join(cashtags) if cashtags else "No cashtags detected.")
+    lines.append("")
+    lines.append("## Tweets")
+    for t in result["tweets"][:50]:
+        lines.append(f"### @{t.get('author_userName')} | {t.get('createdAt')} | {t.get('endpoint_used')}")
+        if t.get("url"):
+            lines.append(str(t.get("url")))
+        lines.append(str(t.get("text") or "").replace("\n", " "))
+        lines.append("")
+    md_path.write_text("\n".join(lines), encoding="utf-8")
+
+    print(f"Saved {json_path}")
+    print(f"Saved {md_path}")
+    print(f"Total tweets collected: {result['total_tweets']}")
+    if result["total_tweets"] == 0:
+        print("No tweets found. Download the JSON artifact and inspect 'attempts.raw_sample' for each account.")
+
+if __name__ == "__main__":
+    main()
