@@ -2,9 +2,7 @@ name: Check TwitterAPI.io
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
+
 
 jobs:
   check-twitterapi-io:
