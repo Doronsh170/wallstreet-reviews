@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>טעימת וול סטריט | מרכז סקירות</title>
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --panel: #ffffff;
+      --panel-2: #eef4fb;
+      --text: #111827;
+      --muted: #64748b;
+      --line: rgba(15,23,42,.12);
+      --accent: #0b66c3;
+      --accent-2: #0f8a6a;
+      --warn: #b7791f;
+      --danger: #b91c1c;
+      --shadow: 0 16px 45px rgba(15,23,42,.10);
+      --radius: 20px;
+      --content-width: 1180px;
+      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    }
+    [data-theme="dark"] {
+      --bg: #0b1220;
+      --panel: #111a2e;
+      --panel-2: #17223a;
+      --text: #e8edf7;
+      --muted: #98a6bd;
+      --line: rgba(255,255,255,.10);
+      --accent: #63b3ff;
+      --accent-2: #8fe3c1;
+      --warn: #ffd166;
+      --danger: #ff7b7b;
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background:
+        radial-gradient(circle at top left, rgba(11,102,195,.10), transparent 32%),
+        radial-gradient(circle at top right, rgba(15,138,106,.08), transparent 35%),
+        linear-gradient(180deg, #ffffff 0%, var(--bg) 240px);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    a { color: inherit; }
+    .app { max-width: var(--content-width); margin: 0 auto; padding: 28px 18px 64px; }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      margin-bottom: 22px;
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .logo {
+      width: 48px; height: 48px; border-radius: 16px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: grid; place-items: center; color: #07111f; font-weight: 900;
+      box-shadow: var(--shadow);
+    }
+    h1 { margin: 0; font-size: clamp(24px, 4vw, 38px); letter-spacing: -.03em; }
+    .subtitle { margin-top: 4px; color: var(--muted); font-size: 15px; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-start; }
+    button, .file-label, .link-button {
+      border: 1px solid var(--line); background: var(--panel); color: var(--text);
+      border-radius: 999px; padding: 10px 14px; cursor: pointer; font-weight: 650;
+      box-shadow: none; transition: .2s ease; font-family: inherit; font-size: 14px;
+      text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    button:hover, .file-label:hover, .link-button:hover { transform: translateY(-1px); border-color: rgba(11,102,195,.45); }
+    .primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #ffffff; border: 0; }
+    input[type="file"] { display: none; }
+    .grid { display: grid; grid-template-columns: 320px 1fr; gap: 18px; align-items: start; }
+    .card {
+      background: color-mix(in srgb, var(--panel) 94%, transparent);
+      border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+    }
+    .sidebar { position: sticky; top: 18px; padding: 16px; }
+    .search {
+      width: 100%; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px;
+      background: var(--panel-2); color: var(--text); outline: none; font-family: inherit;
+      margin-bottom: 14px; font-size: 15px;
+    }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .stat { background: var(--panel-2); border: 1px solid var(--line); border-radius: 16px; padding: 12px; }
+    .stat strong { display: block; font-size: 22px; }
+    .stat span { color: var(--muted); font-size: 12px; }
+    .review-list { display: flex; flex-direction: column; gap: 10px; max-height: 62vh; overflow: auto; padding-left: 4px; }
+    .review-item {
+      text-align: right; width: 100%; border-radius: 16px; padding: 12px; background: var(--panel-2);
+      border: 1px solid var(--line); cursor: pointer;
+    }
+    .review-item.active { outline: 2px solid color-mix(in srgb, var(--accent) 65%, transparent); }
+    .review-item .title { font-weight: 800; margin-bottom: 4px; line-height: 1.3; }
+    .review-item .meta { color: var(--muted); font-size: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .main { min-width: 0; }
+    .hero { padding: 18px; margin-bottom: 18px; }
+    .hero-row { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--panel-2);
+      color: var(--muted); border-radius: 999px; padding: 7px 10px; font-size: 13px; margin: 2px;
+    }
+    .drop {
+      margin-top: 14px; border: 1px dashed color-mix(in srgb, var(--accent) 45%, var(--line));
+      border-radius: 18px; padding: 18px; color: var(--muted); background: color-mix(in srgb, var(--panel-2) 72%, transparent);
+      text-align: center;
+    }
+    .reader { padding: 30px; line-height: 1.75; font-size: 17px; }
+    .reader h1 { font-size: 34px; margin: 0 0 18px; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
+    .reader h2 { margin: 34px 0 12px; font-size: 24px; color: color-mix(in srgb, var(--text) 92%, var(--accent)); }
+    .reader h3 { margin: 24px 0 8px; font-size: 20px; color: var(--accent-2); }
+    .reader p { margin: 0 0 13px; }
+    .reader ul { margin: 8px 0 16px; padding-right: 22px; }
+    .reader li { margin: 7px 0; }
+    .reader strong { color: var(--text); }
+    .reader code {
+      direction: ltr; display: inline-block; background: var(--panel-2); border: 1px solid var(--line);
+      border-radius: 8px; padding: 1px 6px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+    .empty { padding: 40px 28px; color: var(--muted); text-align: center; }
+    .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .footer-note { color: var(--muted); font-size: 12px; margin-top: 14px; line-height: 1.5; }
+    .github-panel {
+      margin-top: 14px; padding: 14px; border-radius: 16px; background: #f8fbff;
+      border: 1px solid var(--line); color: var(--muted); font-size: 13px; line-height: 1.55;
+    }
+    .github-panel .link-button { width: 100%; margin-top: 10px; color: #fff; }
+    .site-footer {
+      margin-top: 22px; padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--radius);
+      background: #ffffff; color: var(--muted); font-size: 13px; line-height: 1.7;
+      box-shadow: var(--shadow);
+    }
+    .site-footer strong { color: var(--text); }
+    .credit { margin-top: 12px; color: var(--text); font-weight: 800; text-align: center; }
+    @media (max-width: 880px) {
+      .grid { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+      .reader { padding: 20px; font-size: 16px; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+    }
+    @media print {
+      body { background: #fff; color: #111; }
+      .topbar, .sidebar, .hero, .actions { display: none !important; }
+      .app { padding: 0; max-width: none; }
+      .grid { display: block; }
+      .card, .reader { box-shadow: none; border: 0; padding: 0; }
+      .reader h1 { color: #111; }
+      .reader h2, .reader h3 { color: #111; }
+    }
+  </style>
+</head>
+<body data-theme="light">
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">WS</div>
+        <div>
+          <h1>טעימת וול סטריט</h1>
+          <div class="subtitle">מרכז צפייה מקצועי לסקירות לפי דרישה</div>
+        </div>
+      </div>
+      <div class="actions">
+        <a class="link-button primary" href="https://github.com/Doronsh170/wallstreet-reviews/actions/workflows/check-twitterapi-io.yml" target="_blank" rel="noopener">יצירת סקירה חדשה בגיטהאב</a>
+        <label class="file-label" for="fileInput">טעינת סקירות Markdown</label>
+        <input id="fileInput" type="file" accept=".md,.txt" multiple />
+        <button id="themeBtn">מצב כהה</button>
+        <button id="clearBtn">ניקוי סקירות מקומיות</button>
+      </div>
+    </header>
+
+    <section class="grid">
+      <aside class="card sidebar">
+        <input id="search" class="search" placeholder="חיפוש בסקירות, טיקרים או נושאים" />
+        <div class="stats">
+          <div class="stat"><strong id="countReviews">0</strong><span>סקירות</span></div>
+          <div class="stat"><strong id="countTickers">0</strong><span>טיקרים</span></div>
+        </div>
+        <div id="reviewList" class="review-list"></div>
+        <div class="github-panel">
+          <strong>יצירת סקירה חדשה</strong><br>
+          לחץ על הקישור לגיטהאב, הפעל <b>Run workflow</b>, הורד את ה־Artifact, ואז טען כאן את קובץ <b>wallstreet_review_*.md</b>.
+          <a class="link-button primary" href="https://github.com/Doronsh170/wallstreet-reviews/actions/workflows/check-twitterapi-io.yml" target="_blank" rel="noopener">פתיחת GitHub Actions</a>
+        </div>
+        <div class="footer-note">
+          הסקירות נשמרות מקומית בדפדפן בלבד, אלא אם העלית אותן בעצמך למקום אחר.
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="card hero">
+          <div class="hero-row">
+            <div>
+              <div class="badge">סקירות לפי דרישה</div>
+              <div class="badge">סקירה ממוקדת חברות, סקטורים ואירועים</div>
+              <div class="badge">מבוסס ציוצי X</div>
+            </div>
+            <div class="toolbar">
+              <a class="link-button" href="https://github.com/Doronsh170/wallstreet-reviews/actions/workflows/check-twitterapi-io.yml" target="_blank" rel="noopener">סקירה חדשה</a>
+              <button id="copyBtn">העתקת סקירה</button>
+              <button id="printBtn">הדפסה / PDF</button>
+              <button id="downloadBtn" class="primary">הורדת HTML</button>
+            </div>
+          </div>
+          <div id="dropZone" class="drop">גרור לכאן קבצי Markdown של סקירות, או לחץ על “טעינת סקירות Markdown”.</div>
+        </div>
+
+        <article id="reader" class="card reader">
+          <div class="empty">
+            עדיין לא נטענה סקירה. טען קובץ Markdown מתוך ה־Artifact של GitHub כדי לצפות בו כאן.
+          </div>
+        </article>
+      </main>
+    </section>
+
+    <footer class="site-footer">
+      <strong>גילוי נאות:</strong>
+      הסקירות באתר זה מיועדות למידע כללי, למעקב שוק ולשימוש מקצועי פנימי בלבד. הן מבוססות על מקורות X ונתונים שסופקו למערכת, ואינן מהוות ייעוץ השקעות, שיווק השקעות, המלצה לקנייה או מכירה של ניירות ערך, או תחליף לבדיקה עצמאית של נתונים, דיווחי חברה ומקורות רשמיים. ייתכנו טעויות, חוסרים, אי־דיוקים או מידע שלא אומת חיצונית.
+      <div class="credit">פותח ע&quot;י דורון שרייבמן</div>
+    </footer>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'ws_reviews_v1';
+    let reviews = loadReviews();
+    let activeId = reviews[0]?.id || null;
+
+    const els = {
+      fileInput: document.getElementById('fileInput'),
+      dropZone: document.getElementById('dropZone'),
+      reviewList: document.getElementById('reviewList'),
+      reader: document.getElementById('reader'),
+      search: document.getElementById('search'),
+      countReviews: document.getElementById('countReviews'),
+      countTickers: document.getElementById('countTickers'),
+      themeBtn: document.getElementById('themeBtn'),
+      clearBtn: document.getElementById('clearBtn'),
+      copyBtn: document.getElementById('copyBtn'),
+      printBtn: document.getElementById('printBtn'),
+      downloadBtn: document.getElementById('downloadBtn'),
+    };
+
+    function loadReviews() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+      catch { return []; }
+    }
+    function saveReviews() { localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews)); }
+
+    function extractTitle(md, filename) {
+      const h1 = md.match(/^#\s+(.+)$/m);
+      return h1 ? h1[1].trim() : filename.replace(/\.md$/i, '');
+    }
+    function extractTickers(md) {
+      return Array.from(new Set((md.match(/\$[A-Z]{1,6}\b/g) || []))).sort();
+    }
+    function extractDate(filename, md) {
+      const fromName = filename.match(/(20\d{6})[_-]?(\d{6})?/);
+      if (fromName) return fromName[1].replace(/(\d{4})(\d{2})(\d{2})/, '$3.$2.$1');
+      const gen = md.match(/Generated UTC:\s*([^\n]+)/i);
+      return gen ? gen[1].trim() : new Date().toLocaleDateString('he-IL');
+    }
+    function addReview(filename, md) {
+      const id = `${filename}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      const review = { id, filename, title: extractTitle(md, filename), date: extractDate(filename, md), tickers: extractTickers(md), md };
+      reviews = [review, ...reviews.filter(r => r.filename !== filename || r.md !== md)];
+      activeId = id;
+      saveReviews();
+      render();
+    }
+
+    function escapeHtml(s) {
+      return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+    }
+    function inlineMd(s) {
+      return escapeHtml(s)
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\$([A-Z]{1,6})\b/g, '<code>\$$1</code>');
+    }
+    function markdownToHtml(md) {
+      const lines = md.split(/\r?\n/);
+      let html = '';
+      let inList = false;
+      for (const raw of lines) {
+        const line = raw.trim();
+        if (!line) { if (inList) { html += '</ul>'; inList = false; } continue; }
+        if (line.startsWith('### ')) { if (inList) { html += '</ul>'; inList = false; } html += `<h3>${inlineMd(line.slice(4))}</h3>`; }
+        else if (line.startsWith('## ')) { if (inList) { html += '</ul>'; inList = false; } html += `<h2>${inlineMd(line.slice(3))}</h2>`; }
+        else if (line.startsWith('# ')) { if (inList) { html += '</ul>'; inList = false; } html += `<h1>${inlineMd(line.slice(2))}</h1>`; }
+        else if (line.startsWith('- ')) { if (!inList) { html += '<ul>'; inList = true; } html += `<li>${inlineMd(line.slice(2))}</li>`; }
+        else { if (inList) { html += '</ul>'; inList = false; } html += `<p>${inlineMd(line)}</p>`; }
+      }
+      if (inList) html += '</ul>';
+      return html;
+    }
+
+    function render() {
+      const q = els.search.value.trim().toLowerCase();
+      const filtered = reviews.filter(r => !q || `${r.title} ${r.filename} ${r.md}`.toLowerCase().includes(q));
+      els.reviewList.innerHTML = filtered.map(r => `
+        <button class="review-item ${r.id === activeId ? 'active' : ''}" data-id="${r.id}">
+          <div class="title">${escapeHtml(r.title)}</div>
+          <div class="meta"><span>${escapeHtml(r.date)}</span><span>${r.tickers.slice(0,4).join(' ')}</span></div>
+        </button>
+      `).join('') || '<div class="empty">אין סקירות להצגה.</div>';
+      els.reviewList.querySelectorAll('.review-item').forEach(btn => btn.addEventListener('click', () => { activeId = btn.dataset.id; render(); }));
+      const active = reviews.find(r => r.id === activeId);
+      els.reader.innerHTML = active ? markdownToHtml(active.md) : '<div class="empty">בחר סקירה מהרשימה או טען קובץ Markdown.</div>';
+      els.countReviews.textContent = String(reviews.length);
+      els.countTickers.textContent = String(new Set(reviews.flatMap(r => r.tickers)).size);
+    }
+
+    async function handleFiles(files) {
+      for (const file of files) {
+        const text = await file.text();
+        addReview(file.name, text);
+      }
+    }
+
+    els.fileInput.addEventListener('change', e => handleFiles(e.target.files));
+    els.dropZone.addEventListener('dragover', e => { e.preventDefault(); els.dropZone.style.borderColor = 'var(--accent)'; });
+    els.dropZone.addEventListener('dragleave', () => { els.dropZone.style.borderColor = ''; });
+    els.dropZone.addEventListener('drop', e => { e.preventDefault(); els.dropZone.style.borderColor = ''; handleFiles(e.dataTransfer.files); });
+    els.search.addEventListener('input', render);
+    els.themeBtn.addEventListener('click', () => {
+      const body = document.body;
+      const next = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      body.setAttribute('data-theme', next);
+      els.themeBtn.textContent = next === 'dark' ? 'מצב בהיר' : 'מצב כהה';
+    });
+    els.clearBtn.addEventListener('click', () => {
+      if (confirm('למחוק את הסקירות שנשמרו בדפדפן?')) { reviews = []; activeId = null; saveReviews(); render(); }
+    });
+    els.copyBtn.addEventListener('click', async () => {
+      const active = reviews.find(r => r.id === activeId);
+      if (!active) return alert('אין סקירה פעילה להעתקה.');
+      await navigator.clipboard.writeText(active.md);
+      alert('הסקירה הועתקה.');
+    });
+    els.printBtn.addEventListener('click', () => window.print());
+    els.downloadBtn.addEventListener('click', () => {
+      const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'wallstreet_reviews_viewer.html';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    render();
+  </script>
+</body>
+</html>
