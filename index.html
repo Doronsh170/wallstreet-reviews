@@ -9,8 +9,8 @@
       --bg:#f4f6f8;--paper:#fff;--ink:#111827;--muted:#667085;--line:#d8dee8;
       --brand:#073b4c;--brand2:#0b556b;--accent:#0f766e;--gold:#a17a25;--soft:#eef6f7;
     }
-    *{box-sizing:border-box;font-family:Arial, Helvetica, sans-serif!important}
-    body{margin:0;background:var(--bg);color:var(--ink);font-size:18px;line-height:1.8;font-weight:500;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+    *{box-sizing:border-box;font-family:'Segoe UI', Arial, 'Noto Sans Hebrew', Helvetica, sans-serif!important}
+    body{margin:0;background:var(--bg);color:var(--ink);font-size:16.5px;line-height:1.72;font-weight:400;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
     html,body,.wrap,.paper,#screen,.review,.preview,.headline,.toolbar,.footer{direction:rtl;text-align:right;unicode-bidi:plaintext}
     .review *,.preview *,.headline *{direction:rtl;text-align:right;unicode-bidi:plaintext}
     .top{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:18px 16px 14px;border-bottom:4px solid #19a7a5}
@@ -22,16 +22,16 @@
     .tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
     .paper{background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 22px rgba(15,23,42,.06);padding:22px;margin-bottom:18px}
     .headline{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:14px}
-    .headline h1{font-size:26px;line-height:1.28;margin:0;color:#0b2e3b;font-weight:800}.meta{font-size:14px;color:var(--muted);white-space:nowrap;margin-top:4px}.subtle{color:var(--muted);font-size:15px;margin:6px 0 0}.status{color:var(--muted);font-size:14px;margin:4px 0 12px}
+    .headline h1{font-size:25px;line-height:1.3;margin:0;color:#0b2e3b;font-weight:750}.meta{font-size:14px;color:var(--muted);white-space:nowrap;margin-top:4px}.subtle{color:var(--muted);font-size:15px;margin:6px 0 0}.status{color:var(--muted);font-size:14px;margin:4px 0 12px}
     .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0;border-top:1px solid var(--line);padding-top:14px}
     button,.action{border:1px solid var(--line);background:#fff;color:#14212f;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;font-size:15px}
     button.primary,.action.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
     input{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;min-width:220px}
-    .review h1{font-size:25px;margin:0 0 8px;color:#0b2e3b;font-weight:800;text-align:right}.review h2{font-size:21px;border-top:1px solid var(--line);padding-top:16px;margin:24px 0 14px;color:#0b2e3b;font-weight:800;text-align:right}.review h3{font-size:19px;margin:18px 0 6px;color:#0b2e3b;font-weight:800;line-height:1.45;text-align:right}.review p{margin:0 0 16px;font-size:18px;line-height:1.9;color:#111827;font-weight:500;text-align:right}.review ul,.preview ul{margin:0 0 16px;padding:0 24px 0 0;text-align:right}.review li,.preview li{margin:0 0 12px;font-size:18px;line-height:1.85;color:#111827;text-align:right}.review strong,.preview strong{font-weight:inherit;color:inherit}.review .ticker,.preview .ticker{color:inherit;font-weight:inherit;opacity:1;background:none}.empty{padding:26px;text-align:center;color:var(--muted)}
-    details.section{border:1px solid var(--line);border-radius:14px;margin:14px 0;background:#fff;overflow:hidden}details.section summary{cursor:pointer;padding:15px 17px;font-weight:800;color:#0b2e3b;background:#f9fbfc;font-size:19px}details.section .section-content{padding:17px}
-    .preview-title{font-size:23px;margin:0 0 14px;color:#0b2e3b;font-weight:800}.read-more{margin-top:12px}.footer{font-size:12px;text-align:center;color:#667085;margin:20px 0 8px}.disclaimer{border-top:1px solid var(--line);padding-top:12px;margin-top:16px;color:#4b5563;font-size:13px;text-align:center}
-    @media(max-width:720px){body{font-size:18px;line-height:1.85}.top-inner{display:block}.brand h1{font-size:23px}.wrap{padding:12px}.headline{display:block}.headline h1{font-size:23px}.meta{white-space:normal}.toolbar{display:grid;grid-template-columns:1fr 1fr}.toolbar input{grid-column:1/-1;width:100%;min-width:0}.paper{padding:16px;border-radius:14px}.review h1{font-size:23px}.review h2{font-size:20px}.review h3{font-size:19px}.review p,.review li,.preview li{font-size:18px;line-height:1.9}.hide-mobile{display:none!important}}
-    @media print{.top,.tabs,.toolbar,.status,.read-more{display:none!important}body{background:#fff}.wrap{max-width:none;padding:0}.paper{box-shadow:none;border:none}.footer{display:block}}
+    .review h1{font-size:24px;margin:0 0 8px;color:#0b2e3b;font-weight:750;text-align:right}.review h2{font-size:19px;border-top:1px solid var(--line);padding-top:14px;margin:22px 0 12px;color:#0b2e3b;font-weight:750;text-align:right}.review h3{font-size:17.5px;margin:16px 0 5px;color:#0b2e3b;font-weight:700;line-height:1.42;text-align:right}.review p{margin:0 0 14px;font-size:16.5px;line-height:1.75;color:#1f2937;font-weight:400;text-align:right}.review ul,.preview ul{margin:0 0 14px;padding:0 24px 0 0;text-align:right}.review li,.preview li{margin:0 0 10px;font-size:16.5px;line-height:1.7;color:#1f2937;text-align:right}.review strong,.preview strong{font-weight:inherit;color:inherit}.review .ticker,.preview .ticker{color:inherit;font-weight:inherit;opacity:1;background:none}.empty{padding:26px;text-align:center;color:var(--muted)}
+    details.section{border:1px solid var(--line);border-radius:14px;margin:14px 0;background:#fff;overflow:hidden}details.section summary{cursor:pointer;padding:14px 16px;font-weight:750;color:#0b2e3b;background:#f9fbfc;font-size:18px}details.section .section-content{padding:17px}
+    .preview-title{font-size:22px;margin:0 0 14px;color:#0b2e3b;font-weight:750}.read-more{margin-top:12px}.footer{font-size:12px;text-align:center;color:#667085;margin:20px 0 8px}.disclaimer{border-top:1px solid var(--line);padding-top:12px;margin-top:16px;color:#4b5563;font-size:13px;text-align:center}
+    @media(max-width:720px){body{font-size:16.5px;line-height:1.72}.top-inner{display:block}.brand h1{font-size:23px}.wrap{padding:12px}.headline{display:block}.headline h1{font-size:23px}.meta{white-space:normal}.toolbar{display:grid;grid-template-columns:1fr 1fr}.toolbar input{grid-column:1/-1;width:100%;min-width:0}.paper{padding:16px;border-radius:14px}.review h1{font-size:22px}.review h2{font-size:19px}.review h3{font-size:17.5px}.review p,.review li,.preview li{font-size:16.5px;line-height:1.75}.hide-mobile{display:none!important}}
+    @media print{.top,.tabs,.toolbar,.status,.read-more{display:none!important}body{background:#fff;font-size:15.5px;line-height:1.65}.wrap{max-width:none;padding:0}.paper{box-shadow:none;border:none}.review p,.review li{font-size:15.5px;line-height:1.65}.review h2{font-size:18px}.review h3{font-size:16.5px}.footer{display:block}}
   </style>
 </head>
 <body>
@@ -58,7 +58,7 @@ const CHANNELS={
   trump:{label:'טראמפ',path:'output/trump/latest.md',json:'output/trump/latest.json'}
 };
 const ACTIONS_URL='https://github.com/Doronsh170/wallstreet-reviews/actions/workflows/check-twitterapi-io.yml';
-let active='wallstreet', raw='', rendered='', meta={}, currentMode='preview';
+let active='wallstreet', raw='', rendered='', meta={}, structured=null, currentMode='preview';
 const rtlMark='\u200F';
 function esc(s){return (s||'').replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))}
 function stripBidi(s){return (s||'').replace(/[\u200E\u200F\u202A-\u202E\u2066-\u2069\u200B-\u200D\uFEFF\u00AD]/g,'').replace(/\u00A0/g,' ')}
@@ -67,6 +67,55 @@ function cleanDisplayText(s){return cleanPointText(s).replace(/^#{1,6}\s*/,'').r
 function stripFooter(md){return (md||'').replace(/⚠️?\s*גילוי נאות:[\s\S]*$/m,'').replace(/פותח ע["׳']?י דורון שרייבמן/g,'').trim()}
 function normalize(md){return stripFooter(md).replace(/\r/g,'').replace(/\n{3,}/g,'\n\n').trim()}
 function inline(s){return esc(cleanDisplayText(s)).replace(/\$[A-Z]{1,6}/g,m=>`<span class="ticker">${m}</span>`)}
+function cleanStructuredText(s){
+  return cleanPointText(s||'')
+    .replace(/^#{1,6}\s*/,'')
+    .replace(/#{1,6}/g,'')
+    .replace(/\*\*/g,'')
+    .replace(/^נקודה\s*\d+\s*[:.：־\-–—]?\s*/i,'')
+    .replace(/--+/g,',')
+    .replace(/[–—]/g,',')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function hasStructured(){return structured && typeof structured==='object' && structured.intro && Array.isArray(structured.main)}
+function structuredTitle(){return cleanStructuredText(structured?.title || CHANNELS[active].label)}
+function structuredSubtitle(){return cleanStructuredText(structured?.subtitle || CHANNELS[active].label)}
+function structuredPoints(limit=5){
+  if(!hasStructured()) return [];
+  let pts=Array.isArray(structured.summary_points)?structured.summary_points.map(cleanStructuredText).filter(Boolean):[];
+  if(!pts.length){
+    pts=[];
+    if(structured.intro) pts.push(cleanStructuredText(structured.intro));
+    [...(structured.main||[]),...(structured.background||[])].forEach(x=>{
+      const h=cleanStructuredText(x.heading), b=cleanStructuredText(x.body);
+      if(h&&b) pts.push(`${h}: ${b}`);
+    });
+  }
+  return pts.map(x=>cleanStructuredText(x).replace(/\.$/,'')).filter(Boolean).slice(0,limit);
+}
+function renderStructuredSections(){
+  if(!hasStructured()) return '';
+  let html='';
+  const p=(x)=>`<p>${inline(cleanStructuredText(x))}</p>`;
+  const h2=(x)=>`<h2>${inline(cleanStructuredText(x))}</h2>`;
+  const h3=(x)=>`<h3>${inline(cleanStructuredText(x))}</h3>`;
+  if(structured.intro) html+=p(structured.intro);
+  if(structured.main && structured.main.length){
+    html+=h2(structured.main_title||'במרכז הפתיחה');
+    structured.main.forEach(item=>{ if(item.heading) html+=h3(item.heading); if(item.body) html+=p(item.body); });
+  }
+  if(structured.background && structured.background.length){
+    html+=h2(structured.background_title||'ברקע');
+    structured.background.forEach(item=>{ if(item.heading) html+=h3(item.heading); if(item.body) html+=p(item.body); });
+  }
+  if(structured.forward && structured.forward.length && cleanStructuredText(structured.forward_title)){
+    html+=h2(structured.forward_title);
+    structured.forward.forEach(item=>{ if(item.heading) html+=h3(item.heading); if(item.body) html+=p(item.body); });
+  }
+  if(structured.bottom_line){ html+=h2('שורה תחתונה'); html+=p(structured.bottom_line); }
+  return html;
+}
 function formatCreated(){
   const iso=meta.generated_israel || meta.generated_utc || '';
   if(!iso) return '';
@@ -77,6 +126,7 @@ function formatCreated(){
   }catch(e){return iso.slice(0,16).replace('T',' ')}
 }
 function extractTitle(md){
+  if(hasStructured()) return structuredTitle();
   const lines=normalize(md).split('\n').map(x=>x.trim()).filter(Boolean);
   const h=lines.find(x=>x.startsWith('# '));
   if(h) return h.replace(/^#\s+/,'');
@@ -177,6 +227,7 @@ function getBulletTexts(){
   return items.map(cleanPointText).filter(Boolean);
 }
 function summaryPoints(limit=5){
+  if(hasStructured()) return structuredPoints(limit);
   return getBulletTexts().slice(0,limit).map(x=>cleanPointText(x).replace(/\.$/,'')).filter(Boolean);
 }
 function fivePoints(limit=5){
@@ -188,7 +239,7 @@ function renderHeader(title){
   const created=formatCreated();
   const createdHtml=created?`<div class="meta">נוצרה: ${created}</div>`:'';
   document.getElementById('updatedTop').textContent=created?`נוצרה: ${created}`:'';
-  return `<div class="headline"><div><h1>${inline(title)}</h1><p class="subtle">${CHANNELS[active].label}</p></div>${createdHtml}</div>`;
+  return `<div class="headline"><div><h1>${inline(title)}</h1><p class="subtle">${hasStructured()?structuredSubtitle():CHANNELS[active].label}</p></div>${createdHtml}</div>`;
 }
 function renderPreview(){
   currentMode='preview';
@@ -200,7 +251,7 @@ function renderPreview(){
 function renderFull(){
   currentMode='full';
   const title=extractTitle(raw);
-  rendered=mdToHtml(raw);
+  rendered=hasStructured()?renderStructuredSections():mdToHtml(raw);
   document.getElementById('screen').innerHTML=`${renderHeader(title)}<section class="review" dir="rtl">${rendered}</section>${toolbarHtml()}`;
   applyMobileSections();
 }
@@ -220,11 +271,12 @@ async function fetchJson(paths){
 async function load(){
   const cfg=CHANNELS[active]; document.getElementById('status').textContent='טוען סקירה...'; meta={};
   meta=await fetchJson([cfg.json,cfg.fallbackJson]);
+  structured = meta && meta.structured_review ? meta.structured_review : null;
   for(const p of [cfg.path,cfg.fallback].filter(Boolean)){
     try{const r=await fetch(p+'?v='+Date.now()); if(r.ok){const t=await r.text(); raw=normalize(t); document.getElementById('status').textContent='הסקירה נטענה'; renderPreview(); return}}
     catch(e){}
   }
-  raw=''; document.getElementById('updatedTop').textContent=''; document.getElementById('screen').innerHTML=`<div class="empty">הסקירה עדיין לא הוגדרה או לא נוצרה. יש להריץ Workflow ולבחור review_type: <b>${active}</b>.</div>`; document.getElementById('status').textContent='אין סקירה זמינה לערוץ זה';
+  raw=''; structured=null; document.getElementById('updatedTop').textContent=''; document.getElementById('screen').innerHTML=`<div class="empty">הסקירה עדיין לא הוגדרה או לא נוצרה. יש להריץ Workflow ולבחור review_type: <b>${active}</b>.</div>`; document.getElementById('status').textContent='אין סקירה זמינה לערוץ זה';
 }
 function setActive(k){active=k; document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.k===k)); load()}
 function buildTabs(){const t=document.getElementById('tabs'); t.innerHTML=''; Object.entries(CHANNELS).forEach(([k,v])=>{const b=document.createElement('button'); b.className='tab'; b.dataset.k=k; b.textContent=v.label; b.onclick=()=>setActive(k); t.appendChild(b)}); setActive(active)}
