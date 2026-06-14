@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-06-14T15:12:30.981061+00:00",
-  "generated_israel": "2026-06-14T18:12:30.981075+03:00",
+  "generated_utc": "2026-06-14T15:43:52.513245+00:00",
+  "generated_israel": "2026-06-14T18:43:52.513261+03:00",
   "model": "gpt-5.5",
   "total_raw_tweets": 20,
   "selected_tweets": [
@@ -11,9 +11,9 @@
       "url": "https://x.com/gurgavin/status/2065885822327435266",
       "createdAt": "Sat Jun 13 19:55:37 +0000 2026",
       "text": "MOST PEOPLE HAVE NO IDEA HOW GOOD OF AN INVESTOR GOOGLE IS  6% OF SPACEX 14% OF ANTHROPIC 75% OF WAYMO  $900M INTO SPACEX IN 2015 →   NOW WORTH $115B   $13B INTO ANTHROPIC → NOW WORTH $140B  WAYMO JUST RAISED $16B AT A $126B VALUATION → GOOGLE’S STAKE WORTH ~$95B.  THOSE THREE BETS ALONE ARE WORTH OVER $350B AND THEY HAVE 100’S MORE SMALLER ONES $GOOGL",
-      "likeCount": 4970,
-      "retweetCount": 326,
-      "viewCount": 581761,
+      "likeCount": 5038,
+      "retweetCount": 330,
+      "viewCount": 591193,
       "cashtags": [
         "$GOOGL"
       ],
@@ -28,7 +28,7 @@
       "text": "SpaceX $SPCX just became a $2T+ public company and the 6th largest company in the world on day one of trading.  Now there is already a 2x daily leveraged ETF coming under $SPCH  Wild times for sure. https://t.co/iJNlFXjhuL",
       "likeCount": 79,
       "retweetCount": 11,
-      "viewCount": 21101,
+      "viewCount": 21144,
       "cashtags": [
         "$SPCH",
         "$SPCX"
@@ -42,22 +42,9 @@
       "url": "https://x.com/KobeissiLetter/status/2066157707569025137",
       "createdAt": "Sun Jun 14 13:55:59 +0000 2026",
       "text": "BREAKING: A diplomat involved in US-Iran peace talks says Israeli strikes on Beirut, Lebanon, today have created issues with finalizing a deal, per Fox News.  The diplomat says the strikes are an attempt to \"sabotage President Trump's deal and drag the US back into war.\"   Yesterday, President Trump said a peace deal was scheduled to be signed today.",
-      "likeCount": 3406,
-      "retweetCount": 473,
-      "viewCount": 348470,
-      "cashtags": [],
-      "is_retweet": false
-    },
-    {
-      "account": "KobeissiLetter",
-      "author": "KobeissiLetter",
-      "id": "2066154120998781391",
-      "url": "https://x.com/KobeissiLetter/status/2066154120998781391",
-      "createdAt": "Sun Jun 14 13:41:44 +0000 2026",
-      "text": "BREAKING: Iran's Speaker of the Parliament Ghalibaf responds after Israel attacks Beirut, Lebanon, on the same day President Trump said a peace deal was coming.  He says the Israeli attacks have \"shown that America either lacks the will to fulfill its commitments or the ability to do so.\"  \"By giving the green light to the regime, you cannot gain concessions. The game of bad cop and good cop is outdated. If you lack the will and ability to fulfill your commitments, speaking of continuing the path is not possible,\" Ghalibaf says.  The Iran Deal appears to be at risk again.",
-      "likeCount": 2569,
-      "retweetCount": 358,
-      "viewCount": 231104,
+      "likeCount": 4557,
+      "retweetCount": 613,
+      "viewCount": 501741,
       "cashtags": [],
       "is_retweet": false
     },
@@ -70,7 +57,7 @@
       "text": "BREAKING: THE US GOVERNMENT JUST SLAPPED EXPORT CONTROLS ON ANTHROPIC’S NEWEST AI MODELS FOR BEING TOO POWERFUL   NO FOREIGN GOVERNMENT, COMPANY, OR INDIVIDUAL ANYWHERE ON EARTH CAN ACCESS MYTHOS 5 OR FABLE 5  AI IS NOW OFFICIALLY BEING TREATED LIKE A WEAPON 🇺🇸",
       "likeCount": 2143,
       "retweetCount": 171,
-      "viewCount": 194298,
+      "viewCount": 194390,
       "cashtags": [],
       "is_retweet": false
     },
@@ -81,11 +68,26 @@
       "url": "https://x.com/StockMKTNewz/status/2066171778959876213",
       "createdAt": "Sun Jun 14 14:51:54 +0000 2026",
       "text": "Predict what price SpaceX $SPCX stock closes trading at this upcoming week https://t.co/MmebJY0Rie",
-      "likeCount": 61,
-      "retweetCount": 3,
-      "viewCount": 6056,
+      "likeCount": 141,
+      "retweetCount": 7,
+      "viewCount": 13487,
       "cashtags": [
         "$SPCX"
+      ],
+      "is_retweet": false
+    },
+    {
+      "account": "StockMKTNewz",
+      "author": "StockMKTNewz",
+      "id": "2066183109695934872",
+      "url": "https://x.com/StockMKTNewz/status/2066183109695934872",
+      "createdAt": "Sun Jun 14 15:36:55 +0000 2026",
+      "text": "\"Apple’s $AAPL new Siri AI is just good enough to pull it out of its AI crisis.\" - Bloomberg's @markgurman after getting to use Apple's new AI features",
+      "likeCount": 18,
+      "retweetCount": 0,
+      "viewCount": 2246,
+      "cashtags": [
+        "$AAPL"
       ],
       "is_retweet": false
     },
@@ -98,7 +100,7 @@
       "text": "📢 𝐉𝐔𝐒𝐓 𝐈𝐍: FAA Close to Picking Asi Over $PLTR Palantir, Thales for Its AI-Powered Air Traffic Management System- Air Current",
       "likeCount": 18,
       "retweetCount": 2,
-      "viewCount": 5607,
+      "viewCount": 5712,
       "cashtags": [
         "$PLTR"
       ],
@@ -113,7 +115,7 @@
       "text": "SPACEX $SPCX OPENS AT $150, IPO AT $135 https://t.co/8Ld9Br1oBT",
       "likeCount": 63,
       "retweetCount": 6,
-      "viewCount": 16626,
+      "viewCount": 16658,
       "cashtags": [
         "$SPCX"
       ],
@@ -128,10 +130,23 @@
       "text": "👀  $SPCX currently indicating $175 opening price, per CNBC.",
       "likeCount": 84,
       "retweetCount": 10,
-      "viewCount": 26504,
+      "viewCount": 26518,
       "cashtags": [
         "$SPCX"
       ],
+      "is_retweet": false
+    },
+    {
+      "account": "KobeissiLetter",
+      "author": "KobeissiLetter",
+      "id": "2066172422445740423",
+      "url": "https://x.com/KobeissiLetter/status/2066172422445740423",
+      "createdAt": "Sun Jun 14 14:54:27 +0000 2026",
+      "text": "BREAKING: President Trump issues a statement on Israel's attack on Beirut this morning. https://t.co/UyKtkOK9J1",
+      "likeCount": 2576,
+      "retweetCount": 276,
+      "viewCount": 172363,
+      "cashtags": [],
       "is_retweet": false
     },
     {
@@ -141,30 +156,10 @@
       "url": "https://x.com/KobeissiLetter/status/2066163966850552051",
       "createdAt": "Sun Jun 14 14:20:51 +0000 2026",
       "text": "Anthropic is in its own league.  Just days after the launch of Anthropic's Claude Fable 5, the company suspended access to the model after US authorities raised \"security concerns.\"  Anthropic said it was ordered to \"suspend foreign nationals\" from using Claude Fable 5, and self-described the model as \"too powerful.\"  \"The net effect of this order is that we must abruptly disable Fable 5 and Mythos 5 for all our customers to ensure compliance,\" Anthropic said.  In other words, Anthropic's latest AI model is so powerful, that the company and US government are now questioning who should even have access to it.  Less than 4 years ago, ChatGPT did not exist. Today, AI is arguably the most powerful technology ever created.  Truly incredible.",
-      "likeCount": 1845,
-      "retweetCount": 123,
-      "viewCount": 146847,
+      "likeCount": 2350,
+      "retweetCount": 157,
+      "viewCount": 207066,
       "cashtags": [],
-      "is_retweet": false
-    },
-    {
-      "account": "StockMKTNewz",
-      "author": "StockMKTNewz",
-      "id": "2066142478453870901",
-      "url": "https://x.com/StockMKTNewz/status/2066142478453870901",
-      "createdAt": "Sun Jun 14 12:55:28 +0000 2026",
-      "text": "Here are the best and worst performing S&amp;P 500 stocks over this past week  Best:  🥇 KLA Corp $KLAC: +32% 🥈 Sandisk $SNDK: +27% 🥉 Intel $INTC: +26%  Worst:  💩 Super Micro $SMCI: -27% Adobe $ADBE: -19% $PTC: -17% https://t.co/SWujXBNhIG",
-      "likeCount": 70,
-      "retweetCount": 11,
-      "viewCount": 23393,
-      "cashtags": [
-        "$ADBE",
-        "$INTC",
-        "$KLAC",
-        "$PTC",
-        "$SMCI",
-        "$SNDK"
-      ],
       "is_retweet": false
     },
     {
@@ -174,9 +169,9 @@
       "url": "https://x.com/AIStockSavvy/status/2066171672139350111",
       "createdAt": "Sun Jun 14 14:51:28 +0000 2026",
       "text": "Trump: Israeli Strike on Beirut Should Not Have Happened, Especially on a Special Day Close to Reaching a Peace Agreement - $QQQ $SPY $USO",
-      "likeCount": 10,
+      "likeCount": 13,
       "retweetCount": 1,
-      "viewCount": 931,
+      "viewCount": 1632,
       "cashtags": [
         "$QQQ",
         "$SPY",
@@ -186,15 +181,10 @@
     }
   ],
   "detected_cashtags": [
-    "$ADBE",
+    "$AAPL",
     "$GOOGL",
-    "$INTC",
-    "$KLAC",
     "$PLTR",
-    "$PTC",
     "$QQQ",
-    "$SMCI",
-    "$SNDK",
     "$SPCH",
     "$SPCX",
     "$SPY",
@@ -205,11 +195,11 @@
     "SPCX",
     "GOOGL",
     "SPCH",
+    "AAPL",
     "PLTR",
-    "ADBE",
-    "INTC",
-    "KLAC",
-    "PTC"
+    "QQQ",
+    "SPY",
+    "USO"
   ],
   "finnhub_context": {
     "enabled": true,
@@ -256,6 +246,27 @@
           }
         ]
       },
+      "AAPL": {
+        "quote": {
+          "price": 291.15,
+          "change_pct": -1.5154,
+          "previous_close": 295.63
+        },
+        "news": [
+          {
+            "headline": "Given the News Out of WWDC, Was Warren Buffett Right to Sell Apple Stock?",
+            "source": "Yahoo"
+          },
+          {
+            "headline": "Goldman Sachs resets Apple stock forecast after WWDC",
+            "source": "Yahoo"
+          },
+          {
+            "headline": "Meet the Spectacular Vanguard ETF That Could Buy SpaceX Stock as Soon as June 19",
+            "source": "Yahoo"
+          }
+        ]
+      },
       "PLTR": {
         "quote": {
           "price": 128.01,
@@ -277,87 +288,66 @@
           }
         ]
       },
-      "ADBE": {
+      "QQQ": {
         "quote": {
-          "price": 204.04,
-          "change_pct": -6.7459,
-          "previous_close": 218.8
+          "price": 721.36,
+          "change_pct": 0.5913,
+          "previous_close": 717.12
         },
         "news": [
           {
-            "headline": "Is Adobe (ADBE) One of the Best Bargain Stocks to Buy in June?",
-            "source": "Yahoo"
+            "headline": "The Fed May Have A Hawkish Surprise For Markets This Week",
+            "source": "SeekingAlpha"
           },
           {
-            "headline": "5 big analyst AI moves: Double-upgrade for Intel; SpaceX gets Buy call after IPO",
-            "source": "Yahoo"
+            "headline": "FOMC Chair Warsh Won't Cut Rates Soon, A More Hawkish Fed Looms",
+            "source": "SeekingAlpha"
           },
           {
-            "headline": "Adobe's CFO Jumps Ship To Marvell For 'Once-In-A-Generation' AI Expansion",
-            "source": "Yahoo"
-          }
-        ]
-      },
-      "INTC": {
-        "quote": {
-          "price": 124.59,
-          "change_pct": 6.5236,
-          "previous_close": 116.96
-        },
-        "news": [
-          {
-            "headline": "Insiders Of Intel Retain US$6.5m Of Investment Selling At Higher Prices",
-            "source": "Yahoo"
-          },
-          {
-            "headline": "Better Stock to Buy Now: Amazon vs. Microsoft",
-            "source": "Yahoo"
-          },
-          {
-            "headline": "Nvidia Taps Veteran Lobbyist To Help Navigate Washington's China Chip Curbs",
-            "source": "Yahoo"
-          }
-        ]
-      },
-      "KLAC": {
-        "quote": {
-          "price": 254.56,
-          "change_pct": 5.5547,
-          "previous_close": 241.164
-        },
-        "news": [
-          {
-            "headline": "KLA (KLAC) Stock After Split And Strong AI Outlook Is The Valuation Still Attractive",
-            "source": "Yahoo"
-          },
-          {
-            "headline": "KLA Corp (NASDAQ:KLAC): A Prime Candidate for the Affordable Growth Screen",
-            "source": "ChartMill"
-          },
-          {
-            "headline": "What Moved Markets This Week",
+            "headline": "May Inflation Print: Why The 4.2% Headline Is An Oil Story",
             "source": "SeekingAlpha"
           }
         ]
       },
-      "PTC": {
+      "SPY": {
         "quote": {
-          "price": 113.7,
-          "change_pct": -3.9615,
-          "previous_close": 118.39
+          "price": 741.77,
+          "change_pct": 0.5435,
+          "previous_close": 737.76
         },
         "news": [
           {
-            "headline": "What Moved Markets This Week",
+            "headline": "The Fed May Have A Hawkish Surprise For Markets This Week",
             "source": "SeekingAlpha"
           },
           {
-            "headline": "Discover which S&P500 stocks are making waves on Friday.",
-            "source": "ChartMill"
+            "headline": "Have S&P 500 Index Funds, Often Touted as the Best Stock Investments, Become Dangerous? There's a Worrisome Development -- and a Possibly Better Alternative.",
+            "source": "Yahoo"
           },
           {
-            "headline": "Which S&P500 stocks have an unusual volume on Friday?",
-            "source": "ChartMill"
+            "headline": "Peace Hopes Revive Rally",
+            "source": "SeekingAlpha"
+          }
+        ]
+      },
+      "USO": {
+        "quote": {
+          "price": 125.45,
+          "change_pct": -2.6236,
+          "previous_close": 128.83
+        },
+        "news": [
+          {
+            "headline": "Oil Is Dirt Cheap, Prepare For The Spike Up Now",
+            "source": "SeekingAlpha"
+          },
+          {
+            "headline": "Inflation And The Fed",
+            "source": "SeekingAlpha"
+          },
+          {
+            "headline": "Iran's Araghchi Says If The Final Stage Of Negotiations Is Completed, The Agreement Will Be Signed Remotely By Both Sides And Then Announced",
+            "source": "Benzinga"
           }
         ]
       }
