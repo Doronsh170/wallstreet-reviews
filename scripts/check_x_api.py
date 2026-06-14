@@ -705,9 +705,9 @@ def sanitize_structured_review(obj: Dict[str, Any], review_context: Dict[str, st
         "main_title": clean_structured_string(obj.get("main_title") or main_title),
         "main": clean_items(obj.get("main"), 3),
         "background_title": clean_structured_string(obj.get("background_title") or background_title),
-        "background": clean_items(obj.get("background"), 3),
+        "background": clean_items(obj.get("background"), 2),
         "forward_title": clean_structured_string(obj.get("forward_title") or forward_title),
-        "forward": clean_items(obj.get("forward"), 4),
+        "forward": clean_items(obj.get("forward"), 3),
         "bottom_line": clean_structured_string(obj.get("bottom_line")),
         "summary_points": [],
     }
@@ -742,8 +742,14 @@ def validate_structured_review(review: Dict[str, Any]) -> None:
     if hits:
         raise ValueError(f"Forbidden artifacts in structured review: {hits}")
     # Prevent half-written output from being saved.
+    complete_endings = ".!?。؟"
+    for section_name in ("main", "background", "forward"):
+        for item in review.get(section_name, []) or []:
+            body = (item.get("body") or "").strip()
+            if body and body[-1] not in complete_endings:
+                raise ValueError(f"{section_name} item body does not end as a complete sentence")
     last = review.get("bottom_line", "").strip()
-    if last and last[-1] not in ".!?。؟":
+    if last and last[-1] not in complete_endings:
         raise ValueError("bottom_line does not end as a complete sentence")
 
 
@@ -880,6 +886,9 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
 אם אין צורך בסעיף קדימה לפי ההקשר, החזר forward_title כריק ו-forward כמערך ריק.
 אם נדרש סעיף קדימה, שם הסעיף חייב להיות: "{forward_section_title}".
 summary_points חייב להכיל 3 עד 5 נקודות נקיות למסך הפתיחה. אסור להתחיל אותן ב"נקודה 1".
+
+היקף חובה: main עד 3 סעיפים, background עד 2 סעיפים, forward עד 3 סעיפים. עדיף קצר ושלם מאשר ארוך ונחתך.
+כל body חייב להסתיים בנקודה. אל תחזיר סעיף אם אין לו גוף שלם.
 
 בדיקת איכות לפני החזרה:
 - אין Markdown בכלל.
