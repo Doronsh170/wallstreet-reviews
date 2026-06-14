@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-06-14T16:32:37.008397+00:00",
-  "generated_israel": "2026-06-14T19:32:37.008411+03:00",
+  "generated_utc": "2026-06-14T16:51:13.842379+00:00",
+  "generated_israel": "2026-06-14T19:51:13.842397+03:00",
   "model": "gpt-5.5",
   "total_raw_tweets": 20,
   "selected_tweets": [
@@ -11,9 +11,9 @@
       "url": "https://x.com/gurgavin/status/2065885822327435266",
       "createdAt": "Sat Jun 13 19:55:37 +0000 2026",
       "text": "MOST PEOPLE HAVE NO IDEA HOW GOOD OF AN INVESTOR GOOGLE IS  6% OF SPACEX 14% OF ANTHROPIC 75% OF WAYMO  $900M INTO SPACEX IN 2015 →   NOW WORTH $115B   $13B INTO ANTHROPIC → NOW WORTH $140B  WAYMO JUST RAISED $16B AT A $126B VALUATION → GOOGLE’S STAKE WORTH ~$95B.  THOSE THREE BETS ALONE ARE WORTH OVER $350B AND THEY HAVE 100’S MORE SMALLER ONES $GOOGL",
-      "likeCount": 5151,
-      "retweetCount": 332,
-      "viewCount": 604952,
+      "likeCount": 5201,
+      "retweetCount": 334,
+      "viewCount": 610664,
       "cashtags": [
         "$GOOGL"
       ],
@@ -28,9 +28,24 @@
       "text": "SpaceX $SPCX just became a $2T+ public company and the 6th largest company in the world on day one of trading.  Now there is already a 2x daily leveraged ETF coming under $SPCH  Wild times for sure. https://t.co/iJNlFXjhuL",
       "likeCount": 79,
       "retweetCount": 11,
-      "viewCount": 21216,
+      "viewCount": 21234,
       "cashtags": [
         "$SPCH",
+        "$SPCX"
+      ],
+      "is_retweet": false
+    },
+    {
+      "account": "StockMKTNewz",
+      "author": "StockMKTNewz",
+      "id": "2066171778959876213",
+      "url": "https://x.com/StockMKTNewz/status/2066171778959876213",
+      "createdAt": "Sun Jun 14 14:51:54 +0000 2026",
+      "text": "Predict what price SpaceX $SPCX stock closes trading at this upcoming week https://t.co/MmebJY0Rie",
+      "likeCount": 250,
+      "retweetCount": 9,
+      "viewCount": 30286,
+      "cashtags": [
         "$SPCX"
       ],
       "is_retweet": false
@@ -44,23 +59,8 @@
       "text": "BREAKING: THE US GOVERNMENT JUST SLAPPED EXPORT CONTROLS ON ANTHROPIC’S NEWEST AI MODELS FOR BEING TOO POWERFUL   NO FOREIGN GOVERNMENT, COMPANY, OR INDIVIDUAL ANYWHERE ON EARTH CAN ACCESS MYTHOS 5 OR FABLE 5  AI IS NOW OFFICIALLY BEING TREATED LIKE A WEAPON 🇺🇸",
       "likeCount": 2143,
       "retweetCount": 171,
-      "viewCount": 194594,
+      "viewCount": 194657,
       "cashtags": [],
-      "is_retweet": false
-    },
-    {
-      "account": "StockMKTNewz",
-      "author": "StockMKTNewz",
-      "id": "2066171778959876213",
-      "url": "https://x.com/StockMKTNewz/status/2066171778959876213",
-      "createdAt": "Sun Jun 14 14:51:54 +0000 2026",
-      "text": "Predict what price SpaceX $SPCX stock closes trading at this upcoming week https://t.co/MmebJY0Rie",
-      "likeCount": 236,
-      "retweetCount": 9,
-      "viewCount": 24547,
-      "cashtags": [
-        "$SPCX"
-      ],
       "is_retweet": false
     },
     {
@@ -70,9 +70,9 @@
       "url": "https://x.com/StockMKTNewz/status/2066183109695934872",
       "createdAt": "Sun Jun 14 15:36:55 +0000 2026",
       "text": "\"Apple’s $AAPL new Siri AI is just good enough to pull it out of its AI crisis.\" - Bloomberg's @markgurman after getting to use Apple's new AI features",
-      "likeCount": 51,
+      "likeCount": 61,
       "retweetCount": 1,
-      "viewCount": 9764,
+      "viewCount": 11334,
       "cashtags": [
         "$AAPL"
       ],
@@ -85,9 +85,9 @@
       "url": "https://x.com/AIStockSavvy/status/2066188995575320585",
       "createdAt": "Sun Jun 14 16:00:19 +0000 2026",
       "text": "$CBRS | Needham maintains 𝐛𝐮𝐲 on 𝐂𝐞𝐫𝐞𝐛𝐫𝐚𝐬 𝐒𝐲𝐬𝐭𝐞𝐦𝐬, maintains 𝐏𝐓 𝐚𝐭 $𝟑𝟎𝟎 https://t.co/qMwAO0ladL",
-      "likeCount": 5,
+      "likeCount": 8,
       "retweetCount": 1,
-      "viewCount": 940,
+      "viewCount": 1252,
       "cashtags": [
         "$CBRS"
       ],
@@ -102,7 +102,7 @@
       "text": "📢 𝐉𝐔𝐒𝐓 𝐈𝐍: FAA Close to Picking Asi Over $PLTR Palantir, Thales for Its AI-Powered Air Traffic Management System- Air Current",
       "likeCount": 19,
       "retweetCount": 2,
-      "viewCount": 5861,
+      "viewCount": 5919,
       "cashtags": [
         "$PLTR"
       ],
@@ -117,7 +117,7 @@
       "text": "SPACEX $SPCX OPENS AT $150, IPO AT $135 https://t.co/8Ld9Br1oBT",
       "likeCount": 63,
       "retweetCount": 6,
-      "viewCount": 16699,
+      "viewCount": 16701,
       "cashtags": [
         "$SPCX"
       ],
@@ -132,7 +132,7 @@
       "text": "👀  $SPCX currently indicating $175 opening price, per CNBC.",
       "likeCount": 84,
       "retweetCount": 10,
-      "viewCount": 26540,
+      "viewCount": 26543,
       "cashtags": [
         "$SPCX"
       ],
@@ -145,9 +145,9 @@
       "url": "https://x.com/KobeissiLetter/status/2066180993363411002",
       "createdAt": "Sun Jun 14 15:28:31 +0000 2026",
       "text": "Key Events This Week:  1. May Industrial Production data - Monday  2. May Housing Starts data - Tuesday  3. May Retail Sales data - Wednesday  4. Fed Interest Rate Decision and Kevin Warsh's First Meeting as Fed Chair - Wednesday  5. June Philly Fed Manufacturing Index - Thursday  6. US Markets Closed for Juneteenth - Friday  All eyes are on the Fed this week.",
-      "likeCount": 544,
-      "retweetCount": 86,
-      "viewCount": 74793,
+      "likeCount": 590,
+      "retweetCount": 91,
+      "viewCount": 83927,
       "cashtags": [],
       "is_retweet": false
     },
@@ -158,9 +158,9 @@
       "url": "https://x.com/KobeissiLetter/status/2066172422445740423",
       "createdAt": "Sun Jun 14 14:54:27 +0000 2026",
       "text": "BREAKING: President Trump issues a statement on Israel's attack on Beirut this morning. https://t.co/UyKtkOK9J1",
-      "likeCount": 3993,
-      "retweetCount": 395,
-      "viewCount": 355273,
+      "likeCount": 4291,
+      "retweetCount": 422,
+      "viewCount": 399776,
       "cashtags": [],
       "is_retweet": false
     },
@@ -171,9 +171,9 @@
       "url": "https://x.com/KobeissiLetter/status/2066163966850552051",
       "createdAt": "Sun Jun 14 14:20:51 +0000 2026",
       "text": "Anthropic is in its own league.  Just days after the launch of Anthropic's Claude Fable 5, the company suspended access to the model after US authorities raised \"security concerns.\"  Anthropic said it was ordered to \"suspend foreign nationals\" from using Claude Fable 5, and self-described the model as \"too powerful.\"  \"The net effect of this order is that we must abruptly disable Fable 5 and Mythos 5 for all our customers to ensure compliance,\" Anthropic said.  In other words, Anthropic's latest AI model is so powerful, that the company and US government are now questioning who should even have access to it.  Less than 4 years ago, ChatGPT did not exist. Today, AI is arguably the most powerful technology ever created.  Truly incredible.",
-      "likeCount": 2730,
-      "retweetCount": 175,
-      "viewCount": 251628,
+      "likeCount": 2848,
+      "retweetCount": 179,
+      "viewCount": 263181,
       "cashtags": [],
       "is_retweet": false
     }
@@ -206,15 +206,15 @@
         },
         "news": [
           {
+            "headline": "SpaceX: Wait For A Pullback",
+            "source": "SeekingAlpha"
+          },
+          {
             "headline": "Powerlaw Corp. And Its SpaceX Holding Are Now Likely A Discount-To-NAV Story, Strong Buy",
             "source": "SeekingAlpha"
           },
           {
             "headline": "SpaceX: Wall Street's $226 Billion Assumption Is Frail",
-            "source": "SeekingAlpha"
-          },
-          {
-            "headline": "SpaceX Is No Longer A Company - It's A Belief System",
             "source": "SeekingAlpha"
           }
         ]
@@ -310,5 +310,67 @@
     "mode": "week_start_prep",
     "title": "היערכות לפתיחת שבוע המסחר בוול סטריט, יום ראשון 2026-06-14",
     "editorial_focus": "סקירת הכנה לפתיחת שבוע: התמקד בנושאים שיכולים ללוות את פתיחת המסחר הקרובה. אל תכתוב כאילו המסחר פתוח היום."
+  },
+  "structured_review": {
+    "title": "טעימת וול סטריט",
+    "subtitle": "היערכות לפתיחת שבוע המסחר בוול סטריט, יום ראשון 2026-06-14",
+    "intro": "שאלת הפתיחה היא האם תשומת הלב תישאר סביב מניות AI וחלל, או שהיומן המאקרו והפד ישתלטו על הטון. לקראת שבוע מקוצר, השוק נכנס עם עומס כותרות סביב ספייסאיקס (SPCX), גוגל (GOOGL), אנת׳רופיק ואפל (AAPL).",
+    "main_title": "במרכז הפתיחה",
+    "main": [
+      {
+        "heading": "ספייסאיקס במוקד אחרי תחילת המסחר",
+        "body": "ספייסאיקס (SPCX) הוצגה בציוצים כחברה ציבורית בשווי מעל 2 טריליון דולר וכשישית בגודלה בעולם ביום המסחר הראשון שלה. ברקע מופיעים מחיר IPO של 135 דולר, פתיחה ב-150 דולר, אינדיקציה מוקדמת ל-175 דולר, וגם דיווח על ETF יומי ממונף פי 2 תחת הסימול (SPCH)."
+      },
+      {
+        "heading": "הפד והנתונים יקבעו את מסגרת השבוע",
+        "body": "ביומן השבוע מופיעים ייצור תעשייתי ביום שני, התחלות בנייה ביום שלישי, מכירות קמעונאיות והחלטת ריבית ביום רביעי, מדד פילי פד ביום חמישי, ושווקים סגורים ביום שישי לרגל Juneteenth. לפי הציוץ, כל העיניים מופנות השבוע לפד ולפגישה הראשונה של Kevin Warsh כיו״ר הפד."
+      },
+      {
+        "heading": "ה-AI עובר גם דרך מגבלות גישה",
+        "body": "בציוצים דווח כי הרשויות בארה״ב העלו חששות ביטחוניים סביב מודלי Claude Fable 5 ו-Mythos 5 של אנת׳רופיק, וכי החברה השעתה גישה ללקוחות כדי לעמוד בדרישות. הנקודה המקצועית היא שהכותרת מציבה את ה-AI לא רק כסיפור צמיחה, אלא גם כנושא של בקרה, גישה ורגולציה."
+      }
+    ],
+    "background_title": "ברקע",
+    "background": [
+      {
+        "heading": "גוגל כסיפור אחזקות פרטי",
+        "body": "בציוץ נטען כי גוגל (GOOGL) מחזיקה 6% מספייסאיקס, 14% מאנת׳רופיק ו-75% מ-Waymo, וכי שלוש האחזקות הללו לבדן שוות מעל 350 מיליארד דולר. עבור השוק, זה ממקד תשומת לב בשווי נכסים שאינם בהכרח במרכז הדוח הרבעוני."
+      },
+      {
+        "heading": "אפל מקבלת כותרת חיובית על Siri",
+        "body": "לפי ציטוט של Bloomberg, Mark Gurman כתב כי ה-Siri AI החדשה של אפל (AAPL) מספיק טובה כדי להוציא אותה ממשבר ה-AI שלה. זו כותרת שיכולה להחזיק את אפל בדיון סביב יכולות AI, בלי לקבוע כיצד המניה תגיב."
+      },
+      {
+        "heading": "פלנטיר מול מכרז תעופה",
+        "body": "דווח כי רשות התעופה הפדרלית קרובה לבחור בחברת ASI על פני פלנטיר (PLTR) ותאלס (Thales) עבור מערכת ניהול תעבורה אווירית מבוססת AI. עבור הסקטור, זו כותרת נקודתית סביב תחרות על פרויקטי AI ממשלתיים ותשתיתיים."
+      }
+    ],
+    "forward_title": "לקראת יום המסחר הבא",
+    "forward": [
+      {
+        "heading": "אם ספייסאיקס נסחרת בתנודתיות גבוהה",
+        "body": "זה יסמן שהשוק עדיין מעבד את התמחור הראשוני, את השווי מעל 2 טריליון דולר ואת הופעת מוצרי המסחר הממונפים סביב המניה."
+      },
+      {
+        "heading": "אם נתון הייצור התעשייתי מפתיע",
+        "body": "זה עשוי להכתיב את הטון המאקרו הראשוני של השבוע לפני רצף הנתונים והחלטת הריבית ביום רביעי."
+      },
+      {
+        "heading": "אם כותרות הפד מתגברות לפני רביעי",
+        "body": "זה יסמן שהמסחר נערך בעיקר סביב החלטת הריבית והפגישה הראשונה של Kevin Warsh כיו״ר הפד."
+      },
+      {
+        "heading": "אם כותרות ה-AI הרגולטוריות מתרחבות",
+        "body": "זה יחזק את המעקב אחרי אנת׳רופיק, גוגל ואפל, בעיקר סביב השאלה מי יכול להשתמש במודלים מתקדמים ובאילו תנאים."
+      }
+    ],
+    "bottom_line": "פתיחת השבוע נראית עמוסה בשני צירים: ספייסאיקס ו-AI מצד אחד, ופד ונתוני מאקרו מצד שני. אין כאן מסקנת כיוון, אלא מפת מוקדים לשבוע שבו הכותרות עשויות לזוז מהר בין תמחור צמיחה, רגולציה וטון מאקרו. השורה התחתונה היא להתמקד בטריגרים ולא בנרטיב יחיד.",
+    "summary_points": [
+      "ספייסאיקס (SPCX) נכנסת לשבוע עם שווי מדווח מעל 2 טריליון דולר וכותרות סביב מוצר ממונף חדש",
+      "הפד והחלטת הריבית ביום רביעי הם עוגן המאקרו המרכזי של השבוע",
+      "מגבלות הגישה למודלי אנת׳רופיק מציבות את ה-AI גם כנושא רגולטורי וביטחוני",
+      "גוגל (GOOGL) מקבלת תשומת לב דרך שווי אחזקות נטען בספייסאיקס, אנת׳רופיק ו-Waymo",
+      "אפל (AAPL) ופלנטיר (PLTR) נשארות במעקב דרך כותרות AI ספציפיות"
+    ]
   }
 }
