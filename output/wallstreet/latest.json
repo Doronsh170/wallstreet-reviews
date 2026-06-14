@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-06-14T15:59:47.202515+00:00",
-  "generated_israel": "2026-06-14T18:59:47.202526+03:00",
+  "generated_utc": "2026-06-14T16:12:08.795328+00:00",
+  "generated_israel": "2026-06-14T19:12:08.795342+03:00",
   "model": "gpt-5.5",
   "total_raw_tweets": 20,
   "selected_tweets": [
@@ -11,9 +11,9 @@
       "url": "https://x.com/gurgavin/status/2065885822327435266",
       "createdAt": "Sat Jun 13 19:55:37 +0000 2026",
       "text": "MOST PEOPLE HAVE NO IDEA HOW GOOD OF AN INVESTOR GOOGLE IS  6% OF SPACEX 14% OF ANTHROPIC 75% OF WAYMO  $900M INTO SPACEX IN 2015 →   NOW WORTH $115B   $13B INTO ANTHROPIC → NOW WORTH $140B  WAYMO JUST RAISED $16B AT A $126B VALUATION → GOOGLE’S STAKE WORTH ~$95B.  THOSE THREE BETS ALONE ARE WORTH OVER $350B AND THEY HAVE 100’S MORE SMALLER ONES $GOOGL",
-      "likeCount": 5082,
+      "likeCount": 5109,
       "retweetCount": 332,
-      "viewCount": 596118,
+      "viewCount": 599797,
       "cashtags": [
         "$GOOGL"
       ],
@@ -28,24 +28,11 @@
       "text": "SpaceX $SPCX just became a $2T+ public company and the 6th largest company in the world on day one of trading.  Now there is already a 2x daily leveraged ETF coming under $SPCH  Wild times for sure. https://t.co/iJNlFXjhuL",
       "likeCount": 79,
       "retweetCount": 11,
-      "viewCount": 21166,
+      "viewCount": 21181,
       "cashtags": [
         "$SPCH",
         "$SPCX"
       ],
-      "is_retweet": false
-    },
-    {
-      "account": "KobeissiLetter",
-      "author": "KobeissiLetter",
-      "id": "2066157707569025137",
-      "url": "https://x.com/KobeissiLetter/status/2066157707569025137",
-      "createdAt": "Sun Jun 14 13:55:59 +0000 2026",
-      "text": "BREAKING: A diplomat involved in US-Iran peace talks says Israeli strikes on Beirut, Lebanon, today have created issues with finalizing a deal, per Fox News.  The diplomat says the strikes are an attempt to \"sabotage President Trump's deal and drag the US back into war.\"   Yesterday, President Trump said a peace deal was scheduled to be signed today.",
-      "likeCount": 4966,
-      "retweetCount": 674,
-      "viewCount": 579801,
-      "cashtags": [],
       "is_retweet": false
     },
     {
@@ -57,7 +44,7 @@
       "text": "BREAKING: THE US GOVERNMENT JUST SLAPPED EXPORT CONTROLS ON ANTHROPIC’S NEWEST AI MODELS FOR BEING TOO POWERFUL   NO FOREIGN GOVERNMENT, COMPANY, OR INDIVIDUAL ANYWHERE ON EARTH CAN ACCESS MYTHOS 5 OR FABLE 5  AI IS NOW OFFICIALLY BEING TREATED LIKE A WEAPON 🇺🇸",
       "likeCount": 2143,
       "retweetCount": 171,
-      "viewCount": 194463,
+      "viewCount": 194524,
       "cashtags": [],
       "is_retweet": false
     },
@@ -68,9 +55,9 @@
       "url": "https://x.com/StockMKTNewz/status/2066171778959876213",
       "createdAt": "Sun Jun 14 14:51:54 +0000 2026",
       "text": "Predict what price SpaceX $SPCX stock closes trading at this upcoming week https://t.co/MmebJY0Rie",
-      "likeCount": 176,
-      "retweetCount": 7,
-      "viewCount": 16305,
+      "likeCount": 201,
+      "retweetCount": 8,
+      "viewCount": 18773,
       "cashtags": [
         "$SPCX"
       ],
@@ -83,11 +70,26 @@
       "url": "https://x.com/StockMKTNewz/status/2066183109695934872",
       "createdAt": "Sun Jun 14 15:36:55 +0000 2026",
       "text": "\"Apple’s $AAPL new Siri AI is just good enough to pull it out of its AI crisis.\" - Bloomberg's @markgurman after getting to use Apple's new AI features",
-      "likeCount": 36,
-      "retweetCount": 0,
-      "viewCount": 5656,
+      "likeCount": 45,
+      "retweetCount": 1,
+      "viewCount": 7581,
       "cashtags": [
         "$AAPL"
+      ],
+      "is_retweet": false
+    },
+    {
+      "account": "AIStockSavvy",
+      "author": "AIStockSavvy",
+      "id": "2066188995575320585",
+      "url": "https://x.com/AIStockSavvy/status/2066188995575320585",
+      "createdAt": "Sun Jun 14 16:00:19 +0000 2026",
+      "text": "$CBRS | Needham maintains 𝐛𝐮𝐲 on 𝐂𝐞𝐫𝐞𝐛𝐫𝐚𝐬 𝐒𝐲𝐬𝐭𝐞𝐦𝐬, maintains 𝐏𝐓 𝐚𝐭 $𝟑𝟎𝟎 https://t.co/qMwAO0ladL",
+      "likeCount": 4,
+      "retweetCount": 1,
+      "viewCount": 439,
+      "cashtags": [
+        "$CBRS"
       ],
       "is_retweet": false
     },
@@ -98,9 +100,9 @@
       "url": "https://x.com/AIStockSavvy/status/2065939930191122488",
       "createdAt": "Sat Jun 13 23:30:37 +0000 2026",
       "text": "📢 𝐉𝐔𝐒𝐓 𝐈𝐍: FAA Close to Picking Asi Over $PLTR Palantir, Thales for Its AI-Powered Air Traffic Management System- Air Current",
-      "likeCount": 18,
+      "likeCount": 19,
       "retweetCount": 2,
-      "viewCount": 5753,
+      "viewCount": 5792,
       "cashtags": [
         "$PLTR"
       ],
@@ -115,7 +117,7 @@
       "text": "SPACEX $SPCX OPENS AT $150, IPO AT $135 https://t.co/8Ld9Br1oBT",
       "likeCount": 63,
       "retweetCount": 6,
-      "viewCount": 16681,
+      "viewCount": 16688,
       "cashtags": [
         "$SPCX"
       ],
@@ -130,7 +132,7 @@
       "text": "👀  $SPCX currently indicating $175 opening price, per CNBC.",
       "likeCount": 84,
       "retweetCount": 10,
-      "viewCount": 26526,
+      "viewCount": 26529,
       "cashtags": [
         "$SPCX"
       ],
@@ -143,9 +145,9 @@
       "url": "https://x.com/KobeissiLetter/status/2066172422445740423",
       "createdAt": "Sun Jun 14 14:54:27 +0000 2026",
       "text": "BREAKING: President Trump issues a statement on Israel's attack on Beirut this morning. https://t.co/UyKtkOK9J1",
-      "likeCount": 3219,
-      "retweetCount": 334,
-      "viewCount": 250870,
+      "likeCount": 3499,
+      "retweetCount": 359,
+      "viewCount": 289727,
       "cashtags": [],
       "is_retweet": false
     },
@@ -156,9 +158,9 @@
       "url": "https://x.com/KobeissiLetter/status/2066163966850552051",
       "createdAt": "Sun Jun 14 14:20:51 +0000 2026",
       "text": "Anthropic is in its own league.  Just days after the launch of Anthropic's Claude Fable 5, the company suspended access to the model after US authorities raised \"security concerns.\"  Anthropic said it was ordered to \"suspend foreign nationals\" from using Claude Fable 5, and self-described the model as \"too powerful.\"  \"The net effect of this order is that we must abruptly disable Fable 5 and Mythos 5 for all our customers to ensure compliance,\" Anthropic said.  In other words, Anthropic's latest AI model is so powerful, that the company and US government are now questioning who should even have access to it.  Less than 4 years ago, ChatGPT did not exist. Today, AI is arguably the most powerful technology ever created.  Truly incredible.",
-      "likeCount": 2514,
-      "retweetCount": 167,
-      "viewCount": 224612,
+      "likeCount": 2607,
+      "retweetCount": 170,
+      "viewCount": 235868,
       "cashtags": [],
       "is_retweet": false
     },
@@ -169,9 +171,9 @@
       "url": "https://x.com/AIStockSavvy/status/2066171672139350111",
       "createdAt": "Sun Jun 14 14:51:28 +0000 2026",
       "text": "Trump: Israeli Strike on Beirut Should Not Have Happened, Especially on a Special Day Close to Reaching a Peace Agreement - $QQQ $SPY $USO",
-      "likeCount": 14,
+      "likeCount": 16,
       "retweetCount": 2,
-      "viewCount": 2019,
+      "viewCount": 2246,
       "cashtags": [
         "$QQQ",
         "$SPY",
@@ -182,6 +184,7 @@
   ],
   "detected_cashtags": [
     "$AAPL",
+    "$CBRS",
     "$GOOGL",
     "$PLTR",
     "$QQQ",
@@ -196,10 +199,10 @@
     "GOOGL",
     "SPCH",
     "AAPL",
+    "CBRS",
     "PLTR",
     "QQQ",
-    "SPY",
-    "USO"
+    "SPY"
   ],
   "finnhub_context": {
     "enabled": true,
@@ -233,15 +236,15 @@
         },
         "news": [
           {
+            "headline": "Bill Ackman Likes This Indirect AI Play Everyone’s Ignoring",
+            "source": "Yahoo"
+          },
+          {
             "headline": "3 Cloud Computing Stocks to Load up on in June",
             "source": "Yahoo"
           },
           {
             "headline": "3 Under-the-Radar Ways to Play Goldman's $1 Trillion AI Spending 2027 Forecast",
-            "source": "Yahoo"
-          },
-          {
-            "headline": "Goldman Sachs resets Apple stock forecast after WWDC",
             "source": "Yahoo"
           }
         ]
@@ -264,6 +267,27 @@
           {
             "headline": "Meet the Spectacular Vanguard ETF That Could Buy SpaceX Stock as Soon as June 19",
             "source": "Yahoo"
+          }
+        ]
+      },
+      "CBRS": {
+        "quote": {
+          "price": 214.02,
+          "change_pct": -5.5308,
+          "previous_close": 226.55
+        },
+        "news": [
+          {
+            "headline": "Wall Street Roundup: Trillion Dollar Baby",
+            "source": "SeekingAlpha"
+          },
+          {
+            "headline": "Crypto Perps Say SpaceX Pops 22% On Launch, But Prediction Markets Disagree",
+            "source": "Benzinga"
+          },
+          {
+            "headline": "Shares of software and AI cloud-related companies are trading lower amid possible sympathy with Oracle after the company reported Q4 financial results and announced a $40 billion financing plan for FY27. The financing needs to fund aggressive capex spending may be giving investors pause.",
+            "source": "Benzinga"
           }
         ]
       },
@@ -327,27 +351,6 @@
           {
             "headline": "Peace Hopes Revive Rally",
             "source": "SeekingAlpha"
-          }
-        ]
-      },
-      "USO": {
-        "quote": {
-          "price": 125.45,
-          "change_pct": -2.6236,
-          "previous_close": 128.83
-        },
-        "news": [
-          {
-            "headline": "Oil Is Dirt Cheap, Prepare For The Spike Up Now",
-            "source": "SeekingAlpha"
-          },
-          {
-            "headline": "Inflation And The Fed",
-            "source": "SeekingAlpha"
-          },
-          {
-            "headline": "Iran's Araghchi Says If The Final Stage Of Negotiations Is Completed, The Agreement Will Be Signed Remotely By Both Sides And Then Announced",
-            "source": "Benzinga"
           }
         ]
       }
