@@ -9,26 +9,28 @@
       --bg:#f4f6f8;--paper:#fff;--ink:#111827;--muted:#667085;--line:#d8dee8;
       --brand:#073b4c;--brand2:#0b556b;--accent:#0f766e;--gold:#a17a25;--soft:#eef6f7;
     }
-    *{box-sizing:border-box;font-family:Arial, sans-serif!important}
-    body{margin:0;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.65}
+    *{box-sizing:border-box;font-family:Arial, Helvetica, sans-serif!important}
+    body{margin:0;background:var(--bg);color:var(--ink);font-size:18px;line-height:1.8;font-weight:500;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+    html,body,.wrap,.paper,#screen,.review,.preview,.headline,.toolbar,.footer{direction:rtl;text-align:right;unicode-bidi:plaintext}
+    .review *,.preview *,.headline *{direction:rtl;text-align:right;unicode-bidi:plaintext}
     .top{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:18px 16px 14px;border-bottom:4px solid #19a7a5}
     .top-inner{max-width:980px;margin:auto;display:flex;gap:14px;align-items:center;justify-content:space-between}
-    .brand h1{margin:0;font-size:25px;letter-spacing:-.4px}.brand p{margin:2px 0 0;color:#d7edf2;font-size:13px}.badge{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:#bde7ef}
+    .brand h1{margin:0;font-size:26px;letter-spacing:-.2px;font-weight:800}.brand p{margin:2px 0 0;color:#d7edf2;font-size:14px}.badge{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:#bde7ef}
     .wrap{max-width:980px;margin:0 auto;padding:16px}
     .tabs{display:flex;gap:8px;overflow:auto;padding:4px 0 12px;position:sticky;top:0;background:var(--bg);z-index:5}
     .tab{white-space:nowrap;border:1px solid var(--line);background:#fff;color:#263241;border-radius:999px;padding:10px 14px;font-weight:700;cursor:pointer}
     .tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
     .paper{background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 22px rgba(15,23,42,.06);padding:22px;margin-bottom:18px}
     .headline{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:14px}
-    .headline h1{font-size:25px;line-height:1.25;margin:0;color:#0b2e3b}.meta{font-size:13px;color:var(--muted);white-space:nowrap;margin-top:4px}.subtle{color:var(--muted);font-size:14px;margin:6px 0 0}.status{color:var(--muted);font-size:13px;margin:4px 0 12px}
+    .headline h1{font-size:26px;line-height:1.28;margin:0;color:#0b2e3b;font-weight:800}.meta{font-size:14px;color:var(--muted);white-space:nowrap;margin-top:4px}.subtle{color:var(--muted);font-size:15px;margin:6px 0 0}.status{color:var(--muted);font-size:14px;margin:4px 0 12px}
     .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0;border-top:1px solid var(--line);padding-top:14px}
-    button,.action{border:1px solid var(--line);background:#fff;color:#14212f;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+    button,.action{border:1px solid var(--line);background:#fff;color:#14212f;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;font-size:15px}
     button.primary,.action.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
     input{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;min-width:220px}
-    .review h1{font-size:24px;margin:0 0 6px;color:#0b2e3b}.review h2{font-size:20px;border-top:1px solid var(--line);padding-top:16px;margin:22px 0 10px;color:#0b2e3b}.review p{margin:0 0 12px}.review ul,.preview ul{margin:0 0 14px;padding:0 22px 0 0}.review li,.preview li{margin:0 0 10px}.review strong,.preview strong{font-weight:800}.review .ticker,.preview .ticker{color:inherit;font-weight:inherit;opacity:1;background:none}.empty{padding:26px;text-align:center;color:var(--muted)}
-    details.section{border:1px solid var(--line);border-radius:14px;margin:12px 0;background:#fff;overflow:hidden}details.section summary{cursor:pointer;padding:14px 16px;font-weight:800;color:#0b2e3b;background:#f9fbfc}details.section .section-content{padding:16px}
-    .preview-title{font-size:22px;margin:0 0 12px;color:#0b2e3b}.read-more{margin-top:12px}.footer{font-size:12px;text-align:center;color:#667085;margin:20px 0 8px}.disclaimer{border-top:1px solid var(--line);padding-top:12px;margin-top:16px;color:#4b5563;font-size:13px;text-align:center}
-    @media(max-width:720px){.top-inner{display:block}.brand h1{font-size:22px}.wrap{padding:12px}.headline{display:block}.headline h1{font-size:22px}.meta{white-space:normal}.toolbar{display:grid;grid-template-columns:1fr 1fr}.toolbar input{grid-column:1/-1;width:100%;min-width:0}.paper{padding:16px;border-radius:14px}.review h1{font-size:22px}.review h2{font-size:18px}.hide-mobile{display:none!important}}
+    .review h1{font-size:25px;margin:0 0 8px;color:#0b2e3b;font-weight:800;text-align:right}.review h2{font-size:21px;border-top:1px solid var(--line);padding-top:16px;margin:24px 0 14px;color:#0b2e3b;font-weight:800;text-align:right}.review h3{font-size:19px;margin:18px 0 6px;color:#0b2e3b;font-weight:800;line-height:1.45;text-align:right}.review p{margin:0 0 16px;font-size:18px;line-height:1.9;color:#111827;font-weight:500;text-align:right}.review ul,.preview ul{margin:0 0 16px;padding:0 24px 0 0;text-align:right}.review li,.preview li{margin:0 0 12px;font-size:18px;line-height:1.85;color:#111827;text-align:right}.review strong,.preview strong{font-weight:inherit;color:inherit}.review .ticker,.preview .ticker{color:inherit;font-weight:inherit;opacity:1;background:none}.empty{padding:26px;text-align:center;color:var(--muted)}
+    details.section{border:1px solid var(--line);border-radius:14px;margin:14px 0;background:#fff;overflow:hidden}details.section summary{cursor:pointer;padding:15px 17px;font-weight:800;color:#0b2e3b;background:#f9fbfc;font-size:19px}details.section .section-content{padding:17px}
+    .preview-title{font-size:23px;margin:0 0 14px;color:#0b2e3b;font-weight:800}.read-more{margin-top:12px}.footer{font-size:12px;text-align:center;color:#667085;margin:20px 0 8px}.disclaimer{border-top:1px solid var(--line);padding-top:12px;margin-top:16px;color:#4b5563;font-size:13px;text-align:center}
+    @media(max-width:720px){body{font-size:18px;line-height:1.85}.top-inner{display:block}.brand h1{font-size:23px}.wrap{padding:12px}.headline{display:block}.headline h1{font-size:23px}.meta{white-space:normal}.toolbar{display:grid;grid-template-columns:1fr 1fr}.toolbar input{grid-column:1/-1;width:100%;min-width:0}.paper{padding:16px;border-radius:14px}.review h1{font-size:23px}.review h2{font-size:20px}.review h3{font-size:19px}.review p,.review li,.preview li{font-size:18px;line-height:1.9}.hide-mobile{display:none!important}}
     @media print{.top,.tabs,.toolbar,.status,.read-more{display:none!important}body{background:#fff}.wrap{max-width:none;padding:0}.paper{box-shadow:none;border:none}.footer{display:block}}
   </style>
 </head>
@@ -59,9 +61,12 @@ const ACTIONS_URL='https://github.com/Doronsh170/wallstreet-reviews/actions/work
 let active='wallstreet', raw='', rendered='', meta={}, currentMode='preview';
 const rtlMark='\u200F';
 function esc(s){return (s||'').replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))}
+function stripBidi(s){return (s||'').replace(/[\u200E\u200F\u202A-\u202E\u2066-\u2069\u200B-\u200D\uFEFF\u00AD]/g,'').replace(/\u00A0/g,' ')}
+function cleanMdLine(s){return stripBidi(s||'').replace(/^\s+|\s+$/g,'').trim()}
+function cleanDisplayText(s){return cleanPointText(s).replace(/^#{1,6}\s*/,'').replace(/\s+#{1,6}\s*/g,' ').replace(/\*\*/g,'').trim()}
 function stripFooter(md){return (md||'').replace(/⚠️?\s*גילוי נאות:[\s\S]*$/m,'').replace(/פותח ע["׳']?י דורון שרייבמן/g,'').trim()}
 function normalize(md){return stripFooter(md).replace(/\r/g,'').replace(/\n{3,}/g,'\n\n').trim()}
-function inline(s){return esc(s).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\$[A-Z]{1,6}/g,m=>`<span class="ticker">${m}</span>`)}
+function inline(s){return esc(cleanDisplayText(s)).replace(/\$[A-Z]{1,6}/g,m=>`<span class="ticker">${m}</span>`)}
 function formatCreated(){
   const iso=meta.generated_israel || meta.generated_utc || '';
   if(!iso) return '';
@@ -86,15 +91,35 @@ function removeDuplicateTitleLines(md){
   }).join('\n');
 }
 function mdToHtml(md){
-  md=removeDuplicateTitleLines(md); let lines=md.split('\n'); let html='', inList=false;
-  const close=()=>{if(inList){html+='</ul>';inList=false}}
-  for(let line of lines){line=line.trim(); if(!line) {close(); continue}
-    if(line.startsWith('# ')){close(); html+=`<h1>${inline(line.slice(2))}</h1>`; continue}
-    if(line.startsWith('## ')){close(); html+=`<h2>${inline(line.slice(3))}</h2>`; continue}
-    if(line.startsWith('•')||line.startsWith('- ')){ if(!inList){html+='<ul>';inList=true} html+=`<li>${inline(line.replace(/^•\s*/, '').replace(/^-\s*/, ''))}</li>`; continue}
+  md=removeDuplicateTitleLines(md);
+  let lines=md.split('\n');
+  let html='', inList=false;
+  const close=()=>{if(inList){html+='</ul>';inList=false}};
+  for(let rawLine of lines){
+    let line=cleanMdLine(rawLine);
+    if(!line){close(); continue}
+    const h=line.match(/^\s*(#{1,3})\s+(.+)$/);
+    if(h){
+      close();
+      const level=h[1].length;
+      const body=cleanDisplayText(h[2]);
+      if(!body) continue;
+      if(level===1) html+=`<h1>${inline(body)}</h1>`;
+      else if(level===2) html+=`<h2>${inline(body)}</h2>`;
+      else html+=`<h3>${inline(body)}</h3>`;
+      continue;
+    }
+    line=cleanDisplayText(line);
+    if(!line) continue;
+    if(/^([•\-]|\d+[.)])\s+/.test(line)){
+      if(!inList){html+='<ul>';inList=true}
+      html+=`<li>${inline(line.replace(/^([•\-]|\d+[.)])\s+/,''))}</li>`;
+      continue;
+    }
     close(); html+=`<p>${inline(line)}</p>`;
   }
-  close(); return html;
+  close();
+  return html.replace(/###/g,'');
 }
 function applyMobileSections(){
   const el=document.querySelector('#screen .review'); if(!el) return; const heads=[...el.querySelectorAll('h2')];
@@ -103,18 +128,61 @@ function applyMobileSections(){
     const s=document.createElement('summary'); s.innerHTML=h.innerHTML; const c=document.createElement('div'); c.className='section-content'; nodes.forEach(x=>c.appendChild(x)); d.append(s,c); h.replaceWith(d);
   })
 }
+function cleanPointText(x){
+  return stripBidi(x||'')
+    .replace(/\u00A0/g,' ')
+    .replace(/\*\*/g,'')
+    .replace(/^\s*([•\-]|\d+[.)])\s*/,'')
+    .replace(/^\s*#{1,6}\s*/,'')
+    .replace(/\s+#{1,6}\s*/g,' ')
+    .replace(/^\s*([•\-]|\d+[.)])\s*/,'')
+    .replace(/^\s*נקודה\s*\d+\s*[:.：־\-–—]?\s*/i,'')
+    .replace(/^\s*נק׳\s*\d+\s*[:.：־\-–—]?\s*/i,'')
+    .replace(/[ \t]{2,}/g,' ')
+    .trim();
+}
 function getBulletTexts(){
-  const txt=raw||'';
-  let bullets=[...txt.matchAll(/(?:^|\n)[•-]\s*(.+)/g)].map(m=>m[1].replace(/\*\*/g,'').trim()).filter(Boolean);
-  if(!bullets.length){
-    bullets=txt.split('\n').map(x=>x.trim()).filter(x=>x.includes(':') && x.length>35).slice(0,7);
+  const txt=stripBidi(raw||'');
+  const lines=txt.split('\n').map(cleanMdLine).filter(Boolean);
+  let items=[];
+  const isSectionHeading = (x)=>/^\s*##\s+/.test(x) && !/^\s*###\s+/.test(x);
+  const isTopicHeading = (x)=>/^\s*###\s+/.test(x);
+
+  for(let i=0;i<lines.length;i++){
+    if(!isTopicHeading(lines[i])) continue;
+    const title=cleanPointText(lines[i]);
+    if(!title || /^(שורה תחתונה|גילוי נאות|פותח ע)/.test(title)) continue;
+    let body='';
+    for(let j=i+1;j<lines.length;j++){
+      if(isTopicHeading(lines[j]) || isSectionHeading(lines[j])) break;
+      const candidate=cleanPointText(lines[j]);
+      if(candidate && !/^(גילוי נאות|פותח ע)/.test(candidate)){body=candidate; break;}
+    }
+    let point=title;
+    if(body) point += ': ' + body;
+    point=cleanPointText(point);
+    if(point && !items.includes(point)) items.push(point);
   }
-  return bullets;
+
+  if(!items.length){
+    items=[...txt.matchAll(/(?:^|\n)\s*(?:[•\-]|\d+[.)])\s*(.+)/g)]
+      .map(m=>cleanPointText(m[1]))
+      .filter(x=>x && !/^(גילוי נאות|פותח ע)/.test(x));
+  }
+  if(!items.length){
+    items=lines.map(cleanPointText)
+      .filter(x=>x && x.includes(':') && x.length>35 && !/^(גילוי נאות|פותח ע)/.test(x))
+      .slice(0,7);
+  }
+  return items.map(cleanPointText).filter(Boolean);
+}
+function summaryPoints(limit=5){
+  return getBulletTexts().slice(0,limit).map(x=>cleanPointText(x).replace(/\.$/,'')).filter(Boolean);
 }
 function fivePoints(limit=5){
-  const bullets=getBulletTexts().slice(0,limit);
+  const bullets=summaryPoints(limit);
   if(!bullets.length) return 'אין מספיק נקודות לקיצור.';
-  return bullets.map((b,i)=>`נקודה ${i+1}: ${b.split('. ')[0].slice(0,210)}`).join('\n');
+  return bullets.map(b=>`${rtlMark}• ${b.slice(0,230)}`).join('\n');
 }
 function renderHeader(title){
   const created=formatCreated();
@@ -125,21 +193,23 @@ function renderHeader(title){
 function renderPreview(){
   currentMode='preview';
   const title=extractTitle(raw);
-  const points=fivePoints(5).split('\n').map(x=>`<li>${inline(x)}</li>`).join('');
-  document.getElementById('screen').innerHTML=`${renderHeader(title)}<section class="preview"><h2 class="preview-title">תקציר מהיר</h2><ul>${points}</ul><div class="read-more"><button class="primary" onclick="renderFull()">קריאת הסקירה המלאה</button></div></section>`;
+  const arr=summaryPoints(5);
+  const points=arr.length ? arr.map(x=>`<li>${inline(x)}</li>`).join('') : '<li>אין מספיק נקודות לקיצור.</li>';
+  document.getElementById('screen').innerHTML=`${renderHeader(title)}<section class="preview" dir="rtl"><h2 class="preview-title">תקציר מהיר</h2><ul dir="rtl">${points}</ul><div class="read-more"><button class="primary" onclick="renderFull()">קריאת הסקירה המלאה</button></div></section>`;
 }
 function renderFull(){
   currentMode='full';
   const title=extractTitle(raw);
   rendered=mdToHtml(raw);
-  document.getElementById('screen').innerHTML=`${renderHeader(title)}<section class="review">${rendered}</section>${toolbarHtml()}`;
+  document.getElementById('screen').innerHTML=`${renderHeader(title)}<section class="review" dir="rtl">${rendered}</section>${toolbarHtml()}`;
   applyMobileSections();
 }
 function toolbarHtml(){return `<div class="toolbar"><a class="action primary" id="runLink" href="${ACTIONS_URL}" target="_blank" rel="noopener">יצירת סקירה חדשה</a><button onclick="load()">טעינת הסקירה האחרונה</button><button onclick="renderShortOnly()">קיצור ל-5 נקודות</button><button onclick="whatsapp()">שליחה בווטסאפ</button><button onclick="window.print()">שמירה ל-PDF</button><input id="search" placeholder="חיפוש בסקירה" oninput="searchReview(this.value)" /></div>`}
 function renderShortOnly(){
   currentMode='short';
   const title=`קיצור ל-5 נקודות, ${CHANNELS[active].label}`;
-  document.getElementById('screen').innerHTML=`${renderHeader(title)}<section class="preview"><ul>${fivePoints(5).split('\n').map(x=>'<li>'+inline(x)+'</li>').join('')}</ul><div class="read-more"><button class="primary" onclick="renderFull()">קריאת הסקירה המלאה</button></div></section>${toolbarHtml()}`;
+  const arr=summaryPoints(5); const points=arr.length ? arr.map(x=>'<li>'+inline(x)+'</li>').join('') : '<li>אין מספיק נקודות לקיצור.</li>';
+  document.getElementById('screen').innerHTML=`${renderHeader(title)}<section class="preview" dir="rtl"><h2 class="preview-title">תקציר מהיר</h2><ul dir="rtl">${points}</ul><div class="read-more"><button class="primary" onclick="renderFull()">קריאת הסקירה המלאה</button></div></section>${toolbarHtml()}`;
 }
 async function fetchJson(paths){
   for(const p of paths.filter(Boolean)){
