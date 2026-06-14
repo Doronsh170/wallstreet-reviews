@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-06-14T16:12:08.795328+00:00",
-  "generated_israel": "2026-06-14T19:12:08.795342+03:00",
+  "generated_utc": "2026-06-14T16:32:37.008397+00:00",
+  "generated_israel": "2026-06-14T19:32:37.008411+03:00",
   "model": "gpt-5.5",
   "total_raw_tweets": 20,
   "selected_tweets": [
@@ -11,9 +11,9 @@
       "url": "https://x.com/gurgavin/status/2065885822327435266",
       "createdAt": "Sat Jun 13 19:55:37 +0000 2026",
       "text": "MOST PEOPLE HAVE NO IDEA HOW GOOD OF AN INVESTOR GOOGLE IS  6% OF SPACEX 14% OF ANTHROPIC 75% OF WAYMO  $900M INTO SPACEX IN 2015 →   NOW WORTH $115B   $13B INTO ANTHROPIC → NOW WORTH $140B  WAYMO JUST RAISED $16B AT A $126B VALUATION → GOOGLE’S STAKE WORTH ~$95B.  THOSE THREE BETS ALONE ARE WORTH OVER $350B AND THEY HAVE 100’S MORE SMALLER ONES $GOOGL",
-      "likeCount": 5109,
+      "likeCount": 5151,
       "retweetCount": 332,
-      "viewCount": 599797,
+      "viewCount": 604952,
       "cashtags": [
         "$GOOGL"
       ],
@@ -28,7 +28,7 @@
       "text": "SpaceX $SPCX just became a $2T+ public company and the 6th largest company in the world on day one of trading.  Now there is already a 2x daily leveraged ETF coming under $SPCH  Wild times for sure. https://t.co/iJNlFXjhuL",
       "likeCount": 79,
       "retweetCount": 11,
-      "viewCount": 21181,
+      "viewCount": 21216,
       "cashtags": [
         "$SPCH",
         "$SPCX"
@@ -44,7 +44,7 @@
       "text": "BREAKING: THE US GOVERNMENT JUST SLAPPED EXPORT CONTROLS ON ANTHROPIC’S NEWEST AI MODELS FOR BEING TOO POWERFUL   NO FOREIGN GOVERNMENT, COMPANY, OR INDIVIDUAL ANYWHERE ON EARTH CAN ACCESS MYTHOS 5 OR FABLE 5  AI IS NOW OFFICIALLY BEING TREATED LIKE A WEAPON 🇺🇸",
       "likeCount": 2143,
       "retweetCount": 171,
-      "viewCount": 194524,
+      "viewCount": 194594,
       "cashtags": [],
       "is_retweet": false
     },
@@ -55,9 +55,9 @@
       "url": "https://x.com/StockMKTNewz/status/2066171778959876213",
       "createdAt": "Sun Jun 14 14:51:54 +0000 2026",
       "text": "Predict what price SpaceX $SPCX stock closes trading at this upcoming week https://t.co/MmebJY0Rie",
-      "likeCount": 201,
-      "retweetCount": 8,
-      "viewCount": 18773,
+      "likeCount": 236,
+      "retweetCount": 9,
+      "viewCount": 24547,
       "cashtags": [
         "$SPCX"
       ],
@@ -70,9 +70,9 @@
       "url": "https://x.com/StockMKTNewz/status/2066183109695934872",
       "createdAt": "Sun Jun 14 15:36:55 +0000 2026",
       "text": "\"Apple’s $AAPL new Siri AI is just good enough to pull it out of its AI crisis.\" - Bloomberg's @markgurman after getting to use Apple's new AI features",
-      "likeCount": 45,
+      "likeCount": 51,
       "retweetCount": 1,
-      "viewCount": 7581,
+      "viewCount": 9764,
       "cashtags": [
         "$AAPL"
       ],
@@ -85,9 +85,9 @@
       "url": "https://x.com/AIStockSavvy/status/2066188995575320585",
       "createdAt": "Sun Jun 14 16:00:19 +0000 2026",
       "text": "$CBRS | Needham maintains 𝐛𝐮𝐲 on 𝐂𝐞𝐫𝐞𝐛𝐫𝐚𝐬 𝐒𝐲𝐬𝐭𝐞𝐦𝐬, maintains 𝐏𝐓 𝐚𝐭 $𝟑𝟎𝟎 https://t.co/qMwAO0ladL",
-      "likeCount": 4,
+      "likeCount": 5,
       "retweetCount": 1,
-      "viewCount": 439,
+      "viewCount": 940,
       "cashtags": [
         "$CBRS"
       ],
@@ -102,7 +102,7 @@
       "text": "📢 𝐉𝐔𝐒𝐓 𝐈𝐍: FAA Close to Picking Asi Over $PLTR Palantir, Thales for Its AI-Powered Air Traffic Management System- Air Current",
       "likeCount": 19,
       "retweetCount": 2,
-      "viewCount": 5792,
+      "viewCount": 5861,
       "cashtags": [
         "$PLTR"
       ],
@@ -117,7 +117,7 @@
       "text": "SPACEX $SPCX OPENS AT $150, IPO AT $135 https://t.co/8Ld9Br1oBT",
       "likeCount": 63,
       "retweetCount": 6,
-      "viewCount": 16688,
+      "viewCount": 16699,
       "cashtags": [
         "$SPCX"
       ],
@@ -132,10 +132,23 @@
       "text": "👀  $SPCX currently indicating $175 opening price, per CNBC.",
       "likeCount": 84,
       "retweetCount": 10,
-      "viewCount": 26529,
+      "viewCount": 26540,
       "cashtags": [
         "$SPCX"
       ],
+      "is_retweet": false
+    },
+    {
+      "account": "KobeissiLetter",
+      "author": "KobeissiLetter",
+      "id": "2066180993363411002",
+      "url": "https://x.com/KobeissiLetter/status/2066180993363411002",
+      "createdAt": "Sun Jun 14 15:28:31 +0000 2026",
+      "text": "Key Events This Week:  1. May Industrial Production data - Monday  2. May Housing Starts data - Tuesday  3. May Retail Sales data - Wednesday  4. Fed Interest Rate Decision and Kevin Warsh's First Meeting as Fed Chair - Wednesday  5. June Philly Fed Manufacturing Index - Thursday  6. US Markets Closed for Juneteenth - Friday  All eyes are on the Fed this week.",
+      "likeCount": 544,
+      "retweetCount": 86,
+      "viewCount": 74793,
+      "cashtags": [],
       "is_retweet": false
     },
     {
@@ -145,9 +158,9 @@
       "url": "https://x.com/KobeissiLetter/status/2066172422445740423",
       "createdAt": "Sun Jun 14 14:54:27 +0000 2026",
       "text": "BREAKING: President Trump issues a statement on Israel's attack on Beirut this morning. https://t.co/UyKtkOK9J1",
-      "likeCount": 3499,
-      "retweetCount": 359,
-      "viewCount": 289727,
+      "likeCount": 3993,
+      "retweetCount": 395,
+      "viewCount": 355273,
       "cashtags": [],
       "is_retweet": false
     },
@@ -158,27 +171,10 @@
       "url": "https://x.com/KobeissiLetter/status/2066163966850552051",
       "createdAt": "Sun Jun 14 14:20:51 +0000 2026",
       "text": "Anthropic is in its own league.  Just days after the launch of Anthropic's Claude Fable 5, the company suspended access to the model after US authorities raised \"security concerns.\"  Anthropic said it was ordered to \"suspend foreign nationals\" from using Claude Fable 5, and self-described the model as \"too powerful.\"  \"The net effect of this order is that we must abruptly disable Fable 5 and Mythos 5 for all our customers to ensure compliance,\" Anthropic said.  In other words, Anthropic's latest AI model is so powerful, that the company and US government are now questioning who should even have access to it.  Less than 4 years ago, ChatGPT did not exist. Today, AI is arguably the most powerful technology ever created.  Truly incredible.",
-      "likeCount": 2607,
-      "retweetCount": 170,
-      "viewCount": 235868,
+      "likeCount": 2730,
+      "retweetCount": 175,
+      "viewCount": 251628,
       "cashtags": [],
-      "is_retweet": false
-    },
-    {
-      "account": "AIStockSavvy",
-      "author": "AIStockSavvy",
-      "id": "2066171672139350111",
-      "url": "https://x.com/AIStockSavvy/status/2066171672139350111",
-      "createdAt": "Sun Jun 14 14:51:28 +0000 2026",
-      "text": "Trump: Israeli Strike on Beirut Should Not Have Happened, Especially on a Special Day Close to Reaching a Peace Agreement - $QQQ $SPY $USO",
-      "likeCount": 16,
-      "retweetCount": 2,
-      "viewCount": 2246,
-      "cashtags": [
-        "$QQQ",
-        "$SPY",
-        "$USO"
-      ],
       "is_retweet": false
     }
   ],
@@ -187,11 +183,8 @@
     "$CBRS",
     "$GOOGL",
     "$PLTR",
-    "$QQQ",
     "$SPCH",
-    "$SPCX",
-    "$SPY",
-    "$USO"
+    "$SPCX"
   ],
   "finnhub_enabled": true,
   "finnhub_symbols_checked": [
@@ -200,9 +193,7 @@
     "SPCH",
     "AAPL",
     "CBRS",
-    "PLTR",
-    "QQQ",
-    "SPY"
+    "PLTR"
   ],
   "finnhub_context": {
     "enabled": true,
@@ -309,48 +300,6 @@
           {
             "headline": "Is Rackspace Technology, Inc. (RXT) A Good Stock To Buy Now?",
             "source": "Yahoo"
-          }
-        ]
-      },
-      "QQQ": {
-        "quote": {
-          "price": 721.36,
-          "change_pct": 0.5913,
-          "previous_close": 717.12
-        },
-        "news": [
-          {
-            "headline": "The Fed May Have A Hawkish Surprise For Markets This Week",
-            "source": "SeekingAlpha"
-          },
-          {
-            "headline": "FOMC Chair Warsh Won't Cut Rates Soon, A More Hawkish Fed Looms",
-            "source": "SeekingAlpha"
-          },
-          {
-            "headline": "May Inflation Print: Why The 4.2% Headline Is An Oil Story",
-            "source": "SeekingAlpha"
-          }
-        ]
-      },
-      "SPY": {
-        "quote": {
-          "price": 741.77,
-          "change_pct": 0.5435,
-          "previous_close": 737.76
-        },
-        "news": [
-          {
-            "headline": "The Fed May Have A Hawkish Surprise For Markets This Week",
-            "source": "SeekingAlpha"
-          },
-          {
-            "headline": "Have S&P 500 Index Funds, Often Touted as the Best Stock Investments, Become Dangerous? There's a Worrisome Development -- and a Possibly Better Alternative.",
-            "source": "Yahoo"
-          },
-          {
-            "headline": "Peace Hopes Revive Rally",
-            "source": "SeekingAlpha"
           }
         ]
       }
