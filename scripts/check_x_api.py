@@ -696,6 +696,7 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
 3. אל תכתוב "לפי הציוצים שנאספו", "לפי נתוני Finnhub", "לפי הטענות" או כל ניסוח שמסביר את המקורות.
 4. אל תשתמש במקפים כפולים כמו -- או ״––״, ואל תשתמש במקף ארוך/Em dash. השתמש בפסיק, נקודה, נקודתיים או נקודה־פסיק.
 5. אל תרבה בסימבולים. אם סימבול חיוני, כתוב אותו פעם אחת בלבד בסוגריים אחרי שם החברה או המוצר. אל תכתוב SPCX$ או TSLA$. אל תפתח שורה בסימבול.
+5א. שמות חברות באנגלית: אל תתרגם שם חברה לא מזוהה לשם עברי פונטי בלבד. אם שם החברה מהמקור הוא ASI, Thales, Palantir, Apple או Alphabet, כתוב בעברית לפניו ואז את השם/הסימבול בסוגריים לפי הצורך, למשל: "חברת ASI", "פלנטיר (PLTR)", "תאלס (Thales)". אל תכתוב "אסי" בלי ASI בסוגריים.
 6. אם כמה כותרות שייכות לאותו נושא, אחד אותן לפסקה אחת. לדוגמה: ספייסאיקס והמוצרים הממונפים סביבה הם סעיף אחד, לא שני סעיפים נפרדים.
 7. הימנע מהמבנה החוזר "זה חשוב כי". במקום זאת, כתוב את המשמעות באופן טבעי: "המשמעות לשוק היא...", "עבור הסקטור...", "הנקודה המקצועית היא...".
 8. אל תסיים כל סעיף בהסתייגות. אם נדרשת זהירות, שלב אותה בקצרה בתוך המשפט.
@@ -791,6 +792,7 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
 - ודא שהשורה התחתונה היא 2 עד 3 משפטים בלבד.
 - ודא שאין מקפים כפולים, אין מקף ארוך ואין הדגשות פנימיות עם **.
 - ודא שאין תקלות RTL כמו SPCX$ או P&S.
+- ודא ששמות חברות לא מוכרים לא עוברתו לבד ללא השם האנגלי, למשל ASI לא תהפוך ל"אסי" בלבד.
 - ודא שלא הודפסו הוראות פנימיות או שמות מצב.
 
 ציוצים:
@@ -839,6 +841,8 @@ TICKER_NAME_MAP = {
     "SPCX": "SpaceX",
     "TSLA": "Tesla",
     "PYPL": "PayPal",
+    "ASI": "חברת ASI",
+    "THALES": "Thales",
     "AMZN": "Amazon",
     "IBIT": "IBIT",
     "SOXX": "קרן השבבים",
@@ -846,11 +850,14 @@ TICKER_NAME_MAP = {
     "VXN": "מדד התנודתיות",
     "SPCH": "מוצר הלונג",
     "SSPC": "מוצר השורט",
+    "PLTR": "Palantir",
+    "AAPL": "Apple",
+    "GOOGL": "Alphabet",
 }
 
 # Only these symbols may remain visually in the text, and only on first meaningful mention.
 # After the first mention, the script converts the symbol to a plain company/instrument name.
-IMPORTANT_KEEP_SYMBOLS = {"SPCX", "SPCH", "SSPC", "IBIT", "SOXX", "SPXL", "VXN", "TSLA", "PYPL"}
+IMPORTANT_KEEP_SYMBOLS = {"SPCX", "SPCH", "SSPC", "IBIT", "SOXX", "SPXL", "VXN", "TSLA", "PYPL", "ASI", "THALES", "PLTR", "AAPL", "GOOGL"}
 
 
 def normalize_cashtag_direction(text: str) -> str:
