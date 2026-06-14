@@ -633,7 +633,163 @@ def get_review_prompt_header() -> str:
 """
 
 
-def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) -> str:
+def extract_json_object(text: str) -> Dict[str, Any]:
+    """Extract and parse the first JSON object from the model response."""
+    text = (text or "").strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```(?:json)?\s*", "", text)
+        text = re.sub(r"\s*```$", "", text)
+    start = text.find("{")
+    if start < 0:
+        raise ValueError("No JSON object found in model output")
+    depth = 0
+    in_string = False
+    escape = False
+    for i in range(start, len(text)):
+        ch = text[i]
+        if in_string:
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == '"':
+                in_string = False
+        else:
+            if ch == '"':
+                in_string = True
+            elif ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    return json.loads(text[start:i+1])
+    raise ValueError("JSON object was not closed, likely truncated output")
+
+
+def clean_structured_string(value: Any) -> str:
+    text = str(value or "")
+    text = strip_model_artifacts(text)
+    text = normalize_review_text(reduce_ticker_noise(text))
+    text = re.sub(r"\bבאסי\b", "בחברת ASI", text)
+    text = re.sub(r"\bאסי\b", "חברת ASI", text)
+    text = re.sub(r"^\s*נקודה\s*\d+\s*[:.：־\-–—]?\s*", "", text, flags=re.I)
+    text = re.sub(r"^\s*#{1,6}\s*", "", text)
+    text = text.replace("###", "").replace("##", "").replace("#", "")
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def strip_model_artifacts(text: str) -> str:
+    return (text or "").replace("**", "").replace("```", "").replace("---", ",").replace("--", ",").replace("—", ",").replace("–", ",")
+
+
+def clean_items(items: Any, max_items: int) -> List[Dict[str, str]]:
+    out: List[Dict[str, str]] = []
+    if not isinstance(items, list):
+        return out
+    for item in items[:max_items]:
+        if not isinstance(item, dict):
+            continue
+        heading = clean_structured_string(item.get("heading") or item.get("title") or item.get("trigger"))
+        body = clean_structured_string(item.get("body") or item.get("implication") or item.get("text"))
+        if heading and body:
+            out.append({"heading": heading, "body": body})
+    return out
+
+
+def sanitize_structured_review(obj: Dict[str, Any], review_context: Dict[str, str], main_title: str, background_title: str, forward_title: str) -> Dict[str, Any]:
+    review = {
+        "title": clean_structured_string(obj.get("title") or REVIEW_CONFIG["label"]),
+        "subtitle": clean_structured_string(obj.get("subtitle") or review_context["title"]),
+        "intro": clean_structured_string(obj.get("intro")),
+        "main_title": clean_structured_string(obj.get("main_title") or main_title),
+        "main": clean_items(obj.get("main"), 3),
+        "background_title": clean_structured_string(obj.get("background_title") or background_title),
+        "background": clean_items(obj.get("background"), 3),
+        "forward_title": clean_structured_string(obj.get("forward_title") or forward_title),
+        "forward": clean_items(obj.get("forward"), 4),
+        "bottom_line": clean_structured_string(obj.get("bottom_line")),
+        "summary_points": [],
+    }
+
+    raw_points = obj.get("summary_points") if isinstance(obj.get("summary_points"), list) else []
+    points = [clean_structured_string(x) for x in raw_points]
+    points = [p for p in points if p]
+    if not points:
+        # Deterministic fallback for the home preview: never use "נקודה 1" and never use raw Markdown.
+        candidates = []
+        if review["intro"]:
+            candidates.append(review["intro"])
+        for item in review["main"] + review["background"]:
+            candidates.append(f'{item["heading"]}: {item["body"]}')
+        points = candidates[:5]
+    review["summary_points"] = [p[:260].rstrip(" ,.;:") for p in points[:5]]
+
+    validate_structured_review(review)
+    return review
+
+
+def validate_structured_review(review: Dict[str, Any]) -> None:
+    if not review.get("intro"):
+        raise ValueError("Missing intro")
+    if len(review.get("main") or []) < 2:
+        raise ValueError("Missing main items")
+    if not review.get("bottom_line"):
+        raise ValueError("Missing bottom_line")
+    blob = json.dumps(review, ensure_ascii=False)
+    forbidden = ["###", "##", "**", "נקודה 1", "נקודה 2", "נקודה 3", "weekly_weekend", "premarket", "intraday", "postmarket", "market_holiday"]
+    hits = [x for x in forbidden if x in blob]
+    if hits:
+        raise ValueError(f"Forbidden artifacts in structured review: {hits}")
+    # Prevent half-written output from being saved.
+    last = review.get("bottom_line", "").strip()
+    if last and last[-1] not in ".!?。؟":
+        raise ValueError("bottom_line does not end as a complete sentence")
+
+
+def structured_review_to_markdown(review: Dict[str, Any]) -> str:
+    """Create a clean markdown fallback without ### topic headings."""
+    lines: List[str] = []
+    lines.append(f'# 🌅 {review["title"]}')
+    lines.append("")
+    lines.append(review["subtitle"])
+    lines.append("")
+    lines.append(review["intro"])
+    lines.append("")
+    lines.append(f'## {review["main_title"]}')
+    lines.append("")
+    for item in review["main"]:
+        lines.append(item["heading"])
+        lines.append("")
+        lines.append(item["body"])
+        lines.append("")
+    if review.get("background"):
+        lines.append(f'## {review["background_title"]}')
+        lines.append("")
+        for item in review["background"]:
+            lines.append(item["heading"])
+            lines.append("")
+            lines.append(item["body"])
+            lines.append("")
+    if review.get("forward") and review.get("forward_title"):
+        lines.append(f'## {review["forward_title"]}')
+        lines.append("")
+        for item in review["forward"]:
+            lines.append(item["heading"])
+            lines.append("")
+            lines.append(item["body"])
+            lines.append("")
+    lines.append("## שורה תחתונה")
+    lines.append("")
+    lines.append(review["bottom_line"])
+    lines.append("")
+    lines.append("⚠️ גילוי נאות: תוכן זה נוצר באמצעות AI לצרכים אינפורמטיביים בלבד. אין באמור ייעוץ השקעות או המלצה לפעולה בניירות ערך.")
+    lines.append("")
+    lines.append("פותח ע\"י דורון שרייבמן")
+    return normalize_review_text("\n".join(lines))
+
+
+def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) -> Dict[str, Any]:
     tweets_text = build_tweets_text(tweets)
     market_context_text = build_market_context_text(market_context)
 
@@ -645,23 +801,13 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
 
     if review_context_mode.endswith("weekly_weekend"):
         forward_section_title = "לקראת השבוע הקרוב"
-        forward_section_instruction = (
-            "חובה להוסיף אחרי נקודות מרכזיות סעיף בשם 'לקראת השבוע הקרוב'. "
-            "כתוב בו 4 עד 5 טריגרים קצרים שמתרגמים את הסקירה לשאלות/מוקדי מעקב לשבוע הבא. "
-            "זה צריך להיות מבט קדימה, לא חזרה על מה שכבר נכתב."
-        )
+        forward_section_instruction = "כלול 3 עד 4 טריגרים מעשיים לשבוע הקרוב."
     elif review_context_mode.endswith("week_start_prep") or review_context_mode.endswith("market_holiday") or review_context_mode in {"week_start_prep", "market_holiday"}:
         forward_section_title = "לקראת יום המסחר הבא"
-        forward_section_instruction = (
-            "חובה להוסיף אחרי נקודות מרכזיות סעיף בשם 'לקראת יום המסחר הבא'. "
-            "כתוב בו 3 עד 5 טריגרים קצרים על מה חשוב לפתיחה/ליום המסחר הבא. "
-            "זה צריך להיות מבט קדימה, לא חזרה על מה שכבר נכתב."
-        )
+        forward_section_instruction = "כלול 3 עד 4 טריגרים מעשיים ליום המסחר הבא."
     else:
         forward_section_title = ""
-        forward_section_instruction = (
-            "אל תוסיף סעיף נפרד של מבט קדימה. אם יש נקודת המשך חשובה, שלב אותה בשורה התחתונה."
-        )
+        forward_section_instruction = "אל תכלול סעיף קדימה נפרד."
 
     if REVIEW_TYPE == "israel":
         main_section_title = "במרכז השוק המקומי"
@@ -671,14 +817,10 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
         elif forward_section_title == "לקראת השבוע הקרוב":
             forward_section_title = "לקראת השבוע בבורסה בתל אביב"
         market_lens_block = """
-כללי עריכה ייחודיים לערוץ ישראל, חובה:
-1. מהות הסקירה היא השוק הישראלי, הבורסה בתל אביב, שקל, אג״ח מקומי, בנקים, נדל״ן, ביטחוניות, אנרגיה, ביטוח ופיננסים.
-2. אל תכתוב סקירת וול סטריט בעברית. אם מופיעה כותרת גלובלית או אמריקאית, הכנס אותה רק אם יש לה השלכה ברורה על תל אביב, שקל, אג״ח, סקטור ישראלי או מניות מקומיות.
-3. הפתיח חייב לענות על שאלת שוק ישראלית, למשל: האם השוק המקומי מתמחר סיכון ביטחוני, ריבית, שקל, בנקים, נדל״ן או זרימות לתל אביב.
-4. בכל נושא ציין את החיבור המקומי. לא מספיק לכתוב אירוע כללי, צריך להסביר איך הוא קשור למדדי ת״א, סקטור מקומי, מט״ח, אג״ח או סנטימנט משקיעים בישראל.
-5. העדף שמות בעברית: מדד ת״א 35, מדד ת״א 90, מדד הבנקים, שקל־דולר, אג״ח ממשלתי, אג״ח קונצרני. אל תתחיל שורה באנגלית.
-6. אם אין מספיק חומר מקומי איכותי, כתוב סקירה קצרה יותר. אל תמלא חלל בכותרות חוץ שאינן קשורות ישירות לשוק הישראלי.
-7. סעיף הקדימה צריך לכלול טריגרים מקומיים: כיוון השקל, תשואות אג״ח, בנקים, נדל״ן, ביטחוניות, מחזורי מסחר בתל אביב, הודעות חברות מקומיות ואירועים ביטחוניים עם קשר שוקי.
+כללי עריכה לערוץ ישראל:
+- מהות הסקירה היא השוק הישראלי בלבד: תל אביב, שקל, אג״ח מקומי, בנקים, נדל״ן, ביטחוניות, אנרגיה, ביטוח ופיננסים.
+- כותרת חוץ תיכנס רק אם יש לה השלכה ברורה על תל אביב, שקל, אג״ח, סקטור ישראלי או מניות מקומיות.
+- כל סעיף חייב להסביר את החיבור המקומי. אם אין חיבור כזה, השמט.
 """
     else:
         main_section_title = "במרכז הפתיחה"
@@ -687,172 +829,125 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
 
     prompt = f"""
 {get_review_prompt_header()}
-המטרה:
-להפיק סקירת Market Desk קצרה, היררכית וקריאה בעברית. הסקירה אינה רשימת ציוצים ואינה דוח ציות. היא צריכה לתת לקורא מסגרת שוקית ברורה: מה במרכז, מה ברקע, ומה הטריגרים להמשך.
 
-עקרונות סגנון חובה:
-1. כתוב בעברית מלאה וביישור טבעי מימין לשמאל. אל תפתח שורה, כותרת משנה או פסקה באנגלית, בטיקר או בסימבול. אם צריך להזכיר שם באנגלית, פתח קודם במילה עברית, למשל "ספייסאיקס", "אלפבית", "מניית", "קרן", "סקטור".
-2. הסקירה צריכה להרגיש כמו עמדת Market Desk, לא כמו סיכום מקורות. יש לנסח תזה מרכזית ולהוביל את הקורא דרכה.
-3. אל תכתוב "לפי הציוצים שנאספו", "לפי נתוני Finnhub", "לפי הטענות" או כל ניסוח שמסביר את המקורות.
-4. אל תשתמש במקפים כפולים כמו -- או ״––״, ואל תשתמש במקף ארוך/Em dash. השתמש בפסיק, נקודה, נקודתיים או נקודה־פסיק.
-5. אל תרבה בסימבולים. אם סימבול חיוני, כתוב אותו פעם אחת בלבד בסוגריים אחרי שם החברה או המוצר. אל תכתוב SPCX$ או TSLA$. אל תפתח שורה בסימבול.
-5א. שמות חברות באנגלית: אל תתרגם שם חברה לא מזוהה לשם עברי פונטי בלבד. אם שם החברה מהמקור הוא ASI, Thales, Palantir, Apple או Alphabet, כתוב בעברית לפניו ואז את השם/הסימבול בסוגריים לפי הצורך, למשל: "חברת ASI", "פלנטיר (PLTR)", "תאלס (Thales)". אל תכתוב "אסי" בלי ASI בסוגריים.
-6. אם כמה כותרות שייכות לאותו נושא, אחד אותן לפסקה אחת. לדוגמה: ספייסאיקס והמוצרים הממונפים סביבה הם סעיף אחד, לא שני סעיפים נפרדים.
-7. הימנע מהמבנה החוזר "זה חשוב כי". במקום זאת, כתוב את המשמעות באופן טבעי: "המשמעות לשוק היא...", "עבור הסקטור...", "הנקודה המקצועית היא...".
-8. אל תסיים כל סעיף בהסתייגות. אם נדרשת זהירות, שלב אותה בקצרה בתוך המשפט.
-9. אל תכניס סעיף שאין לו ערך שוקי ברור. אם אין תובנה, השמט.
-10. אל תכתוב סעיף בשם "מה דורש מעקב".
-11. אל תשתמש ב-** או בהדגשות בתוך משפטים. ההיררכיה תבוא רק מכותרות Markdown: ## לכותרת אזור ו-### לכותרת נושא. הפסקאות עצמן יהיו טקסט רגיל.
+המשימה: כתוב סקירת Market Desk בעברית, קצרה, היררכית וקריאה.
+אסור להחזיר Markdown. אסור להשתמש ב-###, ##, #, **, "נקודה 1", מקפים כפולים או מקף ארוך.
+הפלט חייב להיות JSON תקין בלבד, בלי טקסט לפניו או אחריו.
 
-היררכיה וזרימה:
-- הפתיח יציג ב-2 משפטים בלבד את שאלת השוק המרכזית.
-- לאחר הפתיח חובה לחלק את הסקירה כך:
-  1. "{main_section_title}".
-  2. "{background_section_title}".
-  3. סעיף קדימה רק אם נדרש לפי זמן ההרצה.
-  4. "שורה תחתונה".
-- "במרכז" יכלול 3 נקודות בלבד, הנושאים החשובים ביותר.
-- "ברקע" יכלול 2 עד 3 נקודות קצרות יותר.
-- כל נושא בתוך הסעיף יופיע ככותרת משנה נפרדת ברמה ### בשורה משלו, ואחריה פסקה רגילה של עד 2 משפטים. לא להשתמש בהדגשות בתוך הפסקה.
-- כל כותרת משנה וכל פסקה חייבות להתחיל בעברית, לא באנגלית ולא בטיקר.
-
-ערך מוסף:
-כל נושא חייב לכלול שני רכיבים:
-1. מה קרה או מה בלט.
-2. למה זה משנה עכשיו לשוק, לסקטור, לזרימות, לתנודתיות או לסנטימנט.
-הסקירה צריכה לעזור לקורא להבין סדר עדיפויות, לא רק לדעת מה קרה.
+הסגנון הרצוי:
+- פתיח של 2 משפטים שמציג שאלת שוק מרכזית אחת.
+- עד 3 נושאים ב"{main_section_title}".
+- 2 עד 3 נושאים ב"{background_section_title}".
+- אם יש סעיף קדימה, 3 עד 4 טריגרים. כל טריגר מתחיל ב"אם" או בניסוח תנאי שימושי.
+- שורה תחתונה של 2 עד 3 משפטים בלבד.
+- כל כותרת וכל פסקה מתחילות בעברית, לא באנגלית, לא בטיקר ולא בסימבול.
+- אם יש סימבול, הוא יופיע בסוגריים אחרי שם עברי/שם חברה, למשל: ספייסאיקס (SPCX), פלנטיר (PLTR), חברת ASI, תאלס (Thales).
+- שמות לא מוכרים לא יתורגמו לבד. אל תכתוב "אסי" לבד, כתוב "חברת ASI".
+- אין "זה חשוב כי" שחוזר על עצמו. כתוב טבעי: "המשמעות לשוק", "הנקודה המקצועית", "עבור הסקטור".
+- אל תכניס נושא שאין לו ערך שוקי ברור.
+- אם כמה כותרות שייכות לאותו נושא, אחד אותן לפריט אחד.
 {market_lens_block}
-לקראת המסחר / השבוע:
-{forward_section_instruction}
-אם נדרש סעיף קדימה, הוא חייב להיות בשם המדויק: ## {forward_section_title}
-בסעיף הזה אל תכתוב "לעקוב אחרי" בצורה כללית. כתוב טריגרים שימושיים:
-- "אם X קורה, זה יחזק את..."
-- "אם Y קורה, זה יסמן מעבר ל..."
-- "שילוב של X ו-Y יאותת ש..."
-כתוב 3 עד 4 טריגרים בלבד.
 
-חברות פרטיות ונושאים סקטוריאליים:
-אם חברה פרטית מופיעה בקלט, אל תהפוך אותה לאירוע טיקר ישיר ואל תכתוב "שאינה נסחרת". הצג את המשמעות דרך הסקטור הרלוונטי: רגולציית AI, ענן, שבבים, תשתיות חישוב, ביטחון לאומי או זרימות.
-
-שימוש בנתוני שוק:
-נתוני השוק הם שכבת בדיקה ורקע בלבד. אל תכתוב מחיר או שינוי יומי רק כי הנתון קיים. השתמש במספר רק אם הוא הסיפור עצמו או אם הוא מחזק נקודת שוק קיימת.
-
-הקשר פנימי לזמן ההרצה, לשימושך בלבד ולא להדפסה בסקירה:
+הקשר פנימי לשימושך בלבד, לא להדפסה:
 - מצב סקירה: {review_context_mode}
-- כותרת משנה לשימוש בפלט: {review_context_title}
+- כותרת הסקירה: {review_context_title}
 - הנחיית עריכה: {review_editorial_focus}
 - הנחיית סעיף קדימה: {forward_section_instruction}
-- כותרת סעיף קדימה, אם נדרש: {forward_section_title}
 
-אסור להדפיס בסקירה את המילים "הקשר זמן הסקירה", "הנחיית עריכה", "הנחיית סעיף", "weekly_weekend", "premarket", "intraday", "postmarket", "market_holiday" או כל שם מצב פנימי אחר.
+מבנה JSON חובה, החזר בדיוק את השדות האלה:
+{{
+  "title": "{REVIEW_CONFIG['label']}",
+  "subtitle": "{review_context_title}",
+  "intro": "שני משפטים בלבד",
+  "main_title": "{main_section_title}",
+  "main": [
+    {{"heading": "כותרת עברית קצרה", "body": "פסקה של עד שני משפטים"}}
+  ],
+  "background_title": "{background_section_title}",
+  "background": [
+    {{"heading": "כותרת עברית קצרה", "body": "פסקה של עד שני משפטים"}}
+  ],
+  "forward_title": "{forward_section_title}",
+  "forward": [
+    {{"heading": "אם X קורה", "body": "משפט אחד עד שניים שמסביר מה זה יסמן"}}
+  ],
+  "bottom_line": "שניים עד שלושה משפטים",
+  "summary_points": [
+    "משפט תקציר נקי אחד בלי המילים נקודה 1 ובלי Markdown"
+  ]
+}}
 
-מבנה פלט חובה:
+אם אין צורך בסעיף קדימה לפי ההקשר, החזר forward_title כריק ו-forward כמערך ריק.
+אם נדרש סעיף קדימה, שם הסעיף חייב להיות: "{forward_section_title}".
+summary_points חייב להכיל 3 עד 5 נקודות נקיות למסך הפתיחה. אסור להתחיל אותן ב"נקודה 1".
 
-# 🌅 {REVIEW_CONFIG["label"]}
-
-{review_context_title}
-
-פתיח קצר של 2 משפטים בלבד. הפתיח חייב להציג שאלת שוק מרכזית אחת שמארגנת את הסקירה.
-
-## {main_section_title}
-
-כתוב 3 נושאים בלבד.
-כל נושא בפורמט הבא, בלי כוכביות ובלי הדגשות פנימיות:
-### כותרת עברית קצרה
-פסקה רגילה של עד 2 משפטים.
-כותרת הסעיף הראשית חייבת להיות בדיוק: ## {main_section_title}
-
-## {background_section_title}
-
-כתוב 2 עד 3 נושאים בלבד.
-כל נושא בפורמט של כותרת משנה ### ואחריה פסקה רגילה קצרה יותר מהפסקאות במרכז.
-
-הוסף סעיף קדימה רק לפי ההנחיה הפנימית: {forward_section_instruction}
-אם נדרש סעיף כזה, הכותרת שלו חייבת להיות בדיוק: ## {forward_section_title}
-כתוב בו 3 עד 4 טריגרים. כל טריגר יופיע ככותרת משנה ### ואחריה משפט אחד עד שניים. לא להשתמש בכוכביות ובהדגשות פנימיות.
-
-## שורה תחתונה
-
-כתוב 2 עד 3 משפטים בלבד. השורה התחתונה צריכה להיות עמדה מסכמת, לא חזרה על כל הסקירה.
-
-בסוף כתוב בדיוק:
-
-⚠️ גילוי נאות: תוכן זה נוצר באמצעות AI לצרכים אינפורמטיביים בלבד. אין באמור ייעוץ השקעות או המלצה לפעולה בניירות ערך.
-
-פותח ע"י דורון שרייבמן
-
-בדיקת איכות פנימית לפני החזרה:
-- ודא שהסקירה קצרה יותר, היררכית יותר וחדה יותר.
-- ודא שאין יותר מ-6 נושאים לפני סעיף הקדימה.
-- אם זו סקירת ישראל, ודא שהסקירה היא על השוק הישראלי ולא על וול סטריט; כל כותרת חוץ חייבת להיות מחוברת להשפעה מקומית.
-- ודא שכל כותרת משנה ופסקה מתחילות בעברית ולא באנגלית או בטיקר.
-- ודא שנושאים קשורים אוחדו לפסקה אחת ולא פוצלו מלאכותית.
-- ודא שאין "זה חשוב כי" שחוזר על עצמו.
-- ודא שסעיף הקדימה כולל טריגרים ולא ניסוח כללי של "לעקוב".
-- ודא שהשורה התחתונה היא 2 עד 3 משפטים בלבד.
-- ודא שאין מקפים כפולים, אין מקף ארוך ואין הדגשות פנימיות עם **.
-- ודא שאין תקלות RTL כמו SPCX$ או P&S.
-- ודא ששמות חברות לא מוכרים לא עוברתו לבד ללא השם האנגלי, למשל ASI לא תהפוך ל"אסי" בלבד.
-- ודא שלא הודפסו הוראות פנימיות או שמות מצב.
+בדיקת איכות לפני החזרה:
+- אין Markdown בכלל.
+- אין ###, ##, #, **.
+- אין "נקודה 1".
+- אין משפט שנקטע באמצע.
+- bottom_line מסתיים בנקודה.
+- אין הוראות פנימיות או שמות מצב פנימיים.
+- כל סעיף מתחיל בעברית.
 
 ציוצים:
 {tweets_text}
 
-נתוני שוק, לשימוש פנימי בלבד:
+נתוני שוק, לשימוש כרקע בלבד:
 {market_context_text}
 """
 
     payload = {
         "model": OPENAI_MODEL,
         "input": prompt,
-        "max_output_tokens": 3600,
+        "max_output_tokens": int(os.environ.get("OPENAI_MAX_OUTPUT_TOKENS", "7000")),
     }
 
-    response = requests.post(
-        OPENAI_BASE,
-        headers={
-            "Authorization": f"Bearer {OPENAI_API_KEY}",
-            "Content-Type": "application/json",
-        },
-        json=payload,
-        timeout=220,
-    )
-
-    try:
-        data = response.json()
-    except Exception:
-        raise SystemExit(f"OpenAI returned non-JSON response: {response.text[:2000]}")
-
-    if response.status_code >= 400:
-        raise SystemExit(
-            "OpenAI API error:\n"
-            + json.dumps(data, ensure_ascii=False, indent=2)[:4000]
+    last_error = None
+    for attempt in range(2):
+        response = requests.post(
+            OPENAI_BASE,
+            headers={
+                "Authorization": f"Bearer {OPENAI_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json=payload,
+            timeout=240,
         )
-
-    text = extract_openai_text(data)
-    if not text:
-        raise SystemExit("OpenAI returned empty text.")
-
-    return text.strip()
+        try:
+            data = response.json()
+        except Exception:
+            raise SystemExit(f"OpenAI returned non-JSON response: {response.text[:2000]}")
+        if response.status_code >= 400:
+            raise SystemExit("OpenAI API error:\n" + json.dumps(data, ensure_ascii=False, indent=2)[:4000])
+        text = extract_openai_text(data)
+        try:
+            obj = extract_json_object(text)
+            return sanitize_structured_review(obj, review_context, main_section_title, background_section_title, forward_section_title)
+        except Exception as exc:
+            last_error = exc
+            payload["input"] = prompt + f"\n\nהניסיון הקודם נכשל בבדיקה בגלל: {exc}. החזר הפעם JSON קצר יותר, תקין וסגור לחלוטין."
+            payload["max_output_tokens"] = 7000
+    raise SystemExit(f"Structured review validation failed: {last_error}")
 
 
 
 TICKER_NAME_MAP = {
-    "SPCX": "SpaceX",
-    "TSLA": "Tesla",
-    "PYPL": "PayPal",
+    "SPCX": "ספייסאיקס",
+    "TSLA": "טסלה",
+    "PYPL": "פייפאל",
     "ASI": "חברת ASI",
-    "THALES": "Thales",
-    "AMZN": "Amazon",
-    "IBIT": "IBIT",
+    "THALES": "תאלס",
+    "AMZN": "אמזון",
+    "IBIT": "קרן IBIT",
     "SOXX": "קרן השבבים",
     "SPXL": "קרן ה-S&P הממונפת",
     "VXN": "מדד התנודתיות",
-    "SPCH": "מוצר הלונג",
+    "SPCH": "קרן SPCH",
     "SSPC": "מוצר השורט",
-    "PLTR": "Palantir",
-    "AAPL": "Apple",
-    "GOOGL": "Alphabet",
+    "PLTR": "פלנטיר",
+    "AAPL": "אפל",
+    "GOOGL": "אלפבית",
 }
 
 # Only these symbols may remain visually in the text, and only on first meaningful mention.
@@ -893,14 +988,14 @@ def reduce_ticker_noise(text: str) -> str:
             return name
 
         seen_global.add(symbol)
-        return f"{name} (${symbol})"
+        return f"{name} ({symbol})"
 
     text = re.sub(r"\$([A-Z]{1,6})(?![A-Z0-9])", repl, text)
 
     # Clean duplicated name/ticker patterns, for example SpaceX SpaceX ($SPCX).
     for symbol, name in TICKER_NAME_MAP.items():
-        text = text.replace(f"{name} {name} (${symbol})", f"{name} (${symbol})")
-        text = text.replace(f"{name} ({name} (${symbol}))", f"{name} (${symbol})")
+        text = text.replace(f"{name} {name} ({symbol})", f"{name} ({symbol})")
+        text = text.replace(f"{name} ({name} ({symbol}))", f"{name} ({symbol})")
 
     return text
 
@@ -950,7 +1045,8 @@ def main() -> None:
     print(f"Detected symbols for Finnhub: {', '.join(symbols) or 'None'}")
     print(f"Finnhub enabled: {bool(FINNHUB_API_KEY)}")
 
-    review = normalize_review_text(reduce_ticker_noise(call_openai(selected, market_context)))
+    structured_review = call_openai(selected, market_context)
+    review = structured_review_to_markdown(structured_review)
 
     input_json = {
         "generated_utc": datetime.now(timezone.utc).isoformat(),
@@ -966,6 +1062,7 @@ def main() -> None:
         "finnhub_context": market_context,
         "review_type": REVIEW_TYPE,
         "review_context": get_active_review_context(datetime.now(ZoneInfo("Asia/Jerusalem"))),
+        "structured_review": structured_review,
     }
 
     timestamped_input_path = OUTPUT_DIR / f"review_input_{run_ts}.json"
