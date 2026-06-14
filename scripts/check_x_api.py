@@ -737,7 +737,7 @@ def validate_structured_review(review: Dict[str, Any]) -> None:
     if not review.get("bottom_line"):
         raise ValueError("Missing bottom_line")
     blob = json.dumps(review, ensure_ascii=False)
-    forbidden = ["###", "##", "**", "נקודה 1", "נקודה 2", "נקודה 3", "weekly_weekend", "premarket", "intraday", "postmarket", "market_holiday"]
+    forbidden = ["###", "##", "**", "נקודה 1", "נקודה 2", "נקודה 3", "weekly_weekend", "premarket", "intraday", "postmarket", "market_holiday", "נקודה 4", "נקודה 5", "לפי הציוץ", "ציוץ נוסף", "ציוץ", "הוזכר", "דווח כי", "יום המסחר הבא", "שכבת ערך", "מסגרת חדשה", "שיח ביטחוני", "עתירי נרטיב"]
     hits = [x for x in forbidden if x in blob]
     if hits:
         raise ValueError(f"Forbidden artifacts in structured review: {hits}")
@@ -809,8 +809,8 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
         forward_section_title = "לקראת השבוע הקרוב"
         forward_section_instruction = "כלול 3 עד 4 טריגרים מעשיים לשבוע הקרוב."
     elif review_context_mode.endswith("week_start_prep") or review_context_mode.endswith("market_holiday") or review_context_mode in {"week_start_prep", "market_holiday"}:
-        forward_section_title = "לקראת יום המסחר הבא"
-        forward_section_instruction = "כלול 3 עד 4 טריגרים מעשיים ליום המסחר הבא."
+        forward_section_title = "לקראת המסחר הקרוב"
+        forward_section_instruction = "כלול 3 טריגרים מעשיים למסחר הקרוב."
     else:
         forward_section_title = ""
         forward_section_instruction = "אל תכלול סעיף קדימה נפרד."
@@ -818,7 +818,7 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
     if REVIEW_TYPE == "israel":
         main_section_title = "במרכז השוק המקומי"
         background_section_title = "ברקע המקומי"
-        if forward_section_title == "לקראת יום המסחר הבא":
+        if forward_section_title == "לקראת המסחר הקרוב":
             forward_section_title = "לקראת המסחר בתל אביב"
         elif forward_section_title == "לקראת השבוע הקרוב":
             forward_section_title = "לקראת השבוע בבורסה בתל אביב"
@@ -841,15 +841,20 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
 הפלט חייב להיות JSON תקין בלבד, בלי טקסט לפניו או אחריו.
 
 הסגנון הרצוי:
-- פתיח של 2 משפטים שמציג שאלת שוק מרכזית אחת.
+- כתוב כמו איש שוק מקצועי שמסביר ברור, לא כמו טקסט שיווקי ולא כמו סיכום ציוצים.
+- עברית פשוטה, משפטים קצרים, בלי התחכמות ובלי מילים מנופחות.
+- המבנה בכל סעיף: מה קרה, למה זה משנה לשוק, מה לבדוק במסחר.
+- פתיח של 2 משפטים שמציג את השאלה המרכזית לשוק.
 - עד 3 נושאים ב"{main_section_title}".
-- 2 עד 3 נושאים ב"{background_section_title}".
-- אם יש סעיף קדימה, 3 עד 4 טריגרים. כל טריגר מתחיל ב"אם" או בניסוח תנאי שימושי.
+- עד 2 נושאים ב"{background_section_title}".
+- אם יש סעיף קדימה, 3 טריגרים בלבד. כל טריגר מתחיל ב"אם" ומסביר מה זה יסמן.
+- שם סעיף קדימה לוול סטריט חייב להיות "לקראת המסחר הקרוב", לא "לקראת יום המסחר הבא".
 - שורה תחתונה של 2 עד 3 משפטים בלבד.
 - כל כותרת וכל פסקה מתחילות בעברית, לא באנגלית, לא בטיקר ולא בסימבול.
 - אם יש סימבול, הוא יופיע בסוגריים אחרי שם עברי/שם חברה, למשל: ספייסאיקס (SPCX), פלנטיר (PLTR), חברת ASI, תאלס (Thales).
 - שמות לא מוכרים לא יתורגמו לבד. אל תכתוב "אסי" לבד, כתוב "חברת ASI".
-- אין "זה חשוב כי" שחוזר על עצמו. כתוב טבעי: "המשמעות לשוק", "הנקודה המקצועית", "עבור הסקטור".
+- אסור לכתוב "לפי הציוץ", "ציוץ נוסף", "הוזכר", "דווח כי" או ניסוח שמראה שאתה מסכם פיד.
+- אל תשתמש בביטויים מנופחים כמו "שכבת ערך", "מסגרת חדשה", "שיח ביטחוני", "נכסי צמיחה עתירי נרטיב".
 - אל תכניס נושא שאין לו ערך שוקי ברור.
 - אם כמה כותרות שייכות לאותו נושא, אחד אותן לפריט אחד.
 {market_lens_block}
@@ -885,7 +890,7 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
 
 אם אין צורך בסעיף קדימה לפי ההקשר, החזר forward_title כריק ו-forward כמערך ריק.
 אם נדרש סעיף קדימה, שם הסעיף חייב להיות: "{forward_section_title}".
-summary_points חייב להכיל 3 עד 5 נקודות נקיות למסך הפתיחה. אסור להתחיל אותן ב"נקודה 1".
+summary_points חייב להכיל 3 עד 5 נקודות נקיות למסך הפתיחה. אסור להתחיל אותן ב"נקודה 1". כל נקודה צריכה להיות משפט פשוט וישיר, בלי ניסוח של סיכום ציוץ.
 
 היקף חובה: main עד 3 סעיפים, background עד 2 סעיפים, forward עד 3 סעיפים. עדיף קצר ושלם מאשר ארוך ונחתך.
 כל body חייב להסתיים בנקודה. אל תחזיר סעיף אם אין לו גוף שלם.
