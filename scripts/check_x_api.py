@@ -943,6 +943,7 @@ def main() -> None:
 
     input_json = {
         "generated_utc": datetime.now(timezone.utc).isoformat(),
+        "generated_israel": datetime.now(ZoneInfo("Asia/Jerusalem")).isoformat(),
         "model": OPENAI_MODEL,
         "total_raw_tweets": len(all_tweets),
         "selected_tweets": selected,
