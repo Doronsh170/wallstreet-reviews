@@ -1,10 +1,10 @@
+import json
 import os
 import re
-import json
 from datetime import datetime, timezone, timedelta
-from zoneinfo import ZoneInfo
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
+from zoneinfo import ZoneInfo
 
 import requests
 
@@ -13,832 +13,566 @@ OPENAI_BASE = "https://api.openai.com/v1/responses"
 FINNHUB_BASE = "https://finnhub.io/api/v1"
 
 REVIEW_TYPE = os.environ.get("REVIEW_TYPE", "wallstreet").strip().lower()
-
-REVIEW_CONFIGS = {
-    "wallstreet": {
-        "label": "טעימת וול סטריט",
-        "sources_file": Path("sources/wallstreet.txt"),
-        "legacy_sources_file": Path("accounts.txt"),
-        "output_dir": Path("output/wallstreet"),
-        "legacy_latest": True,
-    },
-    "israel": {
-        "label": "טעימת השוק בישראל",
-        "sources_file": Path("sources/israel.txt"),
-        "legacy_sources_file": None,
-        "output_dir": Path("output/israel"),
-        "legacy_latest": False,
-    },
-    "trump": {
-        "label": "טראמפ והשוק",
-        "sources_file": Path("sources/trump.txt"),
-        "legacy_sources_file": None,
-        "output_dir": Path("output/trump"),
-        "legacy_latest": False,
-    },
-}
-
-if REVIEW_TYPE not in REVIEW_CONFIGS:
-    raise SystemExit(f"Unsupported REVIEW_TYPE: {REVIEW_TYPE}. Use one of: {', '.join(REVIEW_CONFIGS)}")
-
-REVIEW_CONFIG = REVIEW_CONFIGS[REVIEW_TYPE]
-OUTPUT_ROOT = Path("output")
-OUTPUT_ROOT.mkdir(exist_ok=True)
-OUTPUT_DIR = REVIEW_CONFIG["output_dir"]
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+if REVIEW_TYPE != "wallstreet":
+    raise SystemExit("Core rebuild v1 supports only REVIEW_TYPE=wallstreet. Israel/Trump will be rebuilt later.")
 
 TWITTER_API_KEY = os.environ.get("TWITTER_API_KEY", "").strip()
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "").strip()
 FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY", "").strip()
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.5").strip()
-
 MAX_TWEETS_PER_ACCOUNT = int(os.environ.get("MAX_TWEETS_PER_ACCOUNT", "4"))
-MAX_TWEETS_FOR_REVIEW = int(os.environ.get("MAX_TWEETS_FOR_REVIEW", "10"))
-MAX_FINNHUB_SYMBOLS = int(os.environ.get("MAX_FINNHUB_SYMBOLS", "8"))
-
-CASHTAG_RE = re.compile(r"(?<![A-Za-z0-9_])\$[A-Z]{1,6}(?![A-Za-z0-9_])")
+MAX_TWEETS_FOR_REVIEW = int(os.environ.get("MAX_TWEETS_FOR_REVIEW", "12"))
+MAX_OUTPUT_TOKENS = int(os.environ.get("OPENAI_MAX_OUTPUT_TOKENS", "5000"))
 
 if not TWITTER_API_KEY:
     raise SystemExit("Missing GitHub secret: TWITTER_API_KEY")
-
 if not OPENAI_API_KEY:
     raise SystemExit("Missing GitHub secret: OPENAI_API_KEY")
 
+ROOT = Path(".")
+SOURCES_FILE = Path("sources/wallstreet.txt")
+OUTPUT_DIR = Path("output/wallstreet")
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+OUTPUT_ROOT = Path("output")
+OUTPUT_ROOT.mkdir(exist_ok=True)
+
+CASHTAG_RE = re.compile(r"(?<![A-Za-z0-9_])\$([A-Z]{1,6})(?![A-Za-z0-9_])")
+HEBREW_RE = re.compile(r"[א-ת]")
+
+FORBIDDEN_PHRASES = [
+    "לפי הציוץ", "ציוץ נוסף", "הציוץ", "ציוץ", "לפי פוסט", "הפוסט",
+    "הוזכר", "דווח כי", "לפי דיווח", "לפי המקור", "נאמר כי", "מקור",
+    "###", "##", "**", "נקודה 1", "נקודה 2", "נקודה 3", "נקודה 4", "נקודה 5",
+    "יום המסחר הבא", "שכבת ערך", "מסגרת חדשה", "שיח ביטחוני", "עדשת ביטחון לאומי",
+    "נכסי צמיחה עתירי נרטיב", "תמחור נרטיבי", "מוקד נרטיבי", "אס אנד פי"
+]
+
+BANNED_PREFIX_RE = re.compile(r"^\s*([A-Za-z$]|\([A-Za-z$])")
+BAD_NUMERIC_PATTERNS = [
+    re.compile(r"\d+\.\s+\d+"),
+    re.compile(r"סביב\s+0\."),
+    re.compile(r"\b0\.\s*(?:$|[א-ת])"),
+]
+FUTURES_PERCENT_RE = re.compile(r"חוז(?:ה|ים|י)[^\.\n]{0,70}\d+(?:\.\d+)?\s*%")
+
 
 def read_accounts() -> List[str]:
-    sources_file = REVIEW_CONFIG["sources_file"]
-    legacy = REVIEW_CONFIG.get("legacy_sources_file")
-
-    if sources_file.exists():
-        source_path = sources_file
-    elif legacy and legacy.exists():
-        source_path = legacy
-    else:
-        raise SystemExit(f"Missing sources file for {REVIEW_TYPE}: {sources_file}")
-
-    accounts = []
-    for line in source_path.read_text(encoding="utf-8").splitlines():
-        account = line.strip().lstrip("@")
-        if account and not account.startswith("#"):
-            accounts.append(account)
-
+    if not SOURCES_FILE.exists():
+        raise SystemExit(f"Missing sources file: {SOURCES_FILE}")
+    accounts: List[str] = []
+    for line in SOURCES_FILE.read_text(encoding="utf-8").splitlines():
+        x = line.strip().lstrip("@")
+        if x and not x.startswith("#"):
+            accounts.append(x)
     if not accounts:
-        raise SystemExit(f"No X accounts configured in {source_path}")
-
+        raise SystemExit("No Wall Street sources configured")
     return accounts
 
 
-def safe_float(value: Any) -> Optional[float]:
+def http_json(url: str, *, headers=None, params=None, timeout=35) -> Dict[str, Any]:
+    r = requests.get(url, headers=headers or {}, params=params or {}, timeout=timeout)
     try:
-        if value is None:
-            return None
-        x = float(value)
-        if x == 0:
-            return 0.0
-        return x
+        data = r.json()
     except Exception:
-        return None
+        data = {"raw_text": r.text[:1000]}
+    data["_http_status"] = r.status_code
+    return data
 
 
-def get_twitter_json(path: str, params: Dict[str, Any]) -> Dict[str, Any]:
-    response = requests.get(
-        f"{TWITTER_BASE}{path}",
-        headers={"X-API-Key": TWITTER_API_KEY},
-        params=params,
-        timeout=40,
-    )
-
-    try:
-        payload = response.json()
-    except Exception:
-        payload = {"raw_text": response.text[:2000]}
-
-    payload["_http_status"] = response.status_code
-    return payload
-
-
-def looks_like_tweet(item: Any) -> bool:
-    if not isinstance(item, dict):
-        return False
-    text = item.get("text") or item.get("fullText") or item.get("content")
-    return isinstance(text, str) and bool(text.strip())
+def looks_like_tweet(x: Any) -> bool:
+    return isinstance(x, dict) and isinstance(x.get("text") or x.get("fullText") or x.get("content"), str)
 
 
 def find_tweets(obj: Any) -> List[Dict[str, Any]]:
-    found = []
-
+    out: List[Dict[str, Any]] = []
     if looks_like_tweet(obj):
-        found.append(obj)
-
+        out.append(obj)
     elif isinstance(obj, list):
         for item in obj:
-            found.extend(find_tweets(item))
-
+            out.extend(find_tweets(item))
     elif isinstance(obj, dict):
         for key in ("tweets", "data", "items", "results"):
             if key in obj:
-                found.extend(find_tweets(obj[key]))
-
-        if not found:
-            for value in obj.values():
-                found.extend(find_tweets(value))
-
-    dedup = {}
-    for tweet in found:
-        key = str(tweet.get("id") or tweet.get("url") or tweet.get("text"))
-        dedup[key] = tweet
-
+                out.extend(find_tweets(obj[key]))
+        if not out:
+            for v in obj.values():
+                out.extend(find_tweets(v))
+    dedup: Dict[str, Dict[str, Any]] = {}
+    for t in out:
+        key = str(t.get("id") or t.get("url") or t.get("text") or "")
+        if key:
+            dedup[key] = t
     return list(dedup.values())
 
 
 def normalize_tweet(tweet: Dict[str, Any], account: str) -> Dict[str, Any]:
     author = tweet.get("author") if isinstance(tweet.get("author"), dict) else {}
-
     text = tweet.get("text") or tweet.get("fullText") or tweet.get("content") or ""
-    text = text.replace("\n", " ").strip()
-
+    text = re.sub(r"\s+", " ", str(text)).strip()
+    cashtags = sorted(set(m.group(1).upper() for m in CASHTAG_RE.finditer(text)))
     return {
         "account": account,
         "author": author.get("userName") or account,
         "id": tweet.get("id"),
         "url": tweet.get("url") or tweet.get("twitterUrl"),
-        "createdAt": tweet.get("createdAt"),
+        "createdAt": tweet.get("createdAt") or tweet.get("created_at") or tweet.get("date"),
         "text": text,
-        "likeCount": tweet.get("likeCount") or 0,
-        "retweetCount": tweet.get("retweetCount") or 0,
-        "viewCount": tweet.get("viewCount") or 0,
-        "cashtags": sorted(set(CASHTAG_RE.findall(text))),
+        "likeCount": int(tweet.get("likeCount") or 0),
+        "retweetCount": int(tweet.get("retweetCount") or 0),
+        "viewCount": int(tweet.get("viewCount") or 0),
+        "cashtags": cashtags,
         "is_retweet": text.startswith("RT @"),
     }
 
 
 def fetch_tweets_for_account(account: str) -> List[Dict[str, Any]]:
-    payload = get_twitter_json(
-        "/twitter/user/last_tweets",
-        {
-            "userName": account,
-            "cursor": "",
-            "includeReplies": "false",
-        },
+    data = http_json(
+        f"{TWITTER_BASE}/twitter/user/last_tweets",
+        headers={"X-API-Key": TWITTER_API_KEY},
+        params={"userName": account, "cursor": "", "includeReplies": "false"},
     )
-
-    tweets = find_tweets(payload)
-    normalized = [normalize_tweet(tweet, account) for tweet in tweets]
-    return normalized[:MAX_TWEETS_PER_ACCOUNT]
+    print(f"@{account}: status={data.get('_http_status')}")
+    tweets = [normalize_tweet(t, account) for t in find_tweets(data)]
+    print(f"  found={len(tweets)}")
+    return tweets[:MAX_TWEETS_PER_ACCOUNT]
 
 
 def tweet_score(tweet: Dict[str, Any]) -> float:
-    score = 0
-
     text = (tweet.get("text") or "").lower()
-    cashtags = tweet.get("cashtags", [])
-
-    if cashtags:
+    score = 0.0
+    if tweet.get("cashtags"):
         score += 30
-
     keywords = [
-        "breaking", "just in", "earnings", "guidance", "upgrade", "downgrade",
-        "price target", "merger", "acquisition", "contract", "export", "doj",
-        "fed", "cpi", "pce", "yield", "oil", "iran", "ai", "space",
-        "etf", "outflow", "inflow", "volatility", "nasdaq", "bitcoin",
+        "breaking", "just in", "fed", "fomc", "cpi", "ppi", "pce", "jobs", "payrolls", "claims",
+        "earnings", "guidance", "upgrade", "downgrade", "price target", "contract", "ipo", "spacex",
+        "ai", "anthropic", "nvidia", "apple", "google", "tesla", "semiconductor", "chips",
+        "oil", "gold", "yield", "treasury", "dollar", "iran", "tariff", "futures", "nasdaq", "s&p",
     ]
-
-    for word in keywords:
-        if word in text:
-            score += 8
-
-    if tweet.get("viewCount", 0) >= 100000:
+    for k in keywords:
+        if k in text:
+            score += 7
+    views = int(tweet.get("viewCount") or 0)
+    likes = int(tweet.get("likeCount") or 0)
+    if views >= 100000:
         score += 15
-    elif tweet.get("viewCount", 0) >= 25000:
+    elif views >= 25000:
         score += 8
-
-    if tweet.get("likeCount", 0) >= 500:
+    if likes >= 500:
         score += 10
-    elif tweet.get("likeCount", 0) >= 100:
+    elif likes >= 100:
         score += 5
-
     if tweet.get("is_retweet"):
         score -= 25
-
     return score
 
 
 def select_tweets(tweets: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    unique = {}
-    for tweet in tweets:
-        key = str(tweet.get("id") or tweet.get("url") or tweet.get("text"))
-        unique[key] = tweet
-
-    scored = [(tweet_score(tweet), tweet) for tweet in unique.values()]
-    scored.sort(key=lambda x: x[0], reverse=True)
-
-    return [tweet for _, tweet in scored[:MAX_TWEETS_FOR_REVIEW]]
+    dedup: Dict[str, Dict[str, Any]] = {}
+    for t in tweets:
+        key = str(t.get("id") or t.get("url") or t.get("text"))
+        dedup[key] = t
+    scored = sorted(((tweet_score(t), t) for t in dedup.values()), key=lambda x: x[0], reverse=True)
+    return [t for _, t in scored[:MAX_TWEETS_FOR_REVIEW]]
 
 
-def build_tweets_text(tweets: List[Dict[str, Any]]) -> str:
-    lines = []
-
-    for i, tweet in enumerate(tweets, start=1):
-        lines.append(f"Tweet {i}")
-        lines.append(f"Source: @{tweet.get('author')}")
-        lines.append(f"Time: {tweet.get('createdAt')}")
-        lines.append(f"URL: {tweet.get('url')}")
-        lines.append(f"Cashtags: {', '.join(tweet.get('cashtags', [])) or 'None'}")
-        lines.append(f"Text: {tweet.get('text')}")
+def build_source_digest(tweets: List[Dict[str, Any]]) -> str:
+    lines: List[str] = []
+    for i, t in enumerate(tweets, start=1):
+        lines.append(f"Source item {i}")
+        lines.append(f"Time: {t.get('createdAt') or 'unknown'}")
+        lines.append(f"Cashtags: {', '.join(t.get('cashtags') or []) or 'None'}")
+        lines.append(f"Text: {t.get('text')}")
         lines.append("")
-
     return "\n".join(lines)
+
+
+def collect_symbols(tweets: List[Dict[str, Any]]) -> List[str]:
+    counts: Dict[str, int] = {}
+    exclude = {"SPX", "NDX", "DJI", "VIX", "DXY", "USD", "AI", "IPO", "ETF", "CEO", "CFO", "USA", "GDP", "CPI", "PPI"}
+    for t in tweets:
+        for s in t.get("cashtags") or []:
+            if s not in exclude:
+                counts[s] = counts.get(s, 0) + 1
+    return [s for s, _ in sorted(counts.items(), key=lambda x: x[1], reverse=True)[:10]]
+
+
+def safe_float(x: Any) -> Optional[float]:
+    try:
+        if x is None:
+            return None
+        return float(x)
+    except Exception:
+        return None
 
 
 def finnhub_get(path: str, params: Dict[str, Any]) -> Optional[Any]:
     if not FINNHUB_API_KEY:
         return None
-    params = dict(params)
-    params["token"] = FINNHUB_API_KEY
+    p = dict(params)
+    p["token"] = FINNHUB_API_KEY
     try:
-        response = requests.get(f"{FINNHUB_BASE}{path}", params=params, timeout=20)
-        if response.status_code >= 400:
+        r = requests.get(f"{FINNHUB_BASE}{path}", params=p, timeout=15)
+        if not r.ok:
             return None
-        return response.json()
+        return r.json()
     except Exception:
         return None
 
 
-def collect_symbols(tweets: List[Dict[str, Any]]) -> List[str]:
-    counts: Dict[str, int] = {}
-    for tweet in tweets:
-        for tag in tweet.get("cashtags", []):
-            symbol = tag.replace("$", "").upper().strip()
-            # Exclude obvious non-ticker artifacts if any appear.
-            if 1 <= len(symbol) <= 6:
-                counts[symbol] = counts.get(symbol, 0) + 1
-    return [s for s, _ in sorted(counts.items(), key=lambda x: x[1], reverse=True)[:MAX_FINNHUB_SYMBOLS]]
-
-
-def fetch_finnhub_context(symbols: List[str]) -> Dict[str, Any]:
+def fetch_market_facts(symbols: List[str]) -> Dict[str, Any]:
+    facts: Dict[str, Any] = {
+        "note": "Only these numbers are verified by the code. Do not invent other percentages. Futures percentages are not verified in v1.",
+        "futures_percent_verified": False,
+        "symbols": {},
+    }
     if not FINNHUB_API_KEY:
-        return {"enabled": False, "symbols": {}, "note": "FINNHUB_API_KEY not configured"}
-
-    today = datetime.now(timezone.utc).date()
-    start = today - timedelta(days=5)
-    context: Dict[str, Any] = {"enabled": True, "symbols": {}}
-
-    for symbol in symbols:
-        quote = finnhub_get("/quote", {"symbol": symbol})
-        news = finnhub_get(
-            "/company-news",
-            {"symbol": symbol, "from": start.isoformat(), "to": today.isoformat()},
-        )
-
-        clean_quote = None
-        if isinstance(quote, dict):
-            current = safe_float(quote.get("c"))
-            change_pct = safe_float(quote.get("dp"))
-            prev_close = safe_float(quote.get("pc"))
-            if current is not None and current > 0:
-                clean_quote = {
-                    "price": current,
-                    "change_pct": change_pct,
-                    "previous_close": prev_close,
-                }
-
-        clean_news = []
-        if isinstance(news, list):
-            for item in news[:3]:
-                if not isinstance(item, dict):
-                    continue
-                headline = (item.get("headline") or "").strip()
-                source = (item.get("source") or "").strip()
-                if headline:
-                    clean_news.append({"headline": headline, "source": source})
-
-        if clean_quote or clean_news:
-            context["symbols"][symbol] = {
-                "quote": clean_quote,
-                "news": clean_news,
-            }
-
-    return context
+        facts["finnhub_enabled"] = False
+        return facts
+    facts["finnhub_enabled"] = True
+    for s in symbols:
+        q = finnhub_get("/quote", {"symbol": s})
+        if isinstance(q, dict):
+            price = safe_float(q.get("c"))
+            pct = safe_float(q.get("dp"))
+            prev = safe_float(q.get("pc"))
+            if price and price > 0:
+                facts["symbols"][s] = {"price": round(price, 4), "change_pct": pct, "previous_close": prev}
+    # Broad ETFs are validation context only. They are not futures.
+    for s in ["SPY", "QQQ", "DIA", "IWM", "USO", "GLD", "TLT", "UUP"]:
+        if s not in facts["symbols"]:
+            q = finnhub_get("/quote", {"symbol": s})
+            if isinstance(q, dict):
+                price = safe_float(q.get("c"))
+                pct = safe_float(q.get("dp"))
+                if price and price > 0:
+                    facts["symbols"][s] = {"price": round(price, 4), "change_pct": pct, "validation_only": True}
+    return facts
 
 
-def build_market_context_text(context: Dict[str, Any]) -> str:
-    if not context.get("enabled"):
-        return "Market data not configured. Use only the tweets."
-
-    symbols = context.get("symbols") or {}
-    if not symbols:
-        return "Market data configured, but no usable quote/news data was returned for the selected symbols."
-
-    lines = ["Market context for selected cashtags. Use only as background validation, not as standalone content:"]
-    for symbol, data in symbols.items():
-        symbol_lines = []
-
-        # Quote data is intentionally restricted: do not feed ordinary prices or small daily moves
-        # to the model, because that creates irrelevant sentences like “$TSLA traded at...”.
-        quote = data.get("quote")
-        if quote:
-            dp = quote.get("change_pct")
-            if isinstance(dp, (int, float)) and abs(dp) >= 3:
-                symbol_lines.append(f"Large daily move: {dp:.2f}%")
-
-        news = data.get("news") or []
-        for item in news[:2]:
-            source = f" ({item.get('source')})" if item.get("source") else ""
-            headline = item.get("headline")
-            if headline:
-                symbol_lines.append(f"News: {headline}{source}")
-
-        if symbol_lines:
-            lines.append(f"${symbol}")
-            lines.extend(symbol_lines)
-            lines.append("")
-
-    if len(lines) == 1:
-        return "Market data exists, but no large daily moves or useful recent headlines were found. Do not mention prices or daily changes."
-
+def facts_text(facts: Dict[str, Any]) -> str:
+    lines = [
+        "MARKET FACTS, verified by code:",
+        "- Futures percentages are NOT verified in this rebuild version. Do not write any futures percentage.",
+        "- If discussing futures, use direction only, e.g. החוזים עולים בחדות / החוזים יורדים / החוזים יציבים.",
+        "- Do not copy ETF percentages as futures percentages.",
+    ]
+    if not facts.get("finnhub_enabled"):
+        lines.append("- Finnhub is not enabled. Avoid exact prices and exact daily changes unless they appear in source text and are central.")
+        return "\n".join(lines)
+    for s, d in (facts.get("symbols") or {}).items():
+        pct = d.get("change_pct")
+        price = d.get("price")
+        suffix = " (validation only, not futures)" if d.get("validation_only") else ""
+        if pct is not None:
+            lines.append(f"- {s}: price {price}, daily change {pct:.2f}%{suffix}")
+        else:
+            lines.append(f"- {s}: price {price}{suffix}")
     return "\n".join(lines)
 
 
 def hebrew_weekday(dt: datetime) -> str:
-    names = {
-        0: "יום שני",
-        1: "יום שלישי",
-        2: "יום רביעי",
-        3: "יום חמישי",
-        4: "יום שישי",
-        5: "שבת",
-        6: "יום ראשון",
-    }
+    names = {0: "יום שני", 1: "יום שלישי", 2: "יום רביעי", 3: "יום חמישי", 4: "יום שישי", 5: "שבת", 6: "יום ראשון"}
     return names.get(dt.weekday(), "")
-
-
-def observed_date(month: int, day: int, year: int):
-    d = datetime(year, month, day).date()
-    # NYSE observation rule used for federal market holidays:
-    # Saturday holidays are usually observed on the prior Friday;
-    # Sunday holidays are observed on the following Monday.
-    if d.weekday() == 5:
-        return d - timedelta(days=1)
-    if d.weekday() == 6:
-        return d + timedelta(days=1)
-    return d
-
-
-def nth_weekday(year: int, month: int, weekday: int, n: int):
-    d = datetime(year, month, 1).date()
-    days_until = (weekday - d.weekday()) % 7
-    return d + timedelta(days=days_until + 7 * (n - 1))
-
-
-def last_weekday(year: int, month: int, weekday: int):
-    if month == 12:
-        d = datetime(year + 1, 1, 1).date() - timedelta(days=1)
-    else:
-        d = datetime(year, month + 1, 1).date() - timedelta(days=1)
-    return d - timedelta(days=(d.weekday() - weekday) % 7)
-
-
-def easter_date(year: int):
-    # Gregorian Easter algorithm.
-    a = year % 19
-    b = year // 100
-    c = year % 100
-    d = b // 4
-    e = b % 4
-    f = (b + 8) // 25
-    g = (b - f + 1) // 3
-    h = (19 * a + b - d - g + 15) % 30
-    i = c // 4
-    k = c % 4
-    l = (32 + 2 * e + 2 * i - h - k) % 7
-    m = (a + 11 * h + 22 * l) // 451
-    month = (h + l - 7 * m + 114) // 31
-    day = ((h + l - 7 * m + 114) % 31) + 1
-    return datetime(year, month, day).date()
-
-
-def nyse_holiday_name(d) -> Optional[str]:
-    year = d.year
-    holidays = {
-        observed_date(1, 1, year): "ראש השנה האזרחית",
-        nth_weekday(year, 1, 0, 3): "יום מרטין לותר קינג",
-        nth_weekday(year, 2, 0, 3): "יום הנשיאים",
-        easter_date(year) - timedelta(days=2): "Good Friday",
-        last_weekday(year, 5, 0): "Memorial Day",
-        observed_date(6, 19, year): "Juneteenth",
-        observed_date(7, 4, year): "יום העצמאות האמריקאי",
-        nth_weekday(year, 9, 0, 1): "Labor Day",
-        nth_weekday(year, 11, 3, 4): "חג ההודיה",
-        observed_date(12, 25, year): "חג המולד",
-    }
-    return holidays.get(d)
-
-
-def is_trading_day_nyse(d) -> bool:
-    return d.weekday() < 5 and nyse_holiday_name(d) is None
-
-
-def next_trading_day_nyse(d):
-    nd = d + timedelta(days=1)
-    while not is_trading_day_nyse(nd):
-        nd += timedelta(days=1)
-    return nd
 
 
 def get_review_context(now_il: datetime) -> Dict[str, str]:
     now_ny = now_il.astimezone(ZoneInfo("America/New_York"))
     date_str = now_il.strftime("%Y-%m-%d")
     day_il = hebrew_weekday(now_il)
-    ny_date = now_ny.date()
-
-    # Weekend handling by Israel day, because the site is operated from Israel.
-    if now_il.weekday() == 5:  # Saturday
-        return {
-            "mode": "weekly_weekend",
-            "title": f"סיכום שבוע בוול סטריט והיערכות לפתיחת השבוע, {day_il} {date_str}",
-            "editorial_focus": "סקירת סוף שבוע: חבר בין האירועים המרכזיים לשאלה מה חשוב לקראת פתיחת השבוע. אל תכתוב כאילו המסחר פתוח עכשיו.",
-        }
-
-    if now_il.weekday() == 6:  # Sunday
-        return {
-            "mode": "week_start_prep",
-            "title": f"היערכות לפתיחת שבוע המסחר בוול סטריט, {day_il} {date_str}",
-            "editorial_focus": "סקירת הכנה לפתיחת שבוע: התמקד בנושאים שיכולים ללוות את פתיחת המסחר הקרובה. אל תכתוב כאילו המסחר פתוח היום.",
-        }
-
-    # Monday-Friday according to New York market calendar and market hours.
-    holiday = nyse_holiday_name(ny_date)
-    if holiday:
-        next_trade = next_trading_day_nyse(ny_date).isoformat()
-        return {
-            "mode": "market_holiday",
-            "title": f"יום ללא מסחר בוול סטריט, {day_il} {date_str}",
-            "editorial_focus": f"היום אין מסחר רגיל בארה״ב בגלל {holiday}. כתוב סקירת רקע והיערכות ליום המסחר הבא ({next_trade}). אל תכתוב 'לקראת פתיחת המסחר היום', 'בזמן מסחר' או 'סיכום יום המסחר'.",
-        }
-
+    if now_il.weekday() == 5:
+        return {"mode": "weekend", "subtitle": f"סיכום שבוע בוול סטריט והיערכות לפתיחת השבוע, {day_il} {date_str}", "forward_title": "לקראת השבוע הקרוב"}
+    if now_il.weekday() == 6:
+        return {"mode": "week_start", "subtitle": f"היערכות לפתיחת שבוע המסחר בוול סטריט, {day_il} {date_str}", "forward_title": "לקראת המסחר הקרוב"}
     market_open = now_ny.replace(hour=9, minute=30, second=0, microsecond=0)
     market_close = now_ny.replace(hour=16, minute=0, second=0, microsecond=0)
-
     if now_ny < market_open:
-        return {
-            "mode": "premarket",
-            "title": f"נקודות חשובות לקראת פתיחת המסחר בוול סטריט, {day_il} {date_str}",
-            "editorial_focus": "סקירת טרום מסחר: התמקד במה שיכול להשפיע על הפתיחה, חוזים, טיקרים, דוחות, זרימות וסנטימנט.",
-        }
-
+        return {"mode": "premarket", "subtitle": f"נקודות חשובות לקראת פתיחת המסחר בוול סטריט, {day_il} {date_str}", "forward_title": "לקראת המסחר הקרוב"}
     if market_open <= now_ny <= market_close:
-        return {
-            "mode": "intraday",
-            "title": f"עדכון בזמן מסחר בוול סטריט, {day_il} {date_str}",
-            "editorial_focus": "סקירה בזמן מסחר: כתוב כאילו המסחר פעיל עכשיו. התמקד במה שזז, אילו טיקרים/סקטורים במוקד, ומה מסביר את הסנטימנט תוך כדי יום המסחר. אל תכתוב 'לקראת פתיחה' או 'סיכום יום'.",
-        }
-
-    return {
-        "mode": "postmarket",
-        "title": f"סיכום יום המסחר בוול סטריט, {day_il} {date_str}",
-        "editorial_focus": "סקירת אחרי נעילה: התמקד במה שהוביל את היום, אילו טיקרים וסקטורים בלטו, ומה נשאר חשוב להמשך.",
-    }
+        return {"mode": "intraday", "subtitle": f"עדכון בזמן מסחר בוול סטריט, {day_il} {date_str}", "forward_title": ""}
+    return {"mode": "postmarket", "subtitle": f"סיכום יום המסחר בוול סטריט, {day_il} {date_str}", "forward_title": ""}
 
 
-def extract_openai_text(data: Dict[str, Any]) -> str:
-    if isinstance(data.get("output_text"), str):
-        return data["output_text"]
-
-    parts = []
-    for item in data.get("output", []):
-        for content in item.get("content", []):
-            if isinstance(content, dict) and "text" in content:
-                parts.append(content["text"])
-
+def openai_text(payload: Dict[str, Any]) -> str:
+    if isinstance(payload.get("output_text"), str):
+        return payload["output_text"]
+    parts: List[str] = []
+    for item in payload.get("output", []) or []:
+        for c in item.get("content", []) or []:
+            if isinstance(c, dict):
+                if isinstance(c.get("text"), str):
+                    parts.append(c["text"])
+                elif isinstance(c.get("output_text"), str):
+                    parts.append(c["output_text"])
     return "\n".join(parts)
 
 
-def get_israel_review_context(now_il: datetime) -> Dict[str, str]:
-    date_str = now_il.strftime("%Y-%m-%d")
-    day_il = hebrew_weekday(now_il)
-
-    if now_il.weekday() == 5:
-        return {
-            "mode": "israel_weekend",
-            "title": f"סיכום שבוע בבורסה בתל אביב והיערכות לשבוע הקרוב, {day_il} {date_str}",
-            "editorial_focus": "סקירת סוף שבוע לשוק הישראלי: חבר בין האירועים המקומיים למה שחשוב לקראת השבוע הקרוב. אל תכתוב כאילו המסחר פתוח עכשיו.",
-        }
-    if now_il.weekday() == 6:
-        return {
-            "mode": "israel_week_start",
-            "title": f"היערכות לפתיחת שבוע המסחר בתל אביב, {day_il} {date_str}",
-            "editorial_focus": "סקירת הכנה לפתיחת השבוע בשוק הישראלי: התמקד במדדים, סקטורים, שקל/דולר, אג״ח, בנקים, נדל״ן, ביטחוניות ואירועים מקומיים.",
-        }
-    if now_il.hour < 9 or (now_il.hour == 9 and now_il.minute < 30):
-        return {
-            "mode": "israel_premarket",
-            "title": f"נקודות חשובות לקראת פתיחת המסחר בתל אביב, {day_il} {date_str}",
-            "editorial_focus": "סקירת טרום מסחר לשוק הישראלי: התמקד במה שיכול להשפיע על הפתיחה, מדדים, מניות, אג״ח, שקל/דולר וסנטימנט מקומי.",
-        }
-    if (now_il.hour, now_il.minute) <= (17, 35):
-        return {
-            "mode": "israel_intraday",
-            "title": f"עדכון בזמן מסחר בבורסה בתל אביב, {day_il} {date_str}",
-            "editorial_focus": "סקירה בזמן מסחר בישראל: כתוב כאילו המסחר פעיל עכשיו. התמקד במה שזז ובסקטורים/מניות במוקד.",
-        }
-    return {
-        "mode": "israel_postmarket",
-        "title": f"סיכום יום המסחר בבורסה בתל אביב, {day_il} {date_str}",
-        "editorial_focus": "סקירת אחרי נעילה בשוק הישראלי: התמקד במה שהוביל את היום ומה חשוב להמשך.",
+def call_openai(prompt: str) -> str:
+    body = {
+        "model": OPENAI_MODEL,
+        "input": [{"role": "user", "content": [{"type": "input_text", "text": prompt}]}],
+        "max_output_tokens": MAX_OUTPUT_TOKENS,
     }
-
-
-def get_trump_review_context(now_il: datetime) -> Dict[str, str]:
-    base = get_review_context(now_il)
-    date_str = now_il.strftime("%Y-%m-%d")
-    day_il = hebrew_weekday(now_il)
-    base_mode = base["mode"]
-    mode = "trump_" + base_mode
-
-    if base_mode == "weekly_weekend":
-        title = f"טראמפ והשפעה אפשרית על השווקים, סיכום שבוע והיערכות לפתיחה, {day_il} {date_str}"
-        focus = "סקירת סוף שבוע: חבר בין אמירות טראמפ לבין סקטורים, טיקרים, סחורות או רגולציה שיכולים להיות רלוונטיים לפתיחת השבוע. אל תכתוב פוליטיקה כללית."
-    elif base_mode == "week_start_prep":
-        title = f"טראמפ והיערכות לפתיחת שבוע המסחר, {day_il} {date_str}"
-        focus = "סקירת הכנה לפתיחת שבוע: התמקד באמירות עם פוטנציאל השפעה על סקטורים, מניות, סחורות, דולר, אג״ח או סנטימנט."
-    elif base_mode == "market_holiday":
-        title = f"טראמפ ביום ללא מסחר בארה״ב, {day_il} {date_str}"
-        focus = "יום ללא מסחר: כתוב רק נקודות רקע עם פוטנציאל שוקי ליום המסחר הבא."
-    elif base_mode == "premarket":
-        title = f"טראמפ לקראת פתיחת המסחר בוול סטריט, {day_il} {date_str}"
-        focus = "טרום מסחר: התמקד באמירות שעלולות להשפיע על פתיחת המסחר, סקטורים, טיקרים או סנטימנט."
-    elif base_mode == "intraday":
-        title = f"עדכון טראמפ בזמן מסחר, {day_il} {date_str}"
-        focus = "זמן מסחר: התמקד באמירות שעלולות להזיז סקטורים/טיקרים תוך כדי יום המסחר."
-    else:
-        title = f"טראמפ וסיכום השפעה אפשרית על השוק, {day_il} {date_str}"
-        focus = "אחרי נעילה: התמקד באמירות שיכולות להשפיע על המשך השבוע או על פתיחת המסחר הבאה."
-
-    return {"mode": mode, "title": title, "editorial_focus": focus}
-
-
-def get_active_review_context(now_il: datetime) -> Dict[str, str]:
-    if REVIEW_TYPE == "israel":
-        return get_israel_review_context(now_il)
-    if REVIEW_TYPE == "trump":
-        return get_trump_review_context(now_il)
-    return get_review_context(now_il)
-
-
-def get_review_prompt_header() -> str:
-    if REVIEW_TYPE == "israel":
-        return """אתה עורך סקירת שוק ההון בישראל בעברית עבור איש שוק הון מנוסה.
-
-מקורות הקלט שלך הם ידיעות ופוסטים ממקורות שהוגדרו לשוק הישראלי. השתמש בהם בלבד.
-המטרה היא להפיק סקירה קצרה, קריאה ומקצועית על הבורסה בתל אביב והשוק המקומי.
-
-כללי סגנון מחייבים לערוץ ישראל:
-- כתוב פשוט, ישיר ומקצועי. לא שיווקי ולא מתחכם.
-- אל תכתוב כמו סיכום פיד. אסור להזכיר ציוץ, פוסט, מקור או דיווח בתוך הטקסט.
-- כל סעיף חייב לענות בפשטות: מה קרה, למה זה משנה לשוק המקומי, ומה לבדוק במסחר.
-- אל תכניס נושא אם אין לו קשר ברור לתל אביב, שקל, אג״ח ישראלי, סקטור מקומי או מניה ישראלית.
-
-התמקד רק במה שיש לו ערך שוקי ברור בישראל:
-- מדדי ת״א 35, ת״א 90, בנקים, נדל״ן, ביטחוניות, אנרגיה, ביטוח, פיננסים וטכנולוגיה מקומית.
-- אג״ח ממשלתי וקונצרני, תשואות, מרווחים, הנפקות, גיוסים ודירוגי אשראי.
-- שקל/דולר ושקל/אירו, רק אם יש קשר ברור לשוק המקומי.
-- מאקרו ישראלי, בנק ישראל, אינפלציה, תקציב, רגולציה וריבית.
-- אירועים ביטחוניים או פוליטיים רק אם יש להם חיבור ברור למניות, אג״ח, מט״ח, סקטור או סנטימנט.
-
-אל תכתוב סקירת וול סטריט בעברית. כותרת גלובלית נכנסת רק אם ההשפעה שלה על השוק הישראלי ברורה.
-אל תנסה להמציא סימבולים ישראליים אם לא הופיעו בקלט. אם אין טיקר ברור, כתוב שם חברה או סקטור בלבד.
-"""
-    if REVIEW_TYPE == "trump":
-        return """אתה עורך סקירת השפעה אפשרית של אמירות טראמפ על שוק ההון, בעברית, עבור איש שוק הון מנוסה.
-
-מקורות הקלט שלך הם פוסטים מחשבונות שהוגדרו לערוץ טראמפ. השתמש בהם בלבד.
-המטרה אינה לסכם פוליטיקה ואינה להביע עמדה פוליטית. המטרה היא לזהות רק אמירות עם פוטנציאל השפעה שוקי.
-
-כללי סגנון מחייבים לערוץ טראמפ:
-- כתוב פשוט, ישיר ומקצועי. לא שיווקי ולא מתחכם.
-- אל תכתוב כמו סיכום פיד. אסור להזכיר ציוץ, פוסט, מקור או דיווח בתוך הטקסט.
-- כל סעיף חייב לענות בפשטות: מה נאמר, איזה נכס/סקטור עשוי להיות מושפע, ומה לבדוק במסחר.
-- אם אין השלכה שוקית ברורה, אל תכניס את הנושא.
-
-התמקד רק כאשר יש קשר ברור לאחד מהתחומים הבאים:
-- מניות, ETFים, מדדים או סקטורים ציבוריים.
-- מכסים, סין, סחר חוץ, תעשייה, רכב, שבבים, ביטחון, אנרגיה, קריפטו, בנקים, ריבית, דולר, אג״ח או רגולציה.
-- חברה ציבורית שהוזכרה במפורש או סקטור ציבורי שעלול להיות מושפע.
-
-אל תכניס:
-- פוליטיקה כללית בלי קשר ברור לשוק.
-- עלבונות, בחירות, סקרים או משפטים אם אין להם השלכה שוקית ברורה.
-- ניתוח אישי על טראמפ.
-- טיקרים שלא הופיעו בקלט או שלא קשורים באופן ברור לאמירה.
-- ניסוח שמציג את זה כחדשות פוליטיות במקום כבדיקת השפעה שוקית.
-"""
-
-    return """אתה עורך סקירת וול סטריט בעברית עבור איש שוק הון מנוסה.
-
-מקורות הקלט שלך הם פוסטים ונתוני שוק שנשלפו עבור חלק מהטיקרים. השתמש בהם בלבד.
-אל תוסיף ידע חיצוני, אל תשלים פערים, אל תיתן המלצת השקעה, ואל תיצור קשר סיבתי שלא מופיע בקלט.
-"""
+    r = requests.post(
+        OPENAI_BASE,
+        headers={"Authorization": f"Bearer {OPENAI_API_KEY}", "Content-Type": "application/json"},
+        json=body,
+        timeout=120,
+    )
+    try:
+        data = r.json()
+    except Exception:
+        raise RuntimeError(f"OpenAI returned non-JSON status={r.status_code}: {r.text[:500]}")
+    if not r.ok:
+        raise RuntimeError(f"OpenAI error {r.status_code}: {json.dumps(data, ensure_ascii=False)[:1000]}")
+    text = openai_text(data).strip()
+    if not text:
+        raise RuntimeError("OpenAI returned empty text")
+    return text
 
 
 def extract_json_object(text: str) -> Dict[str, Any]:
-    """Extract and parse the first JSON object from the model response."""
-    text = (text or "").strip()
+    text = text.strip()
     if text.startswith("```"):
         text = re.sub(r"^```(?:json)?\s*", "", text)
         text = re.sub(r"\s*```$", "", text)
     start = text.find("{")
     if start < 0:
-        raise ValueError("No JSON object found in model output")
+        raise ValueError("No JSON object found")
     depth = 0
-    in_string = False
-    escape = False
+    in_str = False
+    esc = False
     for i in range(start, len(text)):
         ch = text[i]
-        if in_string:
-            if escape:
-                escape = False
+        if in_str:
+            if esc:
+                esc = False
             elif ch == "\\":
-                escape = True
+                esc = True
             elif ch == '"':
-                in_string = False
+                in_str = False
         else:
             if ch == '"':
-                in_string = True
+                in_str = True
             elif ch == "{":
                 depth += 1
             elif ch == "}":
                 depth -= 1
                 if depth == 0:
-                    return json.loads(text[start:i+1])
-    raise ValueError("JSON object was not closed, likely truncated output")
+                    return json.loads(text[start:i + 1])
+    raise ValueError("JSON object was not closed")
 
 
-def clean_structured_string(value: Any) -> str:
+def fix_numeric_spacing(text: str) -> str:
+    text = re.sub(r"(\d)\.\s+(\d)", r"\1.\2", text)
+    text = re.sub(r"(\d)\s+%", r"\1%", text)
+    text = re.sub(r"(\d+(?:\.\d+)?)%\s*[-–—]\s*(\d+(?:\.\d+)?)%", r"בין \1% ל-\2%", text)
+    text = re.sub(r"(\d+(?:\.\d+)?)\s*[-–—]\s*(\d+(?:\.\d+)?)%", r"בין \1% ל-\2%", text)
+    return text
+
+
+def clean_text(value: Any) -> str:
     text = str(value or "")
-    text = strip_model_artifacts(text)
-    text = normalize_review_text(reduce_ticker_noise(text))
+    text = re.sub(r"[\u200E\u200F\u202A-\u202E\u2066-\u2069\u200B-\u200D\uFEFF\u00AD]", "", text)
+    text = text.replace("**", "").replace("```", "").replace("###", "").replace("##", "").replace("#", "")
+    text = text.replace("---", ",").replace("--", ",").replace("—", ",").replace("–", ",")
+    text = text.replace("אס אנד פי 500", "S&P 500").replace("אס אנד פי", "S&P")
     text = re.sub(r"\bבאסי\b", "בחברת ASI", text)
     text = re.sub(r"\bאסי\b", "חברת ASI", text)
     text = re.sub(r"^\s*נקודה\s*\d+\s*[:.：־\-–—]?\s*", "", text, flags=re.I)
-    text = re.sub(r"^\s*#{1,6}\s*", "", text)
-    text = text.replace("###", "").replace("##", "").replace("#", "")
+    text = re.sub(r"\$([A-Z]{1,6})", r"\1", text)
+    text = fix_numeric_spacing(text)
     text = re.sub(r"\s+", " ", text).strip()
     return text
 
 
-def strip_model_artifacts(text: str) -> str:
-    return (text or "").replace("**", "").replace("```", "").replace("---", ",").replace("--", ",").replace("—", ",").replace("–", ",")
+def ends_complete(text: str) -> bool:
+    t = text.strip()
+    return bool(t) and t[-1] in ".!?؟"
 
 
-
-def trim_to_complete_sentences(text: str, max_sentences: int = 3, max_chars: int = 430) -> str:
-    """Deterministically compact model text so one long item does not fail the whole run.
-    Keeps only complete sentences and avoids saving half-written output.
-    """
-    text = clean_structured_string(text)
-    if not text:
-        return text
-    # Normalize repeated spaces after cleaning.
-    text = re.sub(r"\s+", " ", text).strip()
-    # Split Hebrew/English sentences while keeping punctuation.
-    parts = re.findall(r"[^.!?。؟]+[.!?。؟]", text)
-    if parts:
-        kept = []
-        total = 0
-        for part in parts:
-            part = part.strip()
-            if not part:
-                continue
-            if len(kept) >= max_sentences:
-                break
-            if kept and total + len(part) > max_chars:
-                break
-            kept.append(part)
-            total += len(part) + 1
-        if kept:
-            return " ".join(kept).strip()
-    # Fallback: cut to last punctuation inside max_chars, never mid-sentence if avoidable.
-    clipped = text[:max_chars].strip()
-    last = max(clipped.rfind("."), clipped.rfind("!"), clipped.rfind("?"), clipped.rfind("؟"), clipped.rfind("。"))
-    if last >= 40:
-        return clipped[:last+1].strip()
-    # Last resort: return a complete generic sentence rather than half text.
-    return clipped.rstrip(" ,;:") + "."
-
-
-def clean_items(items: Any, max_items: int) -> List[Dict[str, str]]:
-    out: List[Dict[str, str]] = []
-    if not isinstance(items, list):
-        return out
-    for item in items[:max_items]:
-        if not isinstance(item, dict):
-            continue
-        heading = clean_structured_string(item.get("heading") or item.get("title") or item.get("trigger"))
-        body = clean_structured_string(item.get("body") or item.get("implication") or item.get("text"))
-        if heading and body:
-            out.append({"heading": heading, "body": body})
-    return out
-
-
-def sanitize_structured_review(obj: Dict[str, Any], review_context: Dict[str, str], main_title: str, background_title: str, forward_title: str) -> Dict[str, Any]:
+def normalize_structured(obj: Dict[str, Any], ctx: Dict[str, str]) -> Dict[str, Any]:
     review = {
-        "title": clean_structured_string(obj.get("title") or REVIEW_CONFIG["label"]),
-        "subtitle": clean_structured_string(obj.get("subtitle") or review_context["title"]),
-        "intro": clean_structured_string(obj.get("intro")),
-        "main_title": clean_structured_string(obj.get("main_title") or main_title),
-        "main": clean_items(obj.get("main"), 3),
-        "background_title": clean_structured_string(obj.get("background_title") or background_title),
-        "background": clean_items(obj.get("background"), 2),
-        "forward_title": clean_structured_string(obj.get("forward_title") or forward_title),
-        "forward": clean_items(obj.get("forward"), 3),
-        "bottom_line": clean_structured_string(obj.get("bottom_line")),
+        "title": clean_text(obj.get("title") or "טעימת וול סטריט"),
+        "subtitle": clean_text(obj.get("subtitle") or ctx["subtitle"]),
+        "intro": clean_text(obj.get("intro")),
+        "main_title": clean_text(obj.get("main_title") or "במרכז הפתיחה"),
+        "main": [],
+        "background_title": clean_text(obj.get("background_title") or "ברקע"),
+        "background": [],
+        "forward_title": clean_text(obj.get("forward_title") or ctx.get("forward_title") or ""),
+        "forward": [],
+        "bottom_line": clean_text(obj.get("bottom_line")),
         "summary_points": [],
     }
-
-    # Compact sections deterministically. This prevents a good review from failing only because
-    # one item came back too long, while still preventing half-written text from being saved.
-    review["intro"] = trim_to_complete_sentences(review.get("intro", ""), max_sentences=2, max_chars=360)
-    review["bottom_line"] = trim_to_complete_sentences(review.get("bottom_line", ""), max_sentences=3, max_chars=520)
-    for _section_name, _max_sentences, _max_chars in (("main", 3, 460), ("background", 2, 390), ("forward", 2, 320)):
-        for _item in review.get(_section_name, []) or []:
-            _item["heading"] = trim_to_complete_sentences(_item.get("heading", ""), max_sentences=1, max_chars=90).rstrip(".")
-            _item["body"] = trim_to_complete_sentences(_item.get("body", ""), max_sentences=_max_sentences, max_chars=_max_chars)
-
-    raw_points = obj.get("summary_points") if isinstance(obj.get("summary_points"), list) else []
-    points = [clean_structured_string(x) for x in raw_points]
-    points = [p for p in points if p]
-    if not points:
-        # Deterministic fallback for the home preview: never use "נקודה 1" and never use raw Markdown.
-        candidates = []
-        if review["intro"]:
-            candidates.append(review["intro"])
-        for item in review["main"] + review["background"]:
-            candidates.append(f'{item["heading"]}: {item["body"]}')
-        points = candidates[:5]
-    review["summary_points"] = [trim_to_complete_sentences(p, max_sentences=1, max_chars=240).rstrip(".") for p in points[:5]]
-
-    validate_structured_review(review)
+    for key, limit in (("main", 3), ("background", 2), ("forward", 3)):
+        items = obj.get(key) or []
+        if not isinstance(items, list):
+            items = []
+        for item in items[:limit]:
+            if not isinstance(item, dict):
+                continue
+            heading = clean_text(item.get("heading"))
+            body = clean_text(item.get("body"))
+            if heading and body:
+                review[key].append({"heading": heading, "body": body})
+    points = obj.get("summary_points") or []
+    if not isinstance(points, list):
+        points = []
+    review["summary_points"] = [clean_text(p).rstrip(".") for p in points if clean_text(p)][:5]
+    if len(review["summary_points"]) < 3:
+        fallback = [review["intro"]] + [f'{x["heading"]}: {x["body"]}' for x in review["main"]]
+        review["summary_points"] = [clean_text(x).rstrip(".") for x in fallback if clean_text(x)][:5]
     return review
 
 
-def validate_structured_review(review: Dict[str, Any]) -> None:
-    if not review.get("intro"):
-        raise ValueError("Missing intro")
-    if len(review.get("main") or []) < 2:
-        raise ValueError("Missing main items")
-    if not review.get("bottom_line"):
-        raise ValueError("Missing bottom_line")
+def validate_review(review: Dict[str, Any], facts: Dict[str, Any]) -> None:
     blob = json.dumps(review, ensure_ascii=False)
-    forbidden = [
-        "###", "##", "**", "נקודה 1", "נקודה 2", "נקודה 3", "נקודה 4", "נקודה 5",
-        "weekly_weekend", "premarket", "intraday", "postmarket", "market_holiday",
-        "לפי הציוץ", "ציוץ נוסף", "הציוץ", "ציוץ", "לפי פוסט", "הפוסט", "לפי המקור",
-        "הוזכר", "דווח כי", "לפי דיווח", "נאמר כי",
-        "יום המסחר הבא", "שכבת ערך", "מסגרת חדשה", "שיח ביטחוני", "עדשת ביטחון לאומי", "עתירי נרטיב", "תמחור נרטיבי", "מוקד נרטיבי"
-    ]
-    hits = [x for x in forbidden if x in blob]
+    hits = [p for p in FORBIDDEN_PHRASES if p and p in blob]
     if hits:
-        raise ValueError(f"Forbidden artifacts in structured review: {hits}")
-    # Prevent half-written output from being saved.
-    complete_endings = ".!?。؟"
-    for section_name in ("main", "background", "forward"):
-        for item in review.get(section_name, []) or []:
-            body = (item.get("body") or "").strip()
-            if body and body[-1] not in complete_endings:
-                raise ValueError(f"{section_name} item body does not end as a complete sentence")
-            # Length is normalized earlier; do not fail the whole workflow on a readable long item.
+        raise ValueError(f"forbidden phrases: {hits}")
+    if "$" in blob:
+        raise ValueError("dollar sign ticker format is forbidden")
+    for pat in BAD_NUMERIC_PATTERNS:
+        if pat.search(blob):
+            raise ValueError(f"bad numeric artifact: {pat.pattern}")
+    if FUTURES_PERCENT_RE.search(blob):
+        raise ValueError("futures percentage is forbidden without verified futures feed")
+    if not review.get("intro") or not ends_complete(review["intro"]):
+        raise ValueError("intro missing or incomplete")
+    if len(review.get("main") or []) < 2:
+        raise ValueError("need at least 2 main items")
+    if not review.get("bottom_line") or not ends_complete(review["bottom_line"]):
+        raise ValueError("bottom_line missing or incomplete")
+    for section in ("main", "background", "forward"):
+        for item in review.get(section) or []:
+            if not HEBREW_RE.search(item.get("heading", "")[:4]):
+                raise ValueError(f"{section} heading does not start with Hebrew")
+            if BANNED_PREFIX_RE.search(item.get("body", "")):
+                raise ValueError(f"{section} body starts with English/ticker")
+            if not ends_complete(item.get("body", "")):
+                raise ValueError(f"{section} body incomplete")
+            if len(item.get("body", "")) > 520:
+                raise ValueError(f"{section} body too long")
+    if review.get("forward_title") and review["forward_title"] not in {"לקראת המסחר הקרוב", "לקראת השבוע הקרוב"}:
+        raise ValueError("bad forward title")
 
-    last = review.get("bottom_line", "").strip()
-    if last and last[-1] not in complete_endings:
-        raise ValueError("bottom_line does not end as a complete sentence")
+
+def build_prompt(tweets: List[Dict[str, Any]], facts: Dict[str, Any], ctx: Dict[str, str], previous_error: str = "") -> str:
+    return f"""
+שם המשימה: הפקת סקירת Market Desk מקצועית, קצרה וברורה על וול סטריט.
+שפת הפלט: עברית בלבד, ימין לשמאל, ניסוח פשוט, פיננסי וישיר.
+
+תפקידך:
+לנתח את נתוני המקור ולכתוב סקירת שוק קצרה וברורה למשקיע מקצועי.
+הסקירה אינה סיכום ציוצים ואינה רשימת כותרות. אסור להזכיר בגוף הסקירה את המילים: ציוץ, פוסט, מקור, הוזכר, דווח כי, לפי דיווח, נאמר כי.
+
+סגנון:
+- כתיבה מקצועית, ישירה ופשוטה.
+- משפטים קצרים. בלי התחכמות ובלי מילים מנופחות.
+- להסביר ברור: מה קרה, למה זה משנה, מה לבדוק במסחר.
+- אסור להשתמש בביטויים: שכבת ערך, מסגרת חדשה, שיח ביטחוני, עדשת ביטחון לאומי, נכסי צמיחה עתירי נרטיב, תמחור נרטיבי.
+
+מבנה חובה:
+1. פתיח של שני משפטים: מה שאלת השוק המרכזית.
+2. במרכז הפתיחה: 2 עד 3 נושאים מרכזיים.
+3. ברקע: 1 עד 2 נושאים משניים.
+4. {ctx['forward_title'] or 'אין סעיף קדימה'}: {('3 טריגרים ברורים בלבד' if ctx['forward_title'] else 'להחזיר מערך ריק')}.
+5. שורה תחתונה: 2 עד 3 משפטים בלבד.
+
+כל סעיף:
+- כותרת קצרה בשורה נפרדת.
+- פסקה אחת מתחת, 2 משפטים קצרים לכל היותר.
+- בלי Markdown. אסור ###, ##, #, **, נקודה 1.
+- כל כותרת וכל פסקה מתחילות בעברית, לא באנגלית ולא בטיקר.
+
+טיקרים:
+- אין להשתמש בסימן דולר.
+- אם צריך טיקר, לכתוב אותו בסוגריים אחרי שם החברה: אפל (AAPL), פלנטיר (PLTR), ספייסאיקס (SPCX).
+- שם חברה לא מוכר לא לתרגם לבד: חברת ASI, תאלס (Thales).
+
+נתונים ואחוזים:
+- השתמש רק במספרים שמופיעים ב-MARKET FACTS או בנתוני המקור.
+- אחוזים חייבים להיכתב תקין: 0.7%, 1.2%, בין 0.7% ל-0.8%.
+- אסור לכתוב 0. 7% או סביב 0.
+- אין לכתוב אחוז על חוזים עתידיים. בגרסה זו אין מקור חוזים מאומת. אם צריך לדבר על חוזים, כתוב כיוון בלבד.
+- אסור להעתיק אחוזי ETF כאילו הם חוזים.
+- אם אין נתון מספרי אמין, כתוב כיוון בלבד או השמט את המספר.
+
+הקשר סקירה:
+- כותרת משנה: {ctx['subtitle']}
+- מצב: {ctx['mode']}
+
+{facts_text(facts)}
+
+נתוני מקור לעיבוד. אין להזכיר בגוף הסקירה שהם הגיעו מציוצים או ממקורות:
+{build_source_digest(tweets)}
+
+{('שגיאה בניסיון קודם: ' + previous_error + ' תקן והחזר JSON תקין בלבד.') if previous_error else ''}
+
+החזר JSON תקין בלבד, בדיוק במבנה הזה:
+{{
+  "title": "טעימת וול סטריט",
+  "subtitle": "{ctx['subtitle']}",
+  "intro": "שני משפטים בלבד.",
+  "main_title": "במרכז הפתיחה",
+  "main": [
+    {{"heading": "כותרת עברית קצרה", "body": "פסקה קצרה עד שני משפטים."}}
+  ],
+  "background_title": "ברקע",
+  "background": [
+    {{"heading": "כותרת עברית קצרה", "body": "פסקה קצרה עד שני משפטים."}}
+  ],
+  "forward_title": "{ctx['forward_title']}",
+  "forward": [
+    {{"heading": "אם משהו קורה", "body": "מה זה יסמן במסחר."}}
+  ],
+  "bottom_line": "שניים עד שלושה משפטים.",
+  "summary_points": ["משפט תקציר נקי אחד"]
+}}
+"""
 
 
-def structured_review_to_markdown(review: Dict[str, Any]) -> str:
-    """Create a clean markdown fallback without ### topic headings."""
+def generate_review(tweets: List[Dict[str, Any]], facts: Dict[str, Any], ctx: Dict[str, str]) -> Dict[str, Any]:
+    last_error = ""
+    for attempt in range(1, 4):
+        print(f"OpenAI attempt {attempt}/3")
+        text = call_openai(build_prompt(tweets, facts, ctx, previous_error=last_error))
+        try:
+            obj = extract_json_object(text)
+            review = normalize_structured(obj, ctx)
+            validate_review(review, facts)
+            return review
+        except Exception as e:
+            last_error = str(e)
+            print(f"  validation failed: {last_error}")
+    raise RuntimeError(f"Review generation failed after retries: {last_error}")
+
+
+def markdown_from_review(review: Dict[str, Any]) -> str:
     lines: List[str] = []
-    lines.append(f'# 🌅 {review["title"]}')
+    lines.append(f"# 🌅 {review['title']}")
     lines.append("")
     lines.append(review["subtitle"])
     lines.append("")
     lines.append(review["intro"])
     lines.append("")
-    lines.append(f'## {review["main_title"]}')
+    lines.append(f"## {review['main_title']}")
     lines.append("")
     for item in review["main"]:
         lines.append(item["heading"])
         lines.append("")
         lines.append(item["body"])
         lines.append("")
-    if review.get("background"):
-        lines.append(f'## {review["background_title"]}')
+    if review["background"]:
+        lines.append(f"## {review['background_title']}")
         lines.append("")
         for item in review["background"]:
             lines.append(item["heading"])
             lines.append("")
             lines.append(item["body"])
             lines.append("")
-    if review.get("forward") and review.get("forward_title"):
-        lines.append(f'## {review["forward_title"]}')
+    if review.get("forward_title") and review.get("forward"):
+        lines.append(f"## {review['forward_title']}")
         lines.append("")
         for item in review["forward"]:
             lines.append(item["heading"])
@@ -852,345 +586,48 @@ def structured_review_to_markdown(review: Dict[str, Any]) -> str:
     lines.append("⚠️ גילוי נאות: תוכן זה נוצר באמצעות AI לצרכים אינפורמטיביים בלבד. אין באמור ייעוץ השקעות או המלצה לפעולה בניירות ערך.")
     lines.append("")
     lines.append("פותח ע\"י דורון שרייבמן")
-    return normalize_review_text("\n".join(lines))
+    return "\n".join(lines).strip() + "\n"
 
 
-def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) -> Dict[str, Any]:
-    tweets_text = build_tweets_text(tweets)
-    market_context_text = build_market_context_text(market_context)
-
-    now_il = datetime.now(ZoneInfo("Asia/Jerusalem"))
-    review_context = get_active_review_context(now_il)
-    review_context_title = review_context["title"]
-    review_context_mode = review_context["mode"]
-    review_editorial_focus = review_context["editorial_focus"]
-
-    if review_context_mode.endswith("weekly_weekend"):
-        forward_section_title = "לקראת השבוע הקרוב"
-        forward_section_instruction = "כלול 3 עד 4 טריגרים מעשיים לשבוע הקרוב."
-    elif review_context_mode.endswith("week_start_prep") or review_context_mode.endswith("market_holiday") or review_context_mode in {"week_start_prep", "market_holiday"}:
-        forward_section_title = "לקראת המסחר הקרוב"
-        forward_section_instruction = "כלול 3 טריגרים מעשיים למסחר הקרוב."
-    else:
-        forward_section_title = ""
-        forward_section_instruction = "אל תכלול סעיף קדימה נפרד."
-
-    if REVIEW_TYPE == "israel":
-        main_section_title = "במרכז השוק המקומי"
-        background_section_title = "ברקע המקומי"
-        if forward_section_title == "לקראת המסחר הקרוב":
-            forward_section_title = "לקראת המסחר בתל אביב"
-        elif forward_section_title == "לקראת השבוע הקרוב":
-            forward_section_title = "לקראת השבוע בבורסה בתל אביב"
-        market_lens_block = """
-כללי עריכה לערוץ ישראל:
-- מהות הסקירה היא השוק הישראלי בלבד: תל אביב, שקל, אג״ח מקומי, בנקים, נדל״ן, ביטחוניות, אנרגיה, ביטוח ופיננסים.
-- כותרת חוץ תיכנס רק אם יש לה השלכה ברורה על תל אביב, שקל, אג״ח, סקטור ישראלי או מניות מקומיות.
-- כל סעיף חייב להסביר את החיבור המקומי במילים פשוטות. אם אין חיבור כזה, השמט.
-- אל תכתוב סקירת וול סטריט בעברית ואל תפתח נושא חוץ בלי להסביר איך הוא משפיע על השוק הישראלי.
-"""
-    elif REVIEW_TYPE == "trump":
-        main_section_title = "במרכז ההשפעה השוקית"
-        background_section_title = "ברקע השוקי"
-        market_lens_block = """
-כללי עריכה לערוץ טראמפ:
-- מהות הסקירה היא השפעה אפשרית על השוק, לא סקירה פוליטית.
-- כל סעיף חייב לקשור אמירה או מהלך לסקטור, נכס, טיקר, סחורה, מטבע, אג״ח או רגולציה.
-- אם אין קשר שוקי ברור, השמט גם אם האמירה בולטת פוליטית.
-- אל תכתוב על טראמפ כאישיות ואל תנתח פוליטיקה. כתוב רק מה עשוי לזוז בשוק ומה לבדוק במסחר.
-"""
-    else:
-        main_section_title = "במרכז הפתיחה"
-        background_section_title = "ברקע"
-        market_lens_block = ""
-
-    prompt = f"""
-{get_review_prompt_header()}
-
-המשימה: כתוב סקירת Market Desk בעברית, קצרה, היררכית וקריאה.
-אסור להחזיר Markdown. אסור להשתמש ב-###, ##, #, **, "נקודה 1", מקפים כפולים או מקף ארוך.
-הפלט חייב להיות JSON תקין בלבד, בלי טקסט לפניו או אחריו.
-
-הסגנון הרצוי:
-- כתוב כמו איש שוק מקצועי שמסביר ברור, לא כמו טקסט שיווקי ולא כמו סיכום מקורות.
-- עברית פשוטה, משפטים קצרים, בלי התחכמות ובלי מילים מנופחות.
-- המבנה בכל סעיף: מה קרה, למה זה משנה לשוק, ומה לבדוק במסחר. כתוב את זה טבעי, בלי תוויות פנימיות.
-- אין לציין את מקור המידע בתוך הטקסט. אל תכתוב שהמידע הגיע מפוסט, ציוץ, מקור, חשבון או דיווח.
-- פתיח של 2 משפטים שמציג את השאלה המרכזית לשוק.
-- עד 3 נושאים ב"{main_section_title}".
-- עד 2 נושאים ב"{background_section_title}".
-- אם יש סעיף קדימה, 3 טריגרים בלבד. כל טריגר מתחיל ב"אם" ומסביר מה זה יסמן.
-- גוף כל סעיף יהיה 2 עד 3 משפטים קצרים. לא משפט אחד ארוך שמעמיס כמה רעיונות.
-- אל תסיים סעיף בנתונים בלבד. חייבת להיות משמעות שוקית ברורה.
-- שם סעיף קדימה לוול סטריט חייב להיות "לקראת המסחר הקרוב", לא "לקראת יום המסחר הבא".
-- שורה תחתונה של 2 עד 3 משפטים בלבד.
-- כל כותרת וכל פסקה מתחילות בעברית, לא באנגלית, לא בטיקר ולא בסימבול.
-- אם יש סימבול, הוא יופיע בסוגריים אחרי שם עברי/שם חברה, למשל: ספייסאיקס (SPCX), פלנטיר (PLTR), חברת ASI, תאלס (Thales).
-- שמות לא מוכרים לא יתורגמו לבד. אל תכתוב "אסי" לבד, כתוב "חברת ASI".
-- אסור לכתוב "לפי הציוץ", "ציוץ נוסף", "הציוץ", "לפי פוסט", "הפוסט", "הוזכר", "דווח כי", "לפי דיווח", "לפי המקור", "נאמר כי" או ניסוח שמראה שאתה מסכם פיד.
-- אסור להשתמש בביטויים מנופחים כמו "שכבת ערך", "מסגרת חדשה", "שיח ביטחוני", "עדשת ביטחון לאומי", "נכסי צמיחה עתירי נרטיב", "מוקד נרטיבי", "תמחור נרטיבי".
-- אל תכניס נושא שאין לו ערך שוקי ברור.
-- אם כמה כותרות שייכות לאותו נושא, אחד אותן לפריט אחד.
-{market_lens_block}
-
-הקשר פנימי לשימושך בלבד, לא להדפסה:
-- מצב סקירה: {review_context_mode}
-- כותרת הסקירה: {review_context_title}
-- הנחיית עריכה: {review_editorial_focus}
-- הנחיית סעיף קדימה: {forward_section_instruction}
-
-מבנה JSON חובה, החזר בדיוק את השדות האלה:
-{{
-  "title": "{REVIEW_CONFIG['label']}",
-  "subtitle": "{review_context_title}",
-  "intro": "שני משפטים בלבד",
-  "main_title": "{main_section_title}",
-  "main": [
-    {{"heading": "כותרת עברית קצרה", "body": "פסקה של עד שני משפטים"}}
-  ],
-  "background_title": "{background_section_title}",
-  "background": [
-    {{"heading": "כותרת עברית קצרה", "body": "פסקה של עד שני משפטים"}}
-  ],
-  "forward_title": "{forward_section_title}",
-  "forward": [
-    {{"heading": "אם X קורה", "body": "משפט אחד עד שניים שמסביר מה זה יסמן"}}
-  ],
-  "bottom_line": "שניים עד שלושה משפטים",
-  "summary_points": [
-    "משפט תקציר נקי אחד בלי המילים נקודה 1 ובלי Markdown"
-  ]
-}}
-
-אם אין צורך בסעיף קדימה לפי ההקשר, החזר forward_title כריק ו-forward כמערך ריק.
-אם נדרש סעיף קדימה, שם הסעיף חייב להיות: "{forward_section_title}".
-summary_points חייב להכיל 3 עד 5 נקודות נקיות למסך הפתיחה. אסור להתחיל אותן ב"נקודה 1". כל נקודה צריכה להיות משפט פשוט וישיר, בלי ניסוח של סיכום ציוץ.
-
-היקף חובה: main עד 3 סעיפים, background עד 2 סעיפים, forward עד 3 סעיפים. עדיף קצר ושלם מאשר ארוך ונחתך.
-כל body חייב להסתיים בנקודה. אל תחזיר סעיף אם אין לו גוף שלם.
-
-בדיקת איכות לפני החזרה:
-- אין Markdown בכלל.
-- אין ###, ##, #, **.
-- אין "נקודה 1".
-- אין משפט שנקטע באמצע.
-- bottom_line מסתיים בנקודה.
-- אין הוראות פנימיות או שמות מצב פנימיים.
-- כל סעיף מתחיל בעברית.
-
-מקורות שנאספו:
-{tweets_text}
-
-נתוני שוק, לשימוש כרקע בלבד:
-{market_context_text}
-"""
-
+def write_outputs(review: Dict[str, Any], tweets: List[Dict[str, Any]], facts: Dict[str, Any], ctx: Dict[str, str]) -> None:
+    now_utc = datetime.now(timezone.utc)
+    now_il = now_utc.astimezone(ZoneInfo("Asia/Jerusalem"))
+    md = markdown_from_review(review)
     payload = {
-        "model": OPENAI_MODEL,
-        "input": prompt,
-        "max_output_tokens": int(os.environ.get("OPENAI_MAX_OUTPUT_TOKENS", "7000")),
+        "channel": "wallstreet",
+        "generated_utc": now_utc.isoformat(),
+        "generated_israel": now_il.isoformat(),
+        "mode": ctx["mode"],
+        "title": review["title"],
+        "subtitle": review["subtitle"],
+        "structured_review": review,
+        "market_facts": facts,
+        "source_items": tweets,
     }
+    (OUTPUT_DIR / "latest.md").write_text(md, encoding="utf-8")
+    (OUTPUT_DIR / "latest.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    # Legacy paths for the existing site if it still expects them.
+    (OUTPUT_ROOT / "latest.md").write_text(md, encoding="utf-8")
+    (OUTPUT_ROOT / "latest.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"Wrote {OUTPUT_DIR / 'latest.md'} and {OUTPUT_DIR / 'latest.json'}")
 
-    last_error = None
-    for attempt in range(2):
-        response = requests.post(
-            OPENAI_BASE,
-            headers={
-                "Authorization": f"Bearer {OPENAI_API_KEY}",
-                "Content-Type": "application/json",
-            },
-            json=payload,
-            timeout=240,
-        )
-        try:
-            data = response.json()
-        except Exception:
-            raise SystemExit(f"OpenAI returned non-JSON response: {response.text[:2000]}")
-        if response.status_code >= 400:
-            raise SystemExit("OpenAI API error:\n" + json.dumps(data, ensure_ascii=False, indent=2)[:4000])
-        text = extract_openai_text(data)
-        try:
-            obj = extract_json_object(text)
-            return sanitize_structured_review(obj, review_context, main_section_title, background_section_title, forward_section_title)
-        except Exception as exc:
-            last_error = exc
-            payload["input"] = prompt + f"\n\nהניסיון הקודם נכשל בבדיקה בגלל: {exc}. החזר הפעם JSON קצר יותר, תקין וסגור לחלוטין."
-            payload["max_output_tokens"] = 7000
-    raise SystemExit(f"Structured review validation failed: {last_error}")
-
-
-
-TICKER_NAME_MAP = {
-    "SPCX": "ספייסאיקס",
-    "TSLA": "טסלה",
-    "PYPL": "פייפאל",
-    "ASI": "חברת ASI",
-    "THALES": "תאלס",
-    "AMZN": "אמזון",
-    "IBIT": "קרן IBIT",
-    "SOXX": "קרן השבבים",
-    "SPXL": "קרן ה-S&P הממונפת",
-    "VXN": "מדד התנודתיות",
-    "SPCH": "קרן SPCH",
-    "SSPC": "מוצר השורט",
-    "PLTR": "פלנטיר",
-    "AAPL": "אפל",
-    "GOOGL": "אלפבית",
-}
-
-# Only these symbols may remain visually in the text, and only on first meaningful mention.
-# After the first mention, the script converts the symbol to a plain company/instrument name.
-IMPORTANT_KEEP_SYMBOLS = {"SPCX", "SPCH", "SSPC", "IBIT", "SOXX", "SPXL", "VXN", "TSLA", "PYPL", "ASI", "THALES", "PLTR", "AAPL", "GOOGL"}
-
-
-def normalize_cashtag_direction(text: str) -> str:
-    # Fix RTL artifacts such as SPCX$ or VXN,$ back to normal ticker form.
-    text = re.sub(r"\b([A-Z]{1,6}),\$", r"$\1", text)
-    text = re.sub(r"\b([A-Z]{1,6})\$", r"$\1", text)
-    text = re.sub(r"\$([A-Z]{1,6})\s*,", r"$\1,", text)
-    text = re.sub(r"\$([A-Z]{1,6})\s*\.", r"$\1.", text)
-    return text
-
-
-def reduce_ticker_noise(text: str) -> str:
-    """Reduce unnecessary ticker noise after the model writes the review.
-
-    Policy:
-    - A symbol may appear only once in the whole review.
-    - The first appearance becomes Name ($SYMBOL).
-    - Later appearances become the plain company/instrument name.
-    - Symbols not in IMPORTANT_KEEP_SYMBOLS are removed and replaced by a name when known.
-    - This is deliberately strict because the review is for reading, not a trading terminal.
-    """
-    text = normalize_cashtag_direction(text)
-    seen_global = set()
-
-    def repl(match: re.Match) -> str:
-        symbol = match.group(1).upper()
-        name = TICKER_NAME_MAP.get(symbol, symbol)
-
-        if symbol not in IMPORTANT_KEEP_SYMBOLS:
-            return name
-
-        if symbol in seen_global:
-            return name
-
-        seen_global.add(symbol)
-        return f"{name} ({symbol})"
-
-    text = re.sub(r"\$([A-Z]{1,6})(?![A-Z0-9])", repl, text)
-
-    # Clean duplicated name/ticker patterns, for example SpaceX SpaceX ($SPCX).
-    for symbol, name in TICKER_NAME_MAP.items():
-        text = text.replace(f"{name} {name} ({symbol})", f"{name} ({symbol})")
-        text = text.replace(f"{name} ({name} ({symbol}))", f"{name} ({symbol})")
-
-    return text
-
-
-def normalize_review_text(text: str) -> str:
-    """Final cleanup before writing the review.
-
-    Keeps Hebrew financial text clean and prevents punctuation artifacts
-    such as double hyphens from leaking into the website/PDF/WhatsApp.
-    """
-    replacements = {
-        "---": ",",
-        "--": ",",
-        "––": ",",
-        "—": ",",
-        "–": ",",
-    }
-    for old, new in replacements.items():
-        text = text.replace(old, new)
-
-    # Remove inline bold markers. Headings provide hierarchy; body text stays clean.
-    text = re.sub(r"\*\*(.*?)\*\*", r"\1", text)
-
-    # Clean repeated commas/spaces created by replacements, without harming newlines.
-    text = re.sub(r"[ \t]+,", ",", text)
-    text = re.sub(r",[ \t]*,", ",", text)
-    text = re.sub(r"[ \t]{2,}", " ", text)
-    text = re.sub(r"\n{3,}", "\n\n", text)
-    return text.strip()
 
 def main() -> None:
-    run_ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-
     accounts = read_accounts()
-
-    all_tweets = []
-    for account in accounts:
-        print(f"Fetching @{account}...")
-        all_tweets.extend(fetch_tweets_for_account(account))
-
+    all_tweets: List[Dict[str, Any]] = []
+    for acc in accounts:
+        try:
+            all_tweets.extend(fetch_tweets_for_account(acc))
+        except Exception as e:
+            print(f"Error fetching @{acc}: {e}")
     selected = select_tweets(all_tweets)
+    if not selected:
+        raise SystemExit("No tweets/source items fetched. Refusing to create empty review.")
     symbols = collect_symbols(selected)
-    market_context = fetch_finnhub_context(symbols)
-
-    print(f"Total raw tweets: {len(all_tweets)}")
-    print(f"Selected tweets: {len(selected)}")
-    print(f"Detected symbols for Finnhub: {', '.join(symbols) or 'None'}")
-    print(f"Finnhub enabled: {bool(FINNHUB_API_KEY)}")
-
-    structured_review = call_openai(selected, market_context)
-    review = structured_review_to_markdown(structured_review)
-
-    input_json = {
-        "generated_utc": datetime.now(timezone.utc).isoformat(),
-        "generated_israel": datetime.now(ZoneInfo("Asia/Jerusalem")).isoformat(),
-        "model": OPENAI_MODEL,
-        "total_raw_tweets": len(all_tweets),
-        "selected_tweets": selected,
-        "detected_cashtags": sorted(
-            set(tag for tweet in selected for tag in tweet.get("cashtags", []))
-        ),
-        "finnhub_enabled": bool(FINNHUB_API_KEY),
-        "finnhub_symbols_checked": symbols,
-        "finnhub_context": market_context,
-        "review_type": REVIEW_TYPE,
-        "review_context": get_active_review_context(datetime.now(ZoneInfo("Asia/Jerusalem"))),
-        "structured_review": structured_review,
-    }
-
-    timestamped_input_path = OUTPUT_DIR / f"review_input_{run_ts}.json"
-    timestamped_review_path = OUTPUT_DIR / f"{REVIEW_TYPE}_review_{run_ts}.md"
-
-    timestamped_input_path.write_text(
-        json.dumps(input_json, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-
-    timestamped_review_path.write_text(
-        review,
-        encoding="utf-8",
-    )
-
-    (OUTPUT_DIR / "latest.json").write_text(
-        json.dumps(input_json, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-
-    (OUTPUT_DIR / "latest.md").write_text(
-        review,
-        encoding="utf-8",
-    )
-
-    # Backward compatibility for the existing website path.
-    if REVIEW_CONFIG.get("legacy_latest"):
-        Path("output/latest.json").write_text(
-            json.dumps(input_json, ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
-        Path("output/latest.md").write_text(
-            review,
-            encoding="utf-8",
-        )
-
-    print("Review created successfully.")
-    print(f"Wrote {timestamped_review_path}")
-    print(f"Wrote {OUTPUT_DIR / 'latest.md'} for the website.")
-    print(review[:1200])
+    facts = fetch_market_facts(symbols)
+    ctx = get_review_context(datetime.now(ZoneInfo("Asia/Jerusalem")))
+    review = generate_review(selected, facts, ctx)
+    write_outputs(review, selected, facts, ctx)
 
 
 if __name__ == "__main__":
