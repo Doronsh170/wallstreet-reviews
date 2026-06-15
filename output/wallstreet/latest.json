@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-06-14T17:16:11.433990+00:00",
-  "generated_israel": "2026-06-14T20:16:11.434007+03:00",
+  "generated_utc": "2026-06-15T07:01:29.878899+00:00",
+  "generated_israel": "2026-06-15T10:01:29.878911+03:00",
   "model": "gpt-5.5",
   "total_raw_tweets": 20,
   "selected_tweets": [
@@ -11,9 +11,9 @@
       "url": "https://x.com/gurgavin/status/2065885822327435266",
       "createdAt": "Sat Jun 13 19:55:37 +0000 2026",
       "text": "MOST PEOPLE HAVE NO IDEA HOW GOOD OF AN INVESTOR GOOGLE IS  6% OF SPACEX 14% OF ANTHROPIC 75% OF WAYMO  $900M INTO SPACEX IN 2015 →   NOW WORTH $115B   $13B INTO ANTHROPIC → NOW WORTH $140B  WAYMO JUST RAISED $16B AT A $126B VALUATION → GOOGLE’S STAKE WORTH ~$95B.  THOSE THREE BETS ALONE ARE WORTH OVER $350B AND THEY HAVE 100’S MORE SMALLER ONES $GOOGL",
-      "likeCount": 5242,
-      "retweetCount": 337,
-      "viewCount": 616765,
+      "likeCount": 11505,
+      "retweetCount": 1270,
+      "viewCount": 1828119,
       "cashtags": [
         "$GOOGL"
       ],
@@ -26,9 +26,9 @@
       "url": "https://x.com/wallstengine/status/2065495369878819118",
       "createdAt": "Fri Jun 12 18:04:05 +0000 2026",
       "text": "SpaceX $SPCX just became a $2T+ public company and the 6th largest company in the world on day one of trading.  Now there is already a 2x daily leveraged ETF coming under $SPCH  Wild times for sure. https://t.co/iJNlFXjhuL",
-      "likeCount": 79,
+      "likeCount": 80,
       "retweetCount": 11,
-      "viewCount": 21269,
+      "viewCount": 21916,
       "cashtags": [
         "$SPCH",
         "$SPCX"
@@ -36,18 +36,16 @@
       "is_retweet": false
     },
     {
-      "account": "StockMKTNewz",
-      "author": "StockMKTNewz",
-      "id": "2066171778959876213",
-      "url": "https://x.com/StockMKTNewz/status/2066171778959876213",
-      "createdAt": "Sun Jun 14 14:51:54 +0000 2026",
-      "text": "Predict what price SpaceX $SPCX stock closes trading at this upcoming week https://t.co/MmebJY0Rie",
-      "likeCount": 274,
-      "retweetCount": 9,
-      "viewCount": 37603,
-      "cashtags": [
-        "$SPCX"
-      ],
+      "account": "KobeissiLetter",
+      "author": "KobeissiLetter",
+      "id": "2066280513116213489",
+      "url": "https://x.com/KobeissiLetter/status/2066280513116213489",
+      "createdAt": "Sun Jun 14 22:03:58 +0000 2026",
+      "text": "BREAKING: US stock market futures surge after Pakistan announces that the US and Iran have reached a peace deal:  1. S&P 500: +0.8% 2. Nasdaq 100: +1.3% 3. Dow Jones: +0.6% 4. WTI Crude: -5.0% 5. Brent: -4.0% 6. Gold: +2.0%  Pakistan says the peace deal is set to be signed on June 19th.",
+      "likeCount": 4813,
+      "retweetCount": 574,
+      "viewCount": 514297,
+      "cashtags": [],
       "is_retweet": false
     },
     {
@@ -57,54 +55,73 @@
       "url": "https://x.com/gurgavin/status/2065598381079015885",
       "createdAt": "Sat Jun 13 00:53:25 +0000 2026",
       "text": "BREAKING: THE US GOVERNMENT JUST SLAPPED EXPORT CONTROLS ON ANTHROPIC’S NEWEST AI MODELS FOR BEING TOO POWERFUL   NO FOREIGN GOVERNMENT, COMPANY, OR INDIVIDUAL ANYWHERE ON EARTH CAN ACCESS MYTHOS 5 OR FABLE 5  AI IS NOW OFFICIALLY BEING TREATED LIKE A WEAPON 🇺🇸",
-      "likeCount": 2143,
-      "retweetCount": 171,
-      "viewCount": 194724,
+      "likeCount": 2152,
+      "retweetCount": 173,
+      "viewCount": 197375,
       "cashtags": [],
       "is_retweet": false
     },
     {
-      "account": "StockMKTNewz",
-      "author": "StockMKTNewz",
-      "id": "2066183109695934872",
-      "url": "https://x.com/StockMKTNewz/status/2066183109695934872",
-      "createdAt": "Sun Jun 14 15:36:55 +0000 2026",
-      "text": "\"Apple’s $AAPL new Siri AI is just good enough to pull it out of its AI crisis.\" - Bloomberg's @markgurman after getting to use Apple's new AI features",
-      "likeCount": 71,
-      "retweetCount": 1,
-      "viewCount": 12807,
-      "cashtags": [
-        "$AAPL"
-      ],
-      "is_retweet": false
-    },
-    {
       "account": "AIStockSavvy",
       "author": "AIStockSavvy",
-      "id": "2066188995575320585",
-      "url": "https://x.com/AIStockSavvy/status/2066188995575320585",
-      "createdAt": "Sun Jun 14 16:00:19 +0000 2026",
-      "text": "$CBRS | Needham maintains 𝐛𝐮𝐲 on 𝐂𝐞𝐫𝐞𝐛𝐫𝐚𝐬 𝐒𝐲𝐬𝐭𝐞𝐦𝐬, maintains 𝐏𝐓 𝐚𝐭 $𝟑𝟎𝟎 https://t.co/qMwAO0ladL",
-      "likeCount": 9,
-      "retweetCount": 1,
-      "viewCount": 1559,
-      "cashtags": [
-        "$CBRS"
-      ],
-      "is_retweet": false
-    },
-    {
-      "account": "AIStockSavvy",
-      "author": "AIStockSavvy",
-      "id": "2065939930191122488",
-      "url": "https://x.com/AIStockSavvy/status/2065939930191122488",
-      "createdAt": "Sat Jun 13 23:30:37 +0000 2026",
-      "text": "📢 𝐉𝐔𝐒𝐓 𝐈𝐍: FAA Close to Picking Asi Over $PLTR Palantir, Thales for Its AI-Powered Air Traffic Management System- Air Current",
-      "likeCount": 19,
+      "id": "2066280962695057467",
+      "url": "https://x.com/AIStockSavvy/status/2066280962695057467",
+      "createdAt": "Sun Jun 14 22:05:45 +0000 2026",
+      "text": "⚡ 𝐔𝐏𝐃𝐀𝐓𝐄: Stock futures jump after the U.S. and Iran reach a deal to end the war - $SPX $DOW $QQQ $SPY   Futures tied to the Dow Jones Industrial Average added 304 points points, or 0.6%. S&amp;P 500 futures climed 0.7%, while Nasdaq 100 futures popped 0.8%.",
+      "likeCount": 21,
       "retweetCount": 2,
-      "viewCount": 5974,
+      "viewCount": 3999,
       "cashtags": [
-        "$PLTR"
+        "$DOW",
+        "$QQQ",
+        "$SPX",
+        "$SPY"
+      ],
+      "is_retweet": false
+    },
+    {
+      "account": "KobeissiLetter",
+      "author": "KobeissiLetter",
+      "id": "2066287098806604185",
+      "url": "https://x.com/KobeissiLetter/status/2066287098806604185",
+      "createdAt": "Sun Jun 14 22:30:08 +0000 2026",
+      "text": "BREAKING: President Trump confirms that the US and Iran will be signing a peace deal on June 19th. https://t.co/BtBRH5p2xT",
+      "likeCount": 2816,
+      "retweetCount": 279,
+      "viewCount": 255265,
+      "cashtags": [],
+      "is_retweet": false
+    },
+    {
+      "account": "KobeissiLetter",
+      "author": "KobeissiLetter",
+      "id": "2066285395365470617",
+      "url": "https://x.com/KobeissiLetter/status/2066285395365470617",
+      "createdAt": "Sun Jun 14 22:23:22 +0000 2026",
+      "text": "EXPECTED TERMS OF US-IRAN PEACE DEAL:  1. Extends ceasefire between US and Iran for 60 days  2. Begins 60-day negotiation period for technical discussions around Iran's nuclear program  3. Removes US Naval blockade and reopens Strait of Hormuz  4. US will commit to discuss sanctions relief with Iran  5. US will commit to discuss the release of frozen Iranian funds  6. Peace deal includes permanent end to fighting on all fronts, including Lebanon  7. Final agreement to be signed on June 19th in Switzerland  We expect to receive more detail on terms shortly.",
+      "likeCount": 6046,
+      "retweetCount": 831,
+      "viewCount": 1406146,
+      "cashtags": [],
+      "is_retweet": false
+    },
+    {
+      "account": "AIStockSavvy",
+      "author": "AIStockSavvy",
+      "id": "2066280490714161390",
+      "url": "https://x.com/AIStockSavvy/status/2066280490714161390",
+      "createdAt": "Sun Jun 14 22:03:53 +0000 2026",
+      "text": "Elon: $SPCX SpaceX might be able to reach approximately $1T revenue in 2030 - $RKLB $ASTS $LUNR $PL $RDW",
+      "likeCount": 22,
+      "retweetCount": 3,
+      "viewCount": 6510,
+      "cashtags": [
+        "$ASTS",
+        "$LUNR",
+        "$PL",
+        "$RDW",
+        "$RKLB",
+        "$SPCX"
       ],
       "is_retweet": false
     },
@@ -115,9 +132,9 @@
       "url": "https://x.com/wallstengine/status/2065461942794461677",
       "createdAt": "Fri Jun 12 15:51:16 +0000 2026",
       "text": "SPACEX $SPCX OPENS AT $150, IPO AT $135 https://t.co/8Ld9Br1oBT",
-      "likeCount": 63,
+      "likeCount": 64,
       "retweetCount": 6,
-      "viewCount": 16714,
+      "viewCount": 17059,
       "cashtags": [
         "$SPCX"
       ],
@@ -130,9 +147,9 @@
       "url": "https://x.com/wallstengine/status/2065436862840541633",
       "createdAt": "Fri Jun 12 14:11:36 +0000 2026",
       "text": "👀  $SPCX currently indicating $175 opening price, per CNBC.",
-      "likeCount": 84,
+      "likeCount": 85,
       "retweetCount": 10,
-      "viewCount": 26552,
+      "viewCount": 26838,
       "cashtags": [
         "$SPCX"
       ],
@@ -141,66 +158,61 @@
     {
       "account": "KobeissiLetter",
       "author": "KobeissiLetter",
-      "id": "2066180993363411002",
-      "url": "https://x.com/KobeissiLetter/status/2066180993363411002",
-      "createdAt": "Sun Jun 14 15:28:31 +0000 2026",
-      "text": "Key Events This Week:  1. May Industrial Production data - Monday  2. May Housing Starts data - Tuesday  3. May Retail Sales data - Wednesday  4. Fed Interest Rate Decision and Kevin Warsh's First Meeting as Fed Chair - Wednesday  5. June Philly Fed Manufacturing Index - Thursday  6. US Markets Closed for Juneteenth - Friday  All eyes are on the Fed this week.",
-      "likeCount": 650,
-      "retweetCount": 99,
-      "viewCount": 93536,
+      "id": "2066304011314029024",
+      "url": "https://x.com/KobeissiLetter/status/2066304011314029024",
+      "createdAt": "Sun Jun 14 23:37:21 +0000 2026",
+      "text": "The Iran peace deal has now been announced by Pakistan on X, confirmed by US leaders and Iranian media on X, and backed by Qatar on X.  X has become the central venue to discuss and announce the most influential decisions in the world.",
+      "likeCount": 10496,
+      "retweetCount": 943,
+      "viewCount": 339215,
       "cashtags": [],
       "is_retweet": false
     },
     {
-      "account": "KobeissiLetter",
-      "author": "KobeissiLetter",
-      "id": "2066172422445740423",
-      "url": "https://x.com/KobeissiLetter/status/2066172422445740423",
-      "createdAt": "Sun Jun 14 14:54:27 +0000 2026",
-      "text": "BREAKING: President Trump issues a statement on Israel's attack on Beirut this morning. https://t.co/UyKtkOK9J1",
-      "likeCount": 4617,
-      "retweetCount": 453,
-      "viewCount": 440597,
-      "cashtags": [],
-      "is_retweet": false
-    },
-    {
-      "account": "KobeissiLetter",
-      "author": "KobeissiLetter",
-      "id": "2066163966850552051",
-      "url": "https://x.com/KobeissiLetter/status/2066163966850552051",
-      "createdAt": "Sun Jun 14 14:20:51 +0000 2026",
-      "text": "Anthropic is in its own league.  Just days after the launch of Anthropic's Claude Fable 5, the company suspended access to the model after US authorities raised \"security concerns.\"  Anthropic said it was ordered to \"suspend foreign nationals\" from using Claude Fable 5, and self-described the model as \"too powerful.\"  \"The net effect of this order is that we must abruptly disable Fable 5 and Mythos 5 for all our customers to ensure compliance,\" Anthropic said.  In other words, Anthropic's latest AI model is so powerful, that the company and US government are now questioning who should even have access to it.  Less than 4 years ago, ChatGPT did not exist. Today, AI is arguably the most powerful technology ever created.  Truly incredible.",
-      "likeCount": 2987,
-      "retweetCount": 188,
-      "viewCount": 277381,
+      "account": "gurgavin",
+      "author": "gurgavin",
+      "id": "2066279737887174838",
+      "url": "https://x.com/gurgavin/status/2066279737887174838",
+      "createdAt": "Sun Jun 14 22:00:53 +0000 2026",
+      "text": "FUTURES JUST OPENED   S&amp;P 500 UP 0.8% 📈 NASDAQ 100 UP 1.3% 📈 DOW JONES UP 0.6% 📈 https://t.co/dVGY9F6dyS",
+      "likeCount": 2907,
+      "retweetCount": 111,
+      "viewCount": 147053,
       "cashtags": [],
       "is_retweet": false
     }
   ],
   "detected_cashtags": [
-    "$AAPL",
-    "$CBRS",
+    "$ASTS",
+    "$DOW",
     "$GOOGL",
-    "$PLTR",
+    "$LUNR",
+    "$PL",
+    "$QQQ",
+    "$RDW",
+    "$RKLB",
     "$SPCH",
-    "$SPCX"
+    "$SPCX",
+    "$SPX",
+    "$SPY"
   ],
   "finnhub_enabled": true,
   "finnhub_symbols_checked": [
     "SPCX",
     "GOOGL",
     "SPCH",
-    "AAPL",
-    "CBRS",
-    "PLTR"
+    "DOW",
+    "QQQ",
+    "SPX",
+    "SPY",
+    "ASTS"
   ],
   "finnhub_context": {
     "enabled": true,
     "symbols": {
       "SPCX": {
         "quote": {
-          "price": 160.97,
+          "price": 160.95,
           "change_pct": null,
           "previous_close": 0.0
         },
@@ -221,85 +233,123 @@
       },
       "GOOGL": {
         "quote": {
-          "price": 359.7,
-          "change_pct": 0.5395,
+          "price": 359.68,
+          "change_pct": 0.5339,
           "previous_close": 357.77
         },
         "news": [
           {
-            "headline": "Bill Ackman Likes This Indirect AI Play Everyone’s Ignoring",
+            "headline": "Anthropic Block Marks US Reversal, Warning to Silicon Valley",
             "source": "Yahoo"
           },
           {
-            "headline": "3 Cloud Computing Stocks to Load up on in June",
+            "headline": "Technology Leads Insurance Education: Big Jump SEO Partners with Three Major Insurance Platforms to Enhance VHIS Information Quality with Latest Gemini AI Technology",
             "source": "Yahoo"
           },
           {
-            "headline": "3 Under-the-Radar Ways to Play Goldman's $1 Trillion AI Spending 2027 Forecast",
+            "headline": "Alphabet Ties Search AI And Mobility Closer To Revenue Potential",
             "source": "Yahoo"
           }
         ]
       },
-      "AAPL": {
+      "DOW": {
         "quote": {
-          "price": 291.15,
-          "change_pct": -1.5154,
-          "previous_close": 295.63
+          "price": 33.85,
+          "change_pct": 0.6542,
+          "previous_close": 33.63
         },
         "news": [
           {
-            "headline": "Given the News Out of WWDC, Was Warren Buffett Right to Sell Apple Stock?",
+            "headline": "Dow Layoffs And Xylem Deal Reframe Costs Valuation And Long Term Returns",
             "source": "Yahoo"
           },
           {
-            "headline": "Goldman Sachs resets Apple stock forecast after WWDC",
+            "headline": "DOW vs. APD: Which Stock Is the Better Value Option?",
             "source": "Yahoo"
           },
           {
-            "headline": "Meet the Spectacular Vanguard ETF That Could Buy SpaceX Stock as Soon as June 19",
+            "headline": "Higher Costs for Plastics Used Everywhere Are Becoming Next Inflation Headache",
             "source": "Yahoo"
           }
         ]
       },
-      "CBRS": {
+      "QQQ": {
         "quote": {
-          "price": 214.02,
-          "change_pct": -5.5308,
-          "previous_close": 226.55
+          "price": 721.34,
+          "change_pct": 0.5885,
+          "previous_close": 717.12
         },
         "news": [
           {
-            "headline": "Wall Street Roundup: Trillion Dollar Baby",
+            "headline": "The Fed May Have A Hawkish Surprise For Markets This Week",
             "source": "SeekingAlpha"
           },
           {
-            "headline": "Crypto Perps Say SpaceX Pops 22% On Launch, But Prediction Markets Disagree",
-            "source": "Benzinga"
+            "headline": "FOMC Chair Warsh Won't Cut Rates Soon, A More Hawkish Fed Looms",
+            "source": "SeekingAlpha"
           },
           {
-            "headline": "Shares of software and AI cloud-related companies are trading lower amid possible sympathy with Oracle after the company reported Q4 financial results and announced a $40 billion financing plan for FY27. The financing needs to fund aggressive capex spending may be giving investors pause.",
-            "source": "Benzinga"
+            "headline": "May Inflation Print: Why The 4.2% Headline Is An Oil Story",
+            "source": "SeekingAlpha"
           }
         ]
       },
-      "PLTR": {
+      "SPX": {
+        "quote": null,
+        "news": [
+          {
+            "headline": "While Everyone Was Focused On SpaceX, I'm Buying Gold Miners",
+            "source": "SeekingAlpha"
+          },
+          {
+            "headline": "S&P 500: Setting Up The Second Leg Lower (Technical Analysis)",
+            "source": "SeekingAlpha"
+          },
+          {
+            "headline": "The Fed May Have A Hawkish Surprise For Markets This Week",
+            "source": "SeekingAlpha"
+          }
+        ]
+      },
+      "SPY": {
         "quote": {
-          "price": 128.01,
-          "change_pct": -2.3421,
-          "previous_close": 131.08
+          "price": 741.75,
+          "change_pct": 0.5408,
+          "previous_close": 737.76
         },
         "news": [
           {
-            "headline": "Is Palantir Stock Ripe for a Rebound?",
+            "headline": "Nasdaq, S&P 500, Dow Futures Climb While Oil Slides As US-Iran Deal Signals End To Hormuz Disruption: DJT, NFLX, GLXY, SPCX In Focus",
             "source": "Yahoo"
           },
           {
-            "headline": "Palantir CEO Alex Karp Is 'Rooting For Elon'—And Has Clients 'Screaming' About OpenAI, Anthropic",
-            "source": "Yahoo"
+            "headline": "GPIX: Retirees Don't Need The 4% Rule With This Monthly Income ETF",
+            "source": "SeekingAlpha"
           },
           {
-            "headline": "Is Rackspace Technology, Inc. (RXT) A Good Stock To Buy Now?",
-            "source": "Yahoo"
+            "headline": "S&P 500: Setting Up The Second Leg Lower (Technical Analysis)",
+            "source": "SeekingAlpha"
+          }
+        ]
+      },
+      "ASTS": {
+        "quote": {
+          "price": 82.41,
+          "change_pct": -15.5289,
+          "previous_close": 97.56
+        },
+        "news": [
+          {
+            "headline": "Why AST SpaceMobile May Be One Of The Market's Biggest Asymmetric Bets",
+            "source": "SeekingAlpha"
+          },
+          {
+            "headline": "Fed Rate Decision Takes Centre Stage As Earnings Wind Down",
+            "source": "SeekingAlpha"
+          },
+          {
+            "headline": "Space Stocks Get Torched: Short Seller Calls Them 'Sci-Fi Wishes'",
+            "source": "Benzinga"
           }
         ]
       }
@@ -307,61 +357,49 @@
   },
   "review_type": "wallstreet",
   "review_context": {
-    "mode": "week_start_prep",
-    "title": "היערכות לפתיחת שבוע המסחר בוול סטריט, יום ראשון 2026-06-14",
-    "editorial_focus": "סקירת הכנה לפתיחת שבוע: התמקד בנושאים שיכולים ללוות את פתיחת המסחר הקרובה. אל תכתוב כאילו המסחר פתוח היום."
+    "mode": "premarket",
+    "title": "נקודות חשובות לקראת פתיחת המסחר בוול סטריט, יום שני 2026-06-15",
+    "editorial_focus": "סקירת טרום מסחר: התמקד במה שיכול להשפיע על הפתיחה, חוזים, טיקרים, דוחות, זרימות וסנטימנט."
   },
   "structured_review": {
     "title": "טעימת וול סטריט",
-    "subtitle": "היערכות לפתיחת שבוע המסחר בוול סטריט, יום ראשון 2026-06-14",
-    "intro": "השאלה המרכזית לפתיחת השבוע היא אם השוק ימשיך לתמחר התלהבות סביב בינה מלאכותית וחלל, בזמן שהפד והמאקרו נכנסים למרכז. המסחר הקרוב ייבחן בעיקר דרך תגובת המניות הגדולות לחדשות נקודתיות ולריבית ביום רביעי.",
+    "subtitle": "נקודות חשובות לקראת פתיחת המסחר בוול סטריט, יום שני 2026-06-15",
+    "intro": "השוק נכנס לפתיחה עם מבחן ברור: האם הירידה בפרמיית הסיכון סביב איראן תחזיק גם אחרי הגאפ בחוזים. במקביל, מניות הצמיחה והחלל מגיעות עם זרימת כותרות חזקה שיכולה להגדיל תנודתיות בתחילת המסחר.",
     "main_title": "במרכז הפתיחה",
     "main": [
       {
-        "heading": "הפד והנתונים במרכז השבוע",
-        "body": "השבוע כולל ייצור תעשייתי, התחלות בנייה, מכירות קמעונאיות, החלטת ריבית של הפד ביום רביעי ומדד פילי פד, עם סגירת השווקים ביום שישי ליום ג׳ונטינת׳. זה משנה כי לוח צפוף יכול לקבוע את רמת הסיכון לפני הפתיחה, ובמסחר צריך לבדוק את תגובת התשואות, הדולר והמניות הרגישות לריבית."
+        "heading": "החוזים עולים עם עסקת ארה״ב-איראן",
+        "body": "החוזים על אס אנד פי 500 עלו סביב 0. 7%-0. 8%, נאסד״ק 100 סביב 0."
       },
       {
-        "heading": "ספייסאיקס נכנסת למבחן המסחר",
-        "body": "ספייסאיקס (SPCX) הונפקה ב-135 דולר, פתחה ב-150 דולר, ועלתה לשווי של יותר מ-2 טריליון דולר ביום המסחר הראשון, לצד הכנה לתעודת סל ממונפת יומית פי שניים תחת הסימול (SPCH). זה משנה כי נזילות וסנטימנט סביב השם עשויים להשפיע על תמחור חברות חלל וצמיחה, ובמסחר צריך לבדוק אם המחיר מתייצב או ממשיך לתנודתיות חדה."
+        "heading": "ספייסאיקס מושכת זרימת מסחר",
+        "body": "ספייסאיקס (SPCX) פתחה את יום המסחר הראשון ב-150 דולר מול מחיר הנפקה של 135 דולר, אחרי אינדיקציה מוקדמת ל-175 דולר, והוצגה כחברה ציבורית בשווי מעל 2 טריליון דולר. הכנה לקרן ממונפת יומית פי 2 תחת קרן ספייסאיקס (SPCH) יכולה להגדיל תנודתיות, ולכן צריך לראות אם המניה ממשיכה למשוך מומנטום או נרגעת אחרי הפתיחה החזקה."
       },
       {
-        "heading": "בינה מלאכותית תחת בחינה",
-        "body": "הרשויות בארה״ב הגבילו גישה למודלי Mythos 5 ו-Fable 5 של אנת׳רופיק, ואפל (AAPL) קיבלה הערכה שסירי החדשה מספיק טובה כדי לצמצם את משבר הבינה המלאכותית שלה. זה משנה כי אלפבית (GOOGL) מחזיקה 14% באנת׳רופיק וגם חשיפות ל-Waymo ולספייסאיקס, ובמסחר צריך לבדוק אם המשקיעים מתמחרים מחדש חשיפות עקיפות לבינה מלאכותית."
+        "heading": "גוגל מקבלת מבט דרך החזקות פרטיות",
+        "body": "גוגל (GOOGL) מחזיקה 6% מספייסאיקס, 14% מחברת Anthropic ו-75% מחברת Waymo, ושלוש ההחזקות הוערכו יחד ביותר מ-350 מיליארד דולר. זה יכול להשפיע על הדרך שבה השוק מסתכל על מאזן הנכסים של גוגל, ובמסחר חשוב לראות אם זה מקבל ביטוי בביצוע היחסי של המניה מול ענקיות הטכנולוגיה."
       }
     ],
     "background_title": "ברקע",
     "background": [
       {
-        "heading": "מכרז ניהול התעבורה האווירית",
-        "body": "מינהל התעופה הפדרלי קרוב לבחור בחברת ASI על פני פלנטיר (PLTR) ותאלס (Thales) למערכת ניהול תעבורה אווירית מבוססת בינה מלאכותית. זה משנה לפלנטיר (PLTR) כי זכייה או הפסד במכרז ממשלתי יכולים להזיז את הציפיות, ובמסחר צריך לבדוק תגובה ראשונית במניה ובסקטור הביטחוני טכנולוגי."
+        "heading": "בינה מלאכותית נכנסת למגבלות יצוא",
+        "body": "ממשלת ארה״ב הטילה מגבלות יצוא על מודלי Mythos 5 ו-Fable 5 של חברת Anthropic, כך שממשלות, חברות או יחידים מחוץ לארה״ב לא יכולים לקבל גישה אליהם. עבור מניות AI זה מעלה את החשיבות של רגולציה וגישה לשווקים זרים, ולכן כדאי לעקוב אם הסנטימנט בסקטור נשאר חיובי למרות המגבלה."
       },
       {
-        "heading": "סרברס נשארת תנודתית",
-        "body": "בבית ההשקעות Needham השאירו המלצת קנייה על סרברס סיסטמס (CBRS) עם מחיר יעד של 300 דולר, בזמן שהמניה רשמה תנועה יומית חדה של מינוס 5.53%. זה משנה כי הפער בין יעד האנליסט לתנועת המחיר מחדד את רמת התנודתיות, ובמסחר צריך לבדוק אם יש המשך לחץ או ניסיון התייצבות."
+        "heading": "זהב עולה לצד פתיחת ריסק און",
+        "body": "הזהב עלה 2% לצד עליות בחוזים וירידה חדה בנפט. השילוב הזה לא נותן תמונת סיכון נקייה, ולכן במסחר חשוב לראות אם הביקוש לזהב נחלש או ממשיך לצד העליות במניות."
       }
     ],
-    "forward_title": "לקראת המסחר הקרוב",
-    "forward": [
-      {
-        "heading": "אם החלטת הפד משנה את תמחור הריבית",
-        "body": "זה יסמן שהמאקרו חוזר להוביל את המסחר השבוע, במיוחד במניות צמיחה ובנכסים רגישים לתשואות."
-      },
-      {
-        "heading": "אם ספייסאיקס ממשיכה בתנודתיות גבוהה",
-        "body": "זה יסמן שהשוק עדיין מחפש מחיר שיווי משקל לספייסאיקס (SPCX), ושגם תעודת הסל הממונפת המתוכננת יכולה למשוך תשומת לב."
-      },
-      {
-        "heading": "אם מניות הבינה המלאכותית מגיבות לחדשות המוצר והרגולציה",
-        "body": "זה יסמן שהמשקיעים בוחנים מחדש גם יכולות מסחריות וגם מגבלות גישה למודלים, בעיקר סביב אפל (AAPL), אלפבית (GOOGL) ופלנטיר (PLTR)."
-      }
-    ],
-    "bottom_line": "פתיחת השבוע מגיעה עם שילוב של מאקרו כבד, ספייסאיקס אחרי כניסה חריגה למסחר הציבורי, וחדשות בינה מלאכותית שמגיעות מכמה כיוונים. המבחן אינו רק הכותרות, אלא אם הן מייצרות המשך תמחור במניות עצמן.",
+    "forward_title": "",
+    "forward": [],
+    "bottom_line": "הפתיחה נראית חיובית, אבל היא תלויה בהמשך האמון במהלך המדיני מול איראן ובתגובה של הנפט. ספייסאיקס (SPCX), גוגל (GOOGL) וסקטור הבינה המלאכותית יכולים לייצר תנועה נקודתית מעבר למדדים. אם הגאפ בחוזים לא יתרחב אחרי הפתיחה, השוק עלול לעבור מהר לבדיקת רוחב ועומק הקונים.",
     "summary_points": [
-      "הפד והנתונים של השבוע צפויים להכתיב את רמת הסיכון לפני פתיחת המסחר",
-      "ספייסאיקס (SPCX) נכנסת לשבוע הראשון המלא אחרי פתיחה בשווי של יותר מ-2 טריליון דולר",
-      "הגבלות הגישה למודלים של אנת׳רופיק מוסיפות ממד רגולטורי לסיפור הבינה המלאכותית",
-      "אפל (AAPL), אלפבית (GOOGL), פלנטיר (PLTR) וסרברס סיסטמס (CBRS) נמצאות במוקד חדשות נקודתיות"
+      "החוזים מגיעים לפתיחה בעליות, עם נאסד״ק 100 חזק יותר מהדאו",
+      "הירידה בנפט מציבה את עסקת ארה״ב-איראן כגורם המרכזי לסנטימנט הבוקר",
+      "ספייסאיקס (SPCX) נשארת מוקד תנודתי אחרי פתיחה מעל מחיר ההנפקה והכנה לקרן ממונפת",
+      "גוגל (GOOGL) עשויה לקבל תשומת לב דרך החזקותיה בספייסאיקס, חברת Anthropic וחברת Waymo",
+      "מגבלות היצוא על מודלי חברת Anthropic מוסיפות רגישות רגולטורית לסקטור הבינה המלאכותית"
     ]
   }
 }
