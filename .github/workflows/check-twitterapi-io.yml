@@ -1,17 +1,7 @@
-name: Generate Market Review
+name: Generate Wall Street Core Review
 
 on:
   workflow_dispatch:
-    inputs:
-      review_type:
-        description: "איזו סקירה ליצור"
-        required: true
-        default: "wallstreet"
-        type: choice
-        options:
-          - wallstreet
-          - israel
-          - trump
 
 permissions:
   contents: write
@@ -35,9 +25,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run review
+      - name: Run Wall Street core review
         env:
-          REVIEW_TYPE: ${{ github.event.inputs.review_type }}
+          REVIEW_TYPE: wallstreet
           TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
@@ -51,11 +41,11 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add output/ || true
-          git commit -m "Update market review" || echo "No changes to commit"
+          git commit -m "Update Wall Street core review" || echo "No changes to commit"
           git push
 
       - name: Upload output artifact
         uses: actions/upload-artifact@v4
         with:
-          name: market-review-output
+          name: wallstreet-core-review-output
           path: output/
