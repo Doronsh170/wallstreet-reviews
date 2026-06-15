@@ -1,295 +1,48 @@
 <!doctype html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>טעימת שוק | Market Desk</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>טעימת וול סטריט | Market Desk</title>
   <style>
-    :root{
-      --bg:#f4f6f8;--paper:#fff;--ink:#111827;--muted:#667085;--line:#d8dee8;
-      --brand:#073b4c;--brand2:#0b556b;--accent:#0f766e;--gold:#a17a25;--soft:#eef6f7;
-    }
-    *{box-sizing:border-box;font-family:'Segoe UI', Arial, 'Noto Sans Hebrew', Helvetica, sans-serif!important}
-    body{margin:0;background:var(--bg);color:var(--ink);font-size:16.5px;line-height:1.72;font-weight:400;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
-    html,body,.wrap,.paper,#screen,.review,.preview,.headline,.toolbar,.footer{direction:rtl;text-align:right;unicode-bidi:plaintext}
-    .review *,.preview *,.headline *{direction:rtl;text-align:right;unicode-bidi:plaintext}
+    :root{--bg:#f4f6f8;--paper:#fff;--ink:#111827;--muted:#667085;--line:#d8dee8;--brand:#073b4c;--brand2:#0b556b;--accent:#0f766e}
+    *{box-sizing:border-box;font-family:'Segoe UI',Arial,'Noto Sans Hebrew',Helvetica,sans-serif!important}
+    html,body{direction:rtl;text-align:right;unicode-bidi:plaintext}
+    body{margin:0;background:var(--bg);color:var(--ink);font-size:16.5px;line-height:1.72;font-weight:400;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
     .top{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;padding:18px 16px 14px;border-bottom:4px solid #19a7a5}
-    .top-inner{max-width:980px;margin:auto;display:flex;gap:14px;align-items:center;justify-content:space-between}
-    .brand h1{margin:0;font-size:26px;letter-spacing:-.2px;font-weight:800}.brand p{margin:2px 0 0;color:#d7edf2;font-size:14px}.badge{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:#bde7ef}
-    .wrap{max-width:980px;margin:0 auto;padding:16px}
-    .tabs{display:flex;gap:8px;overflow:auto;padding:4px 0 12px;position:sticky;top:0;background:var(--bg);z-index:5}
-    .tab{white-space:nowrap;border:1px solid var(--line);background:#fff;color:#263241;border-radius:999px;padding:10px 14px;font-weight:700;cursor:pointer}
-    .tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
-    .paper{background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 22px rgba(15,23,42,.06);padding:22px;margin-bottom:18px}
-    .headline{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:14px}
-    .headline h1{font-size:25px;line-height:1.3;margin:0;color:#0b2e3b;font-weight:750}.meta{font-size:14px;color:var(--muted);white-space:nowrap;margin-top:4px}.subtle{color:var(--muted);font-size:15px;margin:6px 0 0}.status{color:var(--muted);font-size:14px;margin:4px 0 12px}
-    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0;border-top:1px solid var(--line);padding-top:14px}
-    button,.action{border:1px solid var(--line);background:#fff;color:#14212f;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;font-size:15px}
-    button.primary,.action.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-    input{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;min-width:220px}
-    .review h1{font-size:24px;margin:0 0 8px;color:#0b2e3b;font-weight:750;text-align:right}.review h2{font-size:19px;border-top:1px solid var(--line);padding-top:14px;margin:22px 0 12px;color:#0b2e3b;font-weight:750;text-align:right}.review h3{font-size:17.5px;margin:16px 0 5px;color:#0b2e3b;font-weight:700;line-height:1.42;text-align:right}.review p{margin:0 0 14px;font-size:16.5px;line-height:1.75;color:#1f2937;font-weight:400;text-align:right}.review ul,.preview ul{margin:0 0 14px;padding:0 24px 0 0;text-align:right}.review li,.preview li{margin:0 0 10px;font-size:16.5px;line-height:1.7;color:#1f2937;text-align:right}.review strong,.preview strong{font-weight:inherit;color:inherit}.review .ticker,.preview .ticker{color:inherit;font-weight:inherit;opacity:1;background:none}.empty{padding:26px;text-align:center;color:var(--muted)}
-    details.section{border:1px solid var(--line);border-radius:14px;margin:14px 0;background:#fff;overflow:hidden}details.section summary{cursor:pointer;padding:14px 16px;font-weight:750;color:#0b2e3b;background:#f9fbfc;font-size:18px}details.section .section-content{padding:17px}
-    .preview-title{font-size:22px;margin:0 0 14px;color:#0b2e3b;font-weight:750}.read-more{margin-top:12px}.footer{font-size:12px;text-align:center;color:#667085;margin:20px 0 8px}.disclaimer{border-top:1px solid var(--line);padding-top:12px;margin-top:16px;color:#4b5563;font-size:13px;text-align:center}
-    @media(max-width:720px){body{font-size:16.5px;line-height:1.72}.top-inner{display:block}.brand h1{font-size:23px}.wrap{padding:12px}.headline{display:block}.headline h1{font-size:23px}.meta{white-space:normal}.toolbar{display:grid;grid-template-columns:1fr 1fr}.toolbar input{grid-column:1/-1;width:100%;min-width:0}.paper{padding:16px;border-radius:14px}.review h1{font-size:22px}.review h2{font-size:19px}.review h3{font-size:17.5px}.review p,.review li,.preview li{font-size:16.5px;line-height:1.75}.hide-mobile{display:none!important}}
-    @media print{.top,.tabs,.toolbar,.status,.read-more{display:none!important}body{background:#fff;font-size:15.5px;line-height:1.65}.wrap{max-width:none;padding:0}.paper{box-shadow:none;border:none}.review p,.review li{font-size:15.5px;line-height:1.65}.review h2{font-size:18px}.review h3{font-size:16.5px}.footer{display:block}}
+    .top-inner{max-width:920px;margin:auto;display:flex;gap:14px;align-items:center;justify-content:space-between}.brand h1{margin:0;font-size:25px;font-weight:800}.brand p{margin:2px 0 0;color:#d7edf2;font-size:14px}.badge{font-size:12px;letter-spacing:.6px;color:#bde7ef}
+    .wrap{max-width:920px;margin:0 auto;padding:16px}.paper{background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 22px rgba(15,23,42,.06);padding:22px;margin-bottom:18px}.status{color:var(--muted);font-size:14px;margin:4px 0 12px}.headline{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:14px}.headline h1{font-size:25px;line-height:1.3;margin:0;color:#0b2e3b;font-weight:750}.subtle{color:var(--muted);font-size:15px;margin:6px 0 0}.meta{font-size:14px;color:var(--muted);white-space:nowrap;margin-top:4px}
+    .review,.preview,.headline,.toolbar,.footer,.review *,.preview *{direction:rtl;text-align:right;unicode-bidi:plaintext}.review h2{font-size:19px;border-top:1px solid var(--line);padding-top:14px;margin:22px 0 12px;color:#0b2e3b;font-weight:750}.review h3{font-size:17.5px;margin:16px 0 5px;color:#0b2e3b;font-weight:700;line-height:1.42}.review p{margin:0 0 14px;font-size:16.5px;line-height:1.75;color:#1f2937;font-weight:400}.preview-title{font-size:22px;margin:0 0 14px;color:#0b2e3b;font-weight:750}.preview ul{margin:0 0 14px;padding:0 24px 0 0}.preview li{margin:0 0 10px;font-size:16.5px;line-height:1.7;color:#1f2937}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0;border-top:1px solid var(--line);padding-top:14px}.toolbar button,.toolbar a{border:1px solid var(--line);background:#fff;color:#14212f;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;font-size:15px}.toolbar .primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .footer{font-size:12px;text-align:center;color:#667085;margin:20px 0 8px}.disclaimer{border-top:1px solid var(--line);padding-top:12px;margin-top:16px;color:#4b5563;font-size:13px;text-align:center}.empty{padding:26px;text-align:center;color:var(--muted)}
+    @media(max-width:720px){body{font-size:16.5px}.top-inner{display:block}.brand h1{font-size:23px}.wrap{padding:12px}.headline{display:block}.headline h1{font-size:23px}.meta{white-space:normal}.paper{padding:16px;border-radius:14px}.review h2{font-size:19px}.review h3{font-size:17.5px}.review p,.preview li{font-size:16.5px;line-height:1.75}.toolbar{display:grid;grid-template-columns:1fr 1fr}}
+    @media print{.top,.toolbar,.status,.read-more{display:none!important}body{background:#fff;font-size:15.5px;line-height:1.65}.wrap{max-width:none;padding:0}.paper{box-shadow:none;border:none}.review p,.preview li{font-size:15.5px;line-height:1.65}.review h2{font-size:18px}.review h3{font-size:16.5px}}
   </style>
 </head>
 <body>
-  <header class="top">
-    <div class="top-inner">
-      <div class="brand"><div class="badge">MARKET UPDATE</div><h1>טעימת שוק 🌅</h1><p>סקירות שוק קצרות, ממוקדות ומוכנות לקריאה ושיתוף</p></div>
-      <div id="updatedTop" class="badge"></div>
-    </div>
-  </header>
-
+  <header class="top"><div class="top-inner"><div class="brand"><div class="badge">MARKET DESK CORE</div><h1>טעימת וול סטריט 🌅</h1><p>גרסת Core: תוכן נקי, JSON מובנה ובדיקות לפני פרסום</p></div><div id="updatedTop" class="badge"></div></div></header>
   <main class="wrap">
-    <nav class="tabs" id="tabs"></nav>
     <div class="status" id="status">טוען סקירה...</div>
     <article class="paper" id="screen"></article>
-    <div class="footer">
-      <div class="disclaimer">⚠️ גילוי נאות: תוכן זה נוצר באמצעות AI לצרכים אינפורמטיביים בלבד. אין באמור ייעוץ השקעות או המלצה לפעולה בניירות ערך.</div>
-      <div style="margin-top:8px;font-weight:700">פותח ע"י דורון שרייבמן</div>
-    </div>
+    <div class="footer"><div class="disclaimer">⚠️ גילוי נאות: תוכן זה נוצר באמצעות AI לצרכים אינפורמטיביים בלבד. אין באמור ייעוץ השקעות או המלצה לפעולה בניירות ערך.</div><div style="margin-top:8px;font-weight:700">פותח ע"י דורון שרייבמן</div></div>
   </main>
 <script>
-const CHANNELS={
-  wallstreet:{label:'וול סטריט',path:'output/wallstreet/latest.md',json:'output/wallstreet/latest.json',fallback:'output/latest.md',fallbackJson:'output/latest.json'},
-  israel:{label:'ישראל',path:'output/israel/latest.md',json:'output/israel/latest.json'},
-  trump:{label:'טראמפ',path:'output/trump/latest.md',json:'output/trump/latest.json'}
-};
+const JSON_PATH='output/wallstreet/latest.json';
 const ACTIONS_URL='https://github.com/Doronsh170/wallstreet-reviews/actions/workflows/check-twitterapi-io.yml';
-let active='wallstreet', raw='', rendered='', meta={}, structured=null, currentMode='preview';
-const rtlMark='\u200F';
+let meta={}, structured=null, mode='preview';
 function esc(s){return (s||'').replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))}
-function stripBidi(s){return (s||'').replace(/[\u200E\u200F\u202A-\u202E\u2066-\u2069\u200B-\u200D\uFEFF\u00AD]/g,'').replace(/\u00A0/g,' ')}
-function cleanMdLine(s){return stripBidi(s||'').replace(/^\s+|\s+$/g,'').trim()}
-function cleanDisplayText(s){return cleanPointText(s).replace(/^#{1,6}\s*/,'').replace(/\s+#{1,6}\s*/g,' ').replace(/\*\*/g,'').trim()}
-function stripFooter(md){return (md||'').replace(/⚠️?\s*גילוי נאות:[\s\S]*$/m,'').replace(/פותח ע["׳']?י דורון שרייבמן/g,'').trim()}
-function normalize(md){return stripFooter(md).replace(/\r/g,'').replace(/\n{3,}/g,'\n\n').trim()}
-function inline(s){return esc(cleanDisplayText(s)).replace(/\$[A-Z]{1,6}/g,m=>`<span class="ticker">${m}</span>`)}
-function cleanStructuredText(s){
-  return cleanPointText(s||'')
-    .replace(/^#{1,6}\s*/,'')
-    .replace(/#{1,6}/g,'')
-    .replace(/\*\*/g,'')
-    .replace(/^נקודה\s*\d+\s*[:.：־\-–—]?\s*/i,'')
-    .replace(/--+/g,',')
-    .replace(/[–—]/g,',')
-    .replace(/\s+/g,' ')
-    .trim();
-}
-function hasStructured(){return structured && typeof structured==='object' && structured.intro && Array.isArray(structured.main)}
-function structuredTitle(){return cleanStructuredText(structured?.title || CHANNELS[active].label)}
-function structuredSubtitle(){return cleanStructuredText(structured?.subtitle || CHANNELS[active].label)}
-function structuredPoints(limit=5){
-  if(!hasStructured()) return [];
-  let pts=Array.isArray(structured.summary_points)?structured.summary_points.map(cleanStructuredText).filter(Boolean):[];
-  if(!pts.length){
-    pts=[];
-    if(structured.intro) pts.push(cleanStructuredText(structured.intro));
-    [...(structured.main||[]),...(structured.background||[])].forEach(x=>{
-      const h=cleanStructuredText(x.heading), b=cleanStructuredText(x.body);
-      if(h&&b) pts.push(`${h}: ${b}`);
-    });
-  }
-  return pts.map(x=>cleanStructuredText(x).replace(/\.$/,'')).filter(Boolean).slice(0,limit);
-}
-function renderStructuredSections(){
-  if(!hasStructured()) return '';
-  let html='';
-  const p=(x)=>`<p>${inline(cleanStructuredText(x))}</p>`;
-  const h2=(x)=>`<h2>${inline(cleanStructuredText(x))}</h2>`;
-  const h3=(x)=>`<h3>${inline(cleanStructuredText(x))}</h3>`;
-  if(structured.intro) html+=p(structured.intro);
-  if(structured.main && structured.main.length){
-    html+=h2(structured.main_title||'במרכז הפתיחה');
-    structured.main.forEach(item=>{ if(item.heading) html+=h3(item.heading); if(item.body) html+=p(item.body); });
-  }
-  if(structured.background && structured.background.length){
-    html+=h2(structured.background_title||'ברקע');
-    structured.background.forEach(item=>{ if(item.heading) html+=h3(item.heading); if(item.body) html+=p(item.body); });
-  }
-  if(structured.forward && structured.forward.length && cleanStructuredText(structured.forward_title)){
-    html+=h2(structured.forward_title);
-    structured.forward.forEach(item=>{ if(item.heading) html+=h3(item.heading); if(item.body) html+=p(item.body); });
-  }
-  if(structured.bottom_line){ html+=h2('שורה תחתונה'); html+=p(structured.bottom_line); }
-  return html;
-}
-function formatCreated(){
-  const iso=meta.generated_israel || meta.generated_utc || '';
-  if(!iso) return '';
-  try{
-    const d=new Date(iso);
-    const parts=new Intl.DateTimeFormat('he-IL',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(d);
-    return parts;
-  }catch(e){return iso.slice(0,16).replace('T',' ')}
-}
-function extractTitle(md){
-  if(hasStructured()) return structuredTitle();
-  const lines=normalize(md).split('\n').map(x=>x.trim()).filter(Boolean);
-  const h=lines.find(x=>x.startsWith('# '));
-  if(h) return h.replace(/^#\s+/,'');
-  return lines[0] || CHANNELS[active].label;
-}
-function removeDuplicateTitleLines(md){
-  const title=extractTitle(md); let seen=false;
-  return normalize(md).split('\n').filter(line=>{
-    const t=line.trim().replace(/^#+\s*/,'');
-    if(t===title){ if(seen) return false; seen=true; return true; }
-    return true;
-  }).join('\n');
-}
-function mdToHtml(md){
-  md=removeDuplicateTitleLines(md);
-  let lines=md.split('\n');
-  let html='', inList=false;
-  const close=()=>{if(inList){html+='</ul>';inList=false}};
-  for(let rawLine of lines){
-    let line=cleanMdLine(rawLine);
-    if(!line){close(); continue}
-    const h=line.match(/^\s*(#{1,3})\s+(.+)$/);
-    if(h){
-      close();
-      const level=h[1].length;
-      const body=cleanDisplayText(h[2]);
-      if(!body) continue;
-      if(level===1) html+=`<h1>${inline(body)}</h1>`;
-      else if(level===2) html+=`<h2>${inline(body)}</h2>`;
-      else html+=`<h3>${inline(body)}</h3>`;
-      continue;
-    }
-    line=cleanDisplayText(line);
-    if(!line) continue;
-    if(/^([•\-]|\d+[.)])\s+/.test(line)){
-      if(!inList){html+='<ul>';inList=true}
-      html+=`<li>${inline(line.replace(/^([•\-]|\d+[.)])\s+/,''))}</li>`;
-      continue;
-    }
-    close(); html+=`<p>${inline(line)}</p>`;
-  }
-  close();
-  return html.replace(/###/g,'');
-}
-function applyMobileSections(){
-  const el=document.querySelector('#screen .review'); if(!el) return; const heads=[...el.querySelectorAll('h2')];
-  heads.forEach((h,i)=>{let nodes=[]; let n=h.nextSibling; while(n && !(n.nodeType===1 && n.tagName==='H2')){let next=n.nextSibling; nodes.push(n); n=next}
-    const d=document.createElement('details'); d.className='section'; if(i===0 || window.innerWidth>720)d.open=true;
-    const s=document.createElement('summary'); s.innerHTML=h.innerHTML; const c=document.createElement('div'); c.className='section-content'; nodes.forEach(x=>c.appendChild(x)); d.append(s,c); h.replaceWith(d);
-  })
-}
-function cleanPointText(x){
-  return stripBidi(x||'')
-    .replace(/\u00A0/g,' ')
-    .replace(/\*\*/g,'')
-    .replace(/^\s*([•\-]|\d+[.)])\s*/,'')
-    .replace(/^\s*#{1,6}\s*/,'')
-    .replace(/\s+#{1,6}\s*/g,' ')
-    .replace(/^\s*([•\-]|\d+[.)])\s*/,'')
-    .replace(/^\s*נקודה\s*\d+\s*[:.：־\-–—]?\s*/i,'')
-    .replace(/^\s*נק׳\s*\d+\s*[:.：־\-–—]?\s*/i,'')
-    .replace(/[ \t]{2,}/g,' ')
-    .trim();
-}
-function getBulletTexts(){
-  const txt=stripBidi(raw||'');
-  const lines=txt.split('\n').map(cleanMdLine).filter(Boolean);
-  let items=[];
-  const isSectionHeading = (x)=>/^\s*##\s+/.test(x) && !/^\s*###\s+/.test(x);
-  const isTopicHeading = (x)=>/^\s*###\s+/.test(x);
-
-  for(let i=0;i<lines.length;i++){
-    if(!isTopicHeading(lines[i])) continue;
-    const title=cleanPointText(lines[i]);
-    if(!title || /^(שורה תחתונה|גילוי נאות|פותח ע)/.test(title)) continue;
-    let body='';
-    for(let j=i+1;j<lines.length;j++){
-      if(isTopicHeading(lines[j]) || isSectionHeading(lines[j])) break;
-      const candidate=cleanPointText(lines[j]);
-      if(candidate && !/^(גילוי נאות|פותח ע)/.test(candidate)){body=candidate; break;}
-    }
-    let point=title;
-    if(body) point += ': ' + body;
-    point=cleanPointText(point);
-    if(point && !items.includes(point)) items.push(point);
-  }
-
-  if(!items.length){
-    items=[...txt.matchAll(/(?:^|\n)\s*(?:[•\-]|\d+[.)])\s*(.+)/g)]
-      .map(m=>cleanPointText(m[1]))
-      .filter(x=>x && !/^(גילוי נאות|פותח ע)/.test(x));
-  }
-  if(!items.length){
-    items=lines.map(cleanPointText)
-      .filter(x=>x && x.includes(':') && x.length>35 && !/^(גילוי נאות|פותח ע)/.test(x))
-      .slice(0,7);
-  }
-  return items.map(cleanPointText).filter(Boolean);
-}
-function summaryPoints(limit=5){
-  if(hasStructured()) return structuredPoints(limit);
-  return getBulletTexts().slice(0,limit).map(x=>cleanPointText(x).replace(/\.$/,'')).filter(Boolean);
-}
-function fivePoints(limit=5){
-  const bullets=summaryPoints(limit);
-  if(!bullets.length) return 'אין מספיק נקודות לקיצור.';
-  return bullets.map(b=>`${rtlMark}• ${b.slice(0,230)}`).join('\n');
-}
-function renderHeader(title){
-  const created=formatCreated();
-  const createdHtml=created?`<div class="meta">נוצרה: ${created}</div>`:'';
-  document.getElementById('updatedTop').textContent=created?`נוצרה: ${created}`:'';
-  return `<div class="headline"><div><h1>${inline(title)}</h1><p class="subtle">${hasStructured()?structuredSubtitle():CHANNELS[active].label}</p></div>${createdHtml}</div>`;
-}
-function renderPreview(){
-  currentMode='preview';
-  const title=extractTitle(raw);
-  const arr=summaryPoints(5);
-  const points=arr.length ? arr.map(x=>`<li>${inline(x)}</li>`).join('') : '<li>אין מספיק נקודות לקיצור.</li>';
-  document.getElementById('screen').innerHTML=`${renderHeader(title)}<section class="preview" dir="rtl"><h2 class="preview-title">תקציר מהיר</h2><ul dir="rtl">${points}</ul><div class="read-more"><button class="primary" onclick="renderFull()">קריאת הסקירה המלאה</button></div></section>`;
-}
-function renderFull(){
-  currentMode='full';
-  const title=extractTitle(raw);
-  rendered=hasStructured()?renderStructuredSections():mdToHtml(raw);
-  document.getElementById('screen').innerHTML=`${renderHeader(title)}<section class="review" dir="rtl">${rendered}</section>${toolbarHtml()}`;
-  applyMobileSections();
-}
-function toolbarHtml(){return `<div class="toolbar"><a class="action primary" id="runLink" href="${ACTIONS_URL}" target="_blank" rel="noopener">יצירת סקירה חדשה</a><button onclick="load()">טעינת הסקירה האחרונה</button><button onclick="renderShortOnly()">קיצור ל-5 נקודות</button><button onclick="whatsapp()">שליחה בווטסאפ</button><button onclick="window.print()">שמירה ל-PDF</button><input id="search" placeholder="חיפוש בסקירה" oninput="searchReview(this.value)" /></div>`}
-function renderShortOnly(){
-  currentMode='short';
-  const title=`קיצור ל-5 נקודות, ${CHANNELS[active].label}`;
-  const arr=summaryPoints(5); const points=arr.length ? arr.map(x=>'<li>'+inline(x)+'</li>').join('') : '<li>אין מספיק נקודות לקיצור.</li>';
-  document.getElementById('screen').innerHTML=`${renderHeader(title)}<section class="preview" dir="rtl"><h2 class="preview-title">תקציר מהיר</h2><ul dir="rtl">${points}</ul><div class="read-more"><button class="primary" onclick="renderFull()">קריאת הסקירה המלאה</button></div></section>${toolbarHtml()}`;
-}
-async function fetchJson(paths){
-  for(const p of paths.filter(Boolean)){
-    try{const r=await fetch(p+'?v='+Date.now()); if(r.ok) return await r.json()}catch(e){}
-  }
-  return {};
-}
-async function load(){
-  const cfg=CHANNELS[active]; document.getElementById('status').textContent='טוען סקירה...'; meta={};
-  meta=await fetchJson([cfg.json,cfg.fallbackJson]);
-  structured = meta && meta.structured_review ? meta.structured_review : null;
-  for(const p of [cfg.path,cfg.fallback].filter(Boolean)){
-    try{const r=await fetch(p+'?v='+Date.now()); if(r.ok){const t=await r.text(); raw=normalize(t); document.getElementById('status').textContent='הסקירה נטענה'; renderPreview(); return}}
-    catch(e){}
-  }
-  raw=''; structured=null; document.getElementById('updatedTop').textContent=''; document.getElementById('screen').innerHTML=`<div class="empty">הסקירה עדיין לא הוגדרה או לא נוצרה. יש להריץ Workflow ולבחור review_type: <b>${active}</b>.</div>`; document.getElementById('status').textContent='אין סקירה זמינה לערוץ זה';
-}
-function setActive(k){active=k; document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.k===k)); load()}
-function buildTabs(){const t=document.getElementById('tabs'); t.innerHTML=''; Object.entries(CHANNELS).forEach(([k,v])=>{const b=document.createElement('button'); b.className='tab'; b.dataset.k=k; b.textContent=v.label; b.onclick=()=>setActive(k); t.appendChild(b)}); setActive(active)}
-function siteUrl(){return location.href.split('#')[0].split('?')[0]}
-function whatsapp(){const msg=`${rtlMark}טעימת שוק, ${CHANNELS[active].label}\n\n${fivePoints(5)}\n\n${rtlMark}לסקירה המלאה:\n${siteUrl()}`; window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank')}
-function searchReview(q){
-  q=(q||'').trim(); if(!q){renderFull();return}
-  const re=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
-  const highlighted=rendered.replace(re,m=>`<mark>${m}</mark>`);
-  const title=extractTitle(raw);
-  document.getElementById('screen').innerHTML=`${renderHeader(title)}<section class="review">${highlighted}</section>${toolbarHtml()}`;
-}
-buildTabs();
+function clean(s){return (s||'').toString().replace(/[\u200E\u200F\u202A-\u202E\u2066-\u2069\u200B-\u200D\uFEFF\u00AD]/g,'').replace(/#{1,6}/g,'').replace(/\*\*/g,'').replace(/\bנקודה\s*\d+\s*[:.：־\-–—]?\s*/gi,'').replace(/--+/g,',').replace(/[–—]/g,',').replace(/\s+/g,' ').trim()}
+function inline(s){return esc(clean(s))}
+function created(){const iso=meta.generated_israel||meta.generated_utc||'';if(!iso)return '';try{return new Intl.DateTimeFormat('he-IL',{timeZone:'Asia/Jerusalem',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).format(new Date(iso))}catch(e){return iso.slice(0,16).replace('T',' ')}}
+function points(){let p=Array.isArray(structured?.summary_points)?structured.summary_points.map(clean).filter(Boolean):[];if(!p.length&&structured){p=[structured.intro,...(structured.main||[]).map(x=>`${x.heading}: ${x.body}`)].map(clean).filter(Boolean)}return p.slice(0,5)}
+function headerHtml(){return `<div class="headline"><div><h1>${inline(structured?.title||'טעימת וול סטריט')}</h1><p class="subtle">${inline(structured?.subtitle||'')}</p></div><div class="meta">${created()?`נוצרה: ${created()}`:''}</div></div>`}
+function toolbar(){return `<div class="toolbar"><button class="primary" onclick="mode='full';render()">קריאת הסקירה המלאה</button><a href="${ACTIONS_URL}" target="_blank">יצירת סקירה חדשה</a><button onclick="window.print()">שמירה ל-PDF</button><button onclick="shareWhatsApp()">שליחה בווטסאפ</button></div>`}
+function renderPreview(){const ps=points();return `<div class="preview">${headerHtml()}<h2 class="preview-title">תקציר מהיר</h2><ul>${ps.map(x=>`<li>${inline(x)}</li>`).join('')}</ul>${toolbar()}</div>`}
+function renderFull(){let html=`<div class="review">${headerHtml()}`;if(structured?.intro)html+=`<p>${inline(structured.intro)}</p>`;if(structured?.main?.length){html+=`<h2>${inline(structured.main_title||'במרכז הפתיחה')}</h2>`;structured.main.forEach(x=>{html+=`<h3>${inline(x.heading)}</h3><p>${inline(x.body)}</p>`})}if(structured?.background?.length){html+=`<h2>${inline(structured.background_title||'ברקע')}</h2>`;structured.background.forEach(x=>{html+=`<h3>${inline(x.heading)}</h3><p>${inline(x.body)}</p>`})}if(structured?.forward?.length&&structured.forward_title){html+=`<h2>${inline(structured.forward_title)}</h2>`;structured.forward.forEach(x=>{html+=`<h3>${inline(x.heading)}</h3><p>${inline(x.body)}</p>`})}if(structured?.bottom_line){html+=`<h2>שורה תחתונה</h2><p>${inline(structured.bottom_line)}</p>`}html+=`<div class="toolbar"><button onclick="mode='preview';render()">חזרה לתקציר</button><a href="${ACTIONS_URL}" target="_blank">יצירת סקירה חדשה</a><button onclick="window.print()">שמירה ל-PDF</button><button onclick="shareWhatsApp()">שליחה בווטסאפ</button></div></div>`;return html}
+function render(){document.getElementById('screen').innerHTML=mode==='full'?renderFull():renderPreview();document.getElementById('updatedTop').textContent=created()?`עודכן: ${created()}`:''}
+function shareWhatsApp(){const ps=points();const text=['טעימת וול סטריט',...(ps.map(x=>'• '+x)),location.href].join('\n');window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank')}
+async function load(){try{const r=await fetch(JSON_PATH+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('לא נמצאה סקירה');meta=await r.json();structured=meta.structured_review;if(!structured)throw new Error('הקובץ לא כולל structured_review');document.getElementById('status').textContent='';render()}catch(e){document.getElementById('status').textContent='שגיאה בטעינת הסקירה';document.getElementById('screen').innerHTML=`<div class="empty">${esc(e.message||String(e))}</div>`}}
+load();
 </script>
 </body>
 </html>
