@@ -1,37 +1,148 @@
 {
-  "generated_utc": "2026-06-15T07:01:29.878899+00:00",
-  "generated_israel": "2026-06-15T10:01:29.878911+03:00",
-  "model": "gpt-5.5",
-  "total_raw_tweets": 20,
-  "selected_tweets": [
+  "channel": "wallstreet",
+  "generated_utc": "2026-06-15T10:58:50.903687+00:00",
+  "generated_israel": "2026-06-15T13:58:50.903687+03:00",
+  "mode": "premarket",
+  "title": "טעימת וול סטריט",
+  "subtitle": "נקודות חשובות לקראת פתיחת המסחר בוול סטריט, יום שני 2026-06-15",
+  "structured_review": {
+    "title": "טעימת וול סטריט",
+    "subtitle": "נקודות חשובות לקראת פתיחת המסחר בוול סטריט, יום שני 2026-06-15",
+    "intro": "שאלת השוק המרכזית היא האם ההקלה הגיאופוליטית סביב איראן תספיק להחזיק את התיאבון לסיכון בפתיחה. במרכז עומדים כיוון החוזים, מחיר הנפט, ומניות AI אחרי פעולות אנליסטים ובקרות יצוא.",
+    "main_title": "במרכז הפתיחה",
+    "main": [
+      {
+        "heading": "הקלה גיאופוליטית",
+        "body": "החוזים עולים לקראת הפתיחה, על רקע ציפייה להסכם בין ארה״ב לאיראן ב-19 ביוני. אם מיצרי הורמוז ייפתחו מחדש והפסקת האש תוארך ל-60 ימים, השוק עשוי להמשיך להעדיף מניות על פני נפט."
+      },
+      {
+        "heading": "לחץ רגולטורי על בינה מלאכותית",
+        "body": "בקרות יצוא חדשות על מודלי AI של אנתרופיק מעלות את הרגישות סביב חברות עם חשיפה עמוקה לתחום. אלפבית (GOOGL) נסחרת במחיר 359.68 אחרי עלייה של 0.53%, והמשקיעים יבדקו אם שווי ההחזקות הפרטיות שלה ממשיך לתמוך במניה."
+      },
+      {
+        "heading": "פעולות אנליסטים במניות צמיחה",
+        "body": "דאטאדוג (DDOG) קיבלה העלאת המלצה לקנייה ויעד מחיר של 300, אך המניה ירדה 1.85% למחיר 229.9. טרהוולף (WULF) קיבלה פתיחת סיקור בקנייה עם יעד 34, על רקע מעבר מתלות בכריית ביטקוין לתשתיות מחשוב ל-AI."
+      }
+    ],
+    "background_title": "ברקע",
+    "background": [
+      {
+        "heading": "מניות עם תמיכת אנליסטים",
+        "body": "פרארי (RACE) קיבלה העלאת המלצה עם יעד 438, למרות ירידה של 2.93% למחיר 354.91. בטר הום אנד פיננס (BETR) עלתה 10.00% למחיר 26.51 אחרי פתיחת סיקור בקנייה ויעד 35."
+      },
+      {
+        "heading": "נפט וזהב במעקב",
+        "body": "קרן הנפט USO ירדה 2.64%, בעוד קרן הזהב GLD עלתה 0.06%. הפער הזה חשוב כי הוא בודק אם השוק באמת מקטין פרמיית סיכון, או רק מחליף חשיפות בזהירות."
+      }
+    ],
+    "forward_title": "לקראת המסחר הקרוב",
+    "forward": [
+      {
+        "heading": "אם החוזים יישארו חזקים",
+        "body": "זה יסמן שהשוק קונה את ההקלה הגיאופוליטית ומוכן להרחיב סיכון מעבר למגה-קאפ."
+      },
+      {
+        "heading": "אם הנפט ימשיך לרדת",
+        "body": "זה יחזק את סקטורי הצריכה והתעופה, ויפחית לחץ אינפלציוני קצר טווח."
+      },
+      {
+        "heading": "אם מניות ה-AI יתקשו לעלות",
+        "body": "זה יסמן שהמשקיעים נותנים משקל גבוה יותר לבקרות יצוא ולסיכון רגולטורי מאשר להעלאות המלצה."
+      }
+    ],
+    "bottom_line": "הפתיחה נראית חיובית, אך היא תלויה באמון של השוק בהמשך ההרגעה מול איראן. מניות AI ותשתיות מחשוב נשארות במרכז, אבל התגובה לבקרות יצוא תהיה מבחן חשוב. עדיף לעקוב אחרי רוחב העליות, לא רק אחרי המדדים הגדולים.",
+    "summary_points": [
+      "שאלת השוק המרכזית היא האם ההקלה הגיאופוליטית סביב איראן תספיק להחזיק את התיאבון לסיכון בפתיחה. במרכז עומדים כיוון החוזים, מחיר הנפט, ומניות AI אחרי פעולות אנליסטים ובקרות יצוא",
+      "הקלה גיאופוליטית: החוזים עולים לקראת הפתיחה, על רקע ציפייה להסכם בין ארה״ב לאיראן ב-19 ביוני. אם מיצרי הורמוז ייפתחו מחדש והפסקת האש תוארך ל-60 ימים, השוק עשוי להמשיך להעדיף מניות על פני נפט",
+      "לחץ רגולטורי על בינה מלאכותית: בקרות יצוא חדשות על מודלי AI של אנתרופיק מעלות את הרגישות סביב חברות עם חשיפה עמוקה לתחום. אלפבית (GOOGL) נסחרת במחיר 359.68 אחרי עלייה של 0.53%, והמשקיעים יבדקו אם שווי ההחזקות הפרטיות שלה ממשיך לתמוך במניה",
+      "פעולות אנליסטים במניות צמיחה: דאטאדוג (DDOG) קיבלה העלאת המלצה לקנייה ויעד מחיר של 300, אך המניה ירדה 1.85% למחיר 229.9. טרהוולף (WULF) קיבלה פתיחת סיקור בקנייה עם יעד 34, על רקע מעבר מתלות בכריית ביטקוין לתשתיות מחשוב ל-AI"
+    ]
+  },
+  "market_facts": {
+    "note": "Only these numbers are verified by the code. Do not invent other percentages. Futures percentages are not verified in v1.",
+    "futures_percent_verified": false,
+    "symbols": {
+      "GOOGL": {
+        "price": 359.68,
+        "change_pct": 0.5339,
+        "previous_close": 357.77
+      },
+      "DDOG": {
+        "price": 229.9,
+        "change_pct": -1.8528,
+        "previous_close": 234.24
+      },
+      "RACE": {
+        "price": 354.91,
+        "change_pct": -2.9293,
+        "previous_close": 365.62
+      },
+      "BETR": {
+        "price": 26.51,
+        "change_pct": 10.0,
+        "previous_close": 24.1
+      },
+      "WULF": {
+        "price": 26.06,
+        "change_pct": 2.8008,
+        "previous_close": 25.35
+      },
+      "SPY": {
+        "price": 741.75,
+        "change_pct": 0.5408,
+        "validation_only": true
+      },
+      "QQQ": {
+        "price": 721.34,
+        "change_pct": 0.5885,
+        "validation_only": true
+      },
+      "DIA": {
+        "price": 513.06,
+        "change_pct": 0.7264,
+        "validation_only": true
+      },
+      "IWM": {
+        "price": 292.95,
+        "change_pct": 0.8746,
+        "validation_only": true
+      },
+      "USO": {
+        "price": 125.43,
+        "change_pct": -2.6391,
+        "validation_only": true
+      },
+      "GLD": {
+        "price": 386.54,
+        "change_pct": 0.0569,
+        "validation_only": true
+      },
+      "TLT": {
+        "price": 85.77,
+        "change_pct": -0.2442,
+        "validation_only": true
+      },
+      "UUP": {
+        "price": 27.95,
+        "change_pct": 0.0,
+        "validation_only": true
+      }
+    },
+    "finnhub_enabled": true
+  },
+  "source_items": [
     {
       "account": "gurgavin",
       "author": "gurgavin",
       "id": "2065885822327435266",
       "url": "https://x.com/gurgavin/status/2065885822327435266",
       "createdAt": "Sat Jun 13 19:55:37 +0000 2026",
-      "text": "MOST PEOPLE HAVE NO IDEA HOW GOOD OF AN INVESTOR GOOGLE IS  6% OF SPACEX 14% OF ANTHROPIC 75% OF WAYMO  $900M INTO SPACEX IN 2015 →   NOW WORTH $115B   $13B INTO ANTHROPIC → NOW WORTH $140B  WAYMO JUST RAISED $16B AT A $126B VALUATION → GOOGLE’S STAKE WORTH ~$95B.  THOSE THREE BETS ALONE ARE WORTH OVER $350B AND THEY HAVE 100’S MORE SMALLER ONES $GOOGL",
-      "likeCount": 11505,
-      "retweetCount": 1270,
-      "viewCount": 1828119,
+      "text": "MOST PEOPLE HAVE NO IDEA HOW GOOD OF AN INVESTOR GOOGLE IS 6% OF SPACEX 14% OF ANTHROPIC 75% OF WAYMO $900M INTO SPACEX IN 2015 → NOW WORTH $115B $13B INTO ANTHROPIC → NOW WORTH $140B WAYMO JUST RAISED $16B AT A $126B VALUATION → GOOGLE’S STAKE WORTH ~$95B. THOSE THREE BETS ALONE ARE WORTH OVER $350B AND THEY HAVE 100’S MORE SMALLER ONES $GOOGL",
+      "likeCount": 12421,
+      "retweetCount": 1419,
+      "viewCount": 1968434,
       "cashtags": [
-        "$GOOGL"
-      ],
-      "is_retweet": false
-    },
-    {
-      "account": "wallstengine",
-      "author": "wallstengine",
-      "id": "2065495369878819118",
-      "url": "https://x.com/wallstengine/status/2065495369878819118",
-      "createdAt": "Fri Jun 12 18:04:05 +0000 2026",
-      "text": "SpaceX $SPCX just became a $2T+ public company and the 6th largest company in the world on day one of trading.  Now there is already a 2x daily leveraged ETF coming under $SPCH  Wild times for sure. https://t.co/iJNlFXjhuL",
-      "likeCount": 80,
-      "retweetCount": 11,
-      "viewCount": 21916,
-      "cashtags": [
-        "$SPCH",
-        "$SPCX"
+        "GOOGL"
       ],
       "is_retweet": false
     },
@@ -41,10 +152,10 @@
       "id": "2066280513116213489",
       "url": "https://x.com/KobeissiLetter/status/2066280513116213489",
       "createdAt": "Sun Jun 14 22:03:58 +0000 2026",
-      "text": "BREAKING: US stock market futures surge after Pakistan announces that the US and Iran have reached a peace deal:  1. S&P 500: +0.8% 2. Nasdaq 100: +1.3% 3. Dow Jones: +0.6% 4. WTI Crude: -5.0% 5. Brent: -4.0% 6. Gold: +2.0%  Pakistan says the peace deal is set to be signed on June 19th.",
-      "likeCount": 4813,
-      "retweetCount": 574,
-      "viewCount": 514297,
+      "text": "BREAKING: US stock market futures surge after Pakistan announces that the US and Iran have reached a peace deal: 1. S&P 500: +0.8% 2. Nasdaq 100: +1.3% 3. Dow Jones: +0.6% 4. WTI Crude: -5.0% 5. Brent: -4.0% 6. Gold: +2.0% Pakistan says the peace deal is set to be signed on June 19th.",
+      "likeCount": 5121,
+      "retweetCount": 593,
+      "viewCount": 553357,
       "cashtags": [],
       "is_retweet": false
     },
@@ -54,28 +165,25 @@
       "id": "2065598381079015885",
       "url": "https://x.com/gurgavin/status/2065598381079015885",
       "createdAt": "Sat Jun 13 00:53:25 +0000 2026",
-      "text": "BREAKING: THE US GOVERNMENT JUST SLAPPED EXPORT CONTROLS ON ANTHROPIC’S NEWEST AI MODELS FOR BEING TOO POWERFUL   NO FOREIGN GOVERNMENT, COMPANY, OR INDIVIDUAL ANYWHERE ON EARTH CAN ACCESS MYTHOS 5 OR FABLE 5  AI IS NOW OFFICIALLY BEING TREATED LIKE A WEAPON 🇺🇸",
+      "text": "BREAKING: THE US GOVERNMENT JUST SLAPPED EXPORT CONTROLS ON ANTHROPIC’S NEWEST AI MODELS FOR BEING TOO POWERFUL NO FOREIGN GOVERNMENT, COMPANY, OR INDIVIDUAL ANYWHERE ON EARTH CAN ACCESS MYTHOS 5 OR FABLE 5 AI IS NOW OFFICIALLY BEING TREATED LIKE A WEAPON 🇺🇸",
       "likeCount": 2152,
       "retweetCount": 173,
-      "viewCount": 197375,
+      "viewCount": 197616,
       "cashtags": [],
       "is_retweet": false
     },
     {
-      "account": "AIStockSavvy",
-      "author": "AIStockSavvy",
-      "id": "2066280962695057467",
-      "url": "https://x.com/AIStockSavvy/status/2066280962695057467",
-      "createdAt": "Sun Jun 14 22:05:45 +0000 2026",
-      "text": "⚡ 𝐔𝐏𝐃𝐀𝐓𝐄: Stock futures jump after the U.S. and Iran reach a deal to end the war - $SPX $DOW $QQQ $SPY   Futures tied to the Dow Jones Industrial Average added 304 points points, or 0.6%. S&amp;P 500 futures climed 0.7%, while Nasdaq 100 futures popped 0.8%.",
-      "likeCount": 21,
-      "retweetCount": 2,
-      "viewCount": 3999,
+      "account": "wallstengine",
+      "author": "wallstengine",
+      "id": "2066463960736616529",
+      "url": "https://x.com/wallstengine/status/2066463960736616529",
+      "createdAt": "Mon Jun 15 10:12:55 +0000 2026",
+      "text": "Truist Securities Upgrades $DDOG to Buy from Hold, Raises PT to $300 from $190 Analyst comments: \"While the rating is consensus, it’s the underlying work that points to a path higher that differentiates our call. Our recent fieldwork revealed key incremental positives. First, despite increased awareness around AI consumption, we believe the urgency of AI adoption in the enterprise is significantly outweighing the urgency to optimize AI, and customers remain early in their agentic journeys. Second, increased visibility into the stability of relationships with frontier labs mitigates risk around what we see as the most likely near-term risk to the bull thesis. As such, we see opportunity for continued upside momentum in shares and raise our PT to $300.\" Analyst: Miller Jump",
+      "likeCount": 22,
+      "retweetCount": 1,
+      "viewCount": 4508,
       "cashtags": [
-        "$DOW",
-        "$QQQ",
-        "$SPX",
-        "$SPY"
+        "DDOG"
       ],
       "is_retweet": false
     },
@@ -86,9 +194,9 @@
       "url": "https://x.com/KobeissiLetter/status/2066287098806604185",
       "createdAt": "Sun Jun 14 22:30:08 +0000 2026",
       "text": "BREAKING: President Trump confirms that the US and Iran will be signing a peace deal on June 19th. https://t.co/BtBRH5p2xT",
-      "likeCount": 2816,
-      "retweetCount": 279,
-      "viewCount": 255265,
+      "likeCount": 2983,
+      "retweetCount": 288,
+      "viewCount": 289058,
       "cashtags": [],
       "is_retweet": false
     },
@@ -98,73 +206,10 @@
       "id": "2066285395365470617",
       "url": "https://x.com/KobeissiLetter/status/2066285395365470617",
       "createdAt": "Sun Jun 14 22:23:22 +0000 2026",
-      "text": "EXPECTED TERMS OF US-IRAN PEACE DEAL:  1. Extends ceasefire between US and Iran for 60 days  2. Begins 60-day negotiation period for technical discussions around Iran's nuclear program  3. Removes US Naval blockade and reopens Strait of Hormuz  4. US will commit to discuss sanctions relief with Iran  5. US will commit to discuss the release of frozen Iranian funds  6. Peace deal includes permanent end to fighting on all fronts, including Lebanon  7. Final agreement to be signed on June 19th in Switzerland  We expect to receive more detail on terms shortly.",
-      "likeCount": 6046,
-      "retweetCount": 831,
-      "viewCount": 1406146,
-      "cashtags": [],
-      "is_retweet": false
-    },
-    {
-      "account": "AIStockSavvy",
-      "author": "AIStockSavvy",
-      "id": "2066280490714161390",
-      "url": "https://x.com/AIStockSavvy/status/2066280490714161390",
-      "createdAt": "Sun Jun 14 22:03:53 +0000 2026",
-      "text": "Elon: $SPCX SpaceX might be able to reach approximately $1T revenue in 2030 - $RKLB $ASTS $LUNR $PL $RDW",
-      "likeCount": 22,
-      "retweetCount": 3,
-      "viewCount": 6510,
-      "cashtags": [
-        "$ASTS",
-        "$LUNR",
-        "$PL",
-        "$RDW",
-        "$RKLB",
-        "$SPCX"
-      ],
-      "is_retweet": false
-    },
-    {
-      "account": "wallstengine",
-      "author": "wallstengine",
-      "id": "2065461942794461677",
-      "url": "https://x.com/wallstengine/status/2065461942794461677",
-      "createdAt": "Fri Jun 12 15:51:16 +0000 2026",
-      "text": "SPACEX $SPCX OPENS AT $150, IPO AT $135 https://t.co/8Ld9Br1oBT",
-      "likeCount": 64,
-      "retweetCount": 6,
-      "viewCount": 17059,
-      "cashtags": [
-        "$SPCX"
-      ],
-      "is_retweet": false
-    },
-    {
-      "account": "wallstengine",
-      "author": "wallstengine",
-      "id": "2065436862840541633",
-      "url": "https://x.com/wallstengine/status/2065436862840541633",
-      "createdAt": "Fri Jun 12 14:11:36 +0000 2026",
-      "text": "👀  $SPCX currently indicating $175 opening price, per CNBC.",
-      "likeCount": 85,
-      "retweetCount": 10,
-      "viewCount": 26838,
-      "cashtags": [
-        "$SPCX"
-      ],
-      "is_retweet": false
-    },
-    {
-      "account": "KobeissiLetter",
-      "author": "KobeissiLetter",
-      "id": "2066304011314029024",
-      "url": "https://x.com/KobeissiLetter/status/2066304011314029024",
-      "createdAt": "Sun Jun 14 23:37:21 +0000 2026",
-      "text": "The Iran peace deal has now been announced by Pakistan on X, confirmed by US leaders and Iranian media on X, and backed by Qatar on X.  X has become the central venue to discuss and announce the most influential decisions in the world.",
-      "likeCount": 10496,
-      "retweetCount": 943,
-      "viewCount": 339215,
+      "text": "EXPECTED TERMS OF US-IRAN PEACE DEAL: 1. Extends ceasefire between US and Iran for 60 days 2. Begins 60-day negotiation period for technical discussions around Iran's nuclear program 3. Removes US Naval blockade and reopens Strait of Hormuz 4. US will commit to discuss sanctions relief with Iran 5. US will commit to discuss the release of frozen Iranian funds 6. Peace deal includes permanent end to fighting on all fronts, including Lebanon 7. Final agreement to be signed on June 19th in Switzerland We expect to receive more detail on terms shortly.",
+      "likeCount": 6511,
+      "retweetCount": 887,
+      "viewCount": 1573242,
       "cashtags": [],
       "is_retweet": false
     },
@@ -174,232 +219,83 @@
       "id": "2066279737887174838",
       "url": "https://x.com/gurgavin/status/2066279737887174838",
       "createdAt": "Sun Jun 14 22:00:53 +0000 2026",
-      "text": "FUTURES JUST OPENED   S&amp;P 500 UP 0.8% 📈 NASDAQ 100 UP 1.3% 📈 DOW JONES UP 0.6% 📈 https://t.co/dVGY9F6dyS",
-      "likeCount": 2907,
-      "retweetCount": 111,
-      "viewCount": 147053,
+      "text": "FUTURES JUST OPENED S&amp;P 500 UP 0.8% 📈 NASDAQ 100 UP 1.3% 📈 DOW JONES UP 0.6% 📈 https://t.co/dVGY9F6dyS",
+      "likeCount": 3003,
+      "retweetCount": 116,
+      "viewCount": 155015,
+      "cashtags": [],
+      "is_retweet": false
+    },
+    {
+      "account": "gurgavin",
+      "author": "gurgavin",
+      "id": "2066276908405600585",
+      "url": "https://x.com/gurgavin/status/2066276908405600585",
+      "createdAt": "Sun Jun 14 21:49:39 +0000 2026",
+      "text": "*TRUMP: THE IRAN DEAL IS COMPLETE RIGHT BEFORE FUTURES OPEN 📈📈📈📈📈📈📈",
+      "likeCount": 2332,
+      "retweetCount": 87,
+      "viewCount": 112556,
+      "cashtags": [],
+      "is_retweet": false
+    },
+    {
+      "account": "AIStockSavvy",
+      "author": "AIStockSavvy",
+      "id": "2066473898145718729",
+      "url": "https://x.com/AIStockSavvy/status/2066473898145718729",
+      "createdAt": "Mon Jun 15 10:52:25 +0000 2026",
+      "text": "$RACE | Morgan Stanley 𝐮𝐩𝐠𝐫𝐚𝐝𝐞𝐬 𝐅𝐞𝐫𝐫𝐚𝐫𝐢 to 𝐎𝐯𝐞𝐫𝐰𝐞𝐢𝐠𝐡𝐭, 𝐫𝐚𝐢𝐬𝐞𝐬 𝐏𝐓 𝐭𝐨 $𝟒𝟑𝟖 Analyst sees the stock's de-rating as overdone, believing brand desirability and scarcity remain intact despite temporary product-cycle mismatches. https://t.co/JtrCAY5Dpf",
+      "likeCount": 3,
+      "retweetCount": 1,
+      "viewCount": 240,
+      "cashtags": [
+        "RACE"
+      ],
+      "is_retweet": false
+    },
+    {
+      "account": "AIStockSavvy",
+      "author": "AIStockSavvy",
+      "id": "2066472753016742010",
+      "url": "https://x.com/AIStockSavvy/status/2066472753016742010",
+      "createdAt": "Mon Jun 15 10:47:52 +0000 2026",
+      "text": "$BETR | Roth/MKM 𝐢𝐧𝐢𝐭𝐢𝐚𝐭𝐞𝐬 𝐜𝐨𝐯𝐞𝐫𝐚𝐠𝐞 on 𝐁𝐞𝐭𝐭𝐞𝐫 𝐇𝐨𝐦𝐞 & 𝐅𝐢𝐧𝐚𝐧𝐜𝐞 with a 𝐁𝐮𝐲 rating and 𝐚 $𝟑𝟓 𝐏𝐓 Analyst sees Better as a future low-cost winner, shifting from a traditional lender to an AI-driven platform with key partnerships giving it a competitive edge.",
+      "likeCount": 1,
+      "retweetCount": 0,
+      "viewCount": 285,
+      "cashtags": [
+        "BETR"
+      ],
+      "is_retweet": false
+    },
+    {
+      "account": "wallstengine",
+      "author": "wallstengine",
+      "id": "2066465289240469854",
+      "url": "https://x.com/wallstengine/status/2066465289240469854",
+      "createdAt": "Mon Jun 15 10:18:12 +0000 2026",
+      "text": "BofA Securities Initiates $WULF at Buy, PT $34 Analyst comments: \"We initiate coverage of TeraWulf (WULF) with a Buy rating and a $34 price objective based on 9.5x EV/Revenue (2028E). WULF is transitioning away from volatile legacy bitcoin mining and is developing digital infrastructure for high-performance compute (HPC) required to satisfy the explosion in AI demand. WULF offers exposure to a multiyear digital infrastructure development pipeline it expects to reach 1.8–3.0GW of critical IT load capacity by 2030E. Near-term catalysts include completing developments at Lake Mariner by YE26E and the announcement of a customer in place for Justified Data in Kentucky.\" Analyst: Michael Funk",
+      "likeCount": 24,
+      "retweetCount": 1,
+      "viewCount": 4954,
+      "cashtags": [
+        "WULF"
+      ],
+      "is_retweet": false
+    },
+    {
+      "account": "KobeissiLetter",
+      "author": "KobeissiLetter",
+      "id": "2066304011314029024",
+      "url": "https://x.com/KobeissiLetter/status/2066304011314029024",
+      "createdAt": "Sun Jun 14 23:37:21 +0000 2026",
+      "text": "The Iran peace deal has now been announced by Pakistan on X, confirmed by US leaders and Iranian media on X, and backed by Qatar on X. X has become the central venue to discuss and announce the most influential decisions in the world.",
+      "likeCount": 11593,
+      "retweetCount": 1044,
+      "viewCount": 394141,
       "cashtags": [],
       "is_retweet": false
     }
-  ],
-  "detected_cashtags": [
-    "$ASTS",
-    "$DOW",
-    "$GOOGL",
-    "$LUNR",
-    "$PL",
-    "$QQQ",
-    "$RDW",
-    "$RKLB",
-    "$SPCH",
-    "$SPCX",
-    "$SPX",
-    "$SPY"
-  ],
-  "finnhub_enabled": true,
-  "finnhub_symbols_checked": [
-    "SPCX",
-    "GOOGL",
-    "SPCH",
-    "DOW",
-    "QQQ",
-    "SPX",
-    "SPY",
-    "ASTS"
-  ],
-  "finnhub_context": {
-    "enabled": true,
-    "symbols": {
-      "SPCX": {
-        "quote": {
-          "price": 160.95,
-          "change_pct": null,
-          "previous_close": 0.0
-        },
-        "news": [
-          {
-            "headline": "SpaceX: Wait For A Pullback",
-            "source": "SeekingAlpha"
-          },
-          {
-            "headline": "Powerlaw Corp. And Its SpaceX Holding Are Now Likely A Discount-To-NAV Story, Strong Buy",
-            "source": "SeekingAlpha"
-          },
-          {
-            "headline": "SpaceX: Wall Street's $226 Billion Assumption Is Frail",
-            "source": "SeekingAlpha"
-          }
-        ]
-      },
-      "GOOGL": {
-        "quote": {
-          "price": 359.68,
-          "change_pct": 0.5339,
-          "previous_close": 357.77
-        },
-        "news": [
-          {
-            "headline": "Anthropic Block Marks US Reversal, Warning to Silicon Valley",
-            "source": "Yahoo"
-          },
-          {
-            "headline": "Technology Leads Insurance Education: Big Jump SEO Partners with Three Major Insurance Platforms to Enhance VHIS Information Quality with Latest Gemini AI Technology",
-            "source": "Yahoo"
-          },
-          {
-            "headline": "Alphabet Ties Search AI And Mobility Closer To Revenue Potential",
-            "source": "Yahoo"
-          }
-        ]
-      },
-      "DOW": {
-        "quote": {
-          "price": 33.85,
-          "change_pct": 0.6542,
-          "previous_close": 33.63
-        },
-        "news": [
-          {
-            "headline": "Dow Layoffs And Xylem Deal Reframe Costs Valuation And Long Term Returns",
-            "source": "Yahoo"
-          },
-          {
-            "headline": "DOW vs. APD: Which Stock Is the Better Value Option?",
-            "source": "Yahoo"
-          },
-          {
-            "headline": "Higher Costs for Plastics Used Everywhere Are Becoming Next Inflation Headache",
-            "source": "Yahoo"
-          }
-        ]
-      },
-      "QQQ": {
-        "quote": {
-          "price": 721.34,
-          "change_pct": 0.5885,
-          "previous_close": 717.12
-        },
-        "news": [
-          {
-            "headline": "The Fed May Have A Hawkish Surprise For Markets This Week",
-            "source": "SeekingAlpha"
-          },
-          {
-            "headline": "FOMC Chair Warsh Won't Cut Rates Soon, A More Hawkish Fed Looms",
-            "source": "SeekingAlpha"
-          },
-          {
-            "headline": "May Inflation Print: Why The 4.2% Headline Is An Oil Story",
-            "source": "SeekingAlpha"
-          }
-        ]
-      },
-      "SPX": {
-        "quote": null,
-        "news": [
-          {
-            "headline": "While Everyone Was Focused On SpaceX, I'm Buying Gold Miners",
-            "source": "SeekingAlpha"
-          },
-          {
-            "headline": "S&P 500: Setting Up The Second Leg Lower (Technical Analysis)",
-            "source": "SeekingAlpha"
-          },
-          {
-            "headline": "The Fed May Have A Hawkish Surprise For Markets This Week",
-            "source": "SeekingAlpha"
-          }
-        ]
-      },
-      "SPY": {
-        "quote": {
-          "price": 741.75,
-          "change_pct": 0.5408,
-          "previous_close": 737.76
-        },
-        "news": [
-          {
-            "headline": "Nasdaq, S&P 500, Dow Futures Climb While Oil Slides As US-Iran Deal Signals End To Hormuz Disruption: DJT, NFLX, GLXY, SPCX In Focus",
-            "source": "Yahoo"
-          },
-          {
-            "headline": "GPIX: Retirees Don't Need The 4% Rule With This Monthly Income ETF",
-            "source": "SeekingAlpha"
-          },
-          {
-            "headline": "S&P 500: Setting Up The Second Leg Lower (Technical Analysis)",
-            "source": "SeekingAlpha"
-          }
-        ]
-      },
-      "ASTS": {
-        "quote": {
-          "price": 82.41,
-          "change_pct": -15.5289,
-          "previous_close": 97.56
-        },
-        "news": [
-          {
-            "headline": "Why AST SpaceMobile May Be One Of The Market's Biggest Asymmetric Bets",
-            "source": "SeekingAlpha"
-          },
-          {
-            "headline": "Fed Rate Decision Takes Centre Stage As Earnings Wind Down",
-            "source": "SeekingAlpha"
-          },
-          {
-            "headline": "Space Stocks Get Torched: Short Seller Calls Them 'Sci-Fi Wishes'",
-            "source": "Benzinga"
-          }
-        ]
-      }
-    }
-  },
-  "review_type": "wallstreet",
-  "review_context": {
-    "mode": "premarket",
-    "title": "נקודות חשובות לקראת פתיחת המסחר בוול סטריט, יום שני 2026-06-15",
-    "editorial_focus": "סקירת טרום מסחר: התמקד במה שיכול להשפיע על הפתיחה, חוזים, טיקרים, דוחות, זרימות וסנטימנט."
-  },
-  "structured_review": {
-    "title": "טעימת וול סטריט",
-    "subtitle": "נקודות חשובות לקראת פתיחת המסחר בוול סטריט, יום שני 2026-06-15",
-    "intro": "השוק נכנס לפתיחה עם מבחן ברור: האם הירידה בפרמיית הסיכון סביב איראן תחזיק גם אחרי הגאפ בחוזים. במקביל, מניות הצמיחה והחלל מגיעות עם זרימת כותרות חזקה שיכולה להגדיל תנודתיות בתחילת המסחר.",
-    "main_title": "במרכז הפתיחה",
-    "main": [
-      {
-        "heading": "החוזים עולים עם עסקת ארה״ב-איראן",
-        "body": "החוזים על אס אנד פי 500 עלו סביב 0. 7%-0. 8%, נאסד״ק 100 סביב 0."
-      },
-      {
-        "heading": "ספייסאיקס מושכת זרימת מסחר",
-        "body": "ספייסאיקס (SPCX) פתחה את יום המסחר הראשון ב-150 דולר מול מחיר הנפקה של 135 דולר, אחרי אינדיקציה מוקדמת ל-175 דולר, והוצגה כחברה ציבורית בשווי מעל 2 טריליון דולר. הכנה לקרן ממונפת יומית פי 2 תחת קרן ספייסאיקס (SPCH) יכולה להגדיל תנודתיות, ולכן צריך לראות אם המניה ממשיכה למשוך מומנטום או נרגעת אחרי הפתיחה החזקה."
-      },
-      {
-        "heading": "גוגל מקבלת מבט דרך החזקות פרטיות",
-        "body": "גוגל (GOOGL) מחזיקה 6% מספייסאיקס, 14% מחברת Anthropic ו-75% מחברת Waymo, ושלוש ההחזקות הוערכו יחד ביותר מ-350 מיליארד דולר. זה יכול להשפיע על הדרך שבה השוק מסתכל על מאזן הנכסים של גוגל, ובמסחר חשוב לראות אם זה מקבל ביטוי בביצוע היחסי של המניה מול ענקיות הטכנולוגיה."
-      }
-    ],
-    "background_title": "ברקע",
-    "background": [
-      {
-        "heading": "בינה מלאכותית נכנסת למגבלות יצוא",
-        "body": "ממשלת ארה״ב הטילה מגבלות יצוא על מודלי Mythos 5 ו-Fable 5 של חברת Anthropic, כך שממשלות, חברות או יחידים מחוץ לארה״ב לא יכולים לקבל גישה אליהם. עבור מניות AI זה מעלה את החשיבות של רגולציה וגישה לשווקים זרים, ולכן כדאי לעקוב אם הסנטימנט בסקטור נשאר חיובי למרות המגבלה."
-      },
-      {
-        "heading": "זהב עולה לצד פתיחת ריסק און",
-        "body": "הזהב עלה 2% לצד עליות בחוזים וירידה חדה בנפט. השילוב הזה לא נותן תמונת סיכון נקייה, ולכן במסחר חשוב לראות אם הביקוש לזהב נחלש או ממשיך לצד העליות במניות."
-      }
-    ],
-    "forward_title": "",
-    "forward": [],
-    "bottom_line": "הפתיחה נראית חיובית, אבל היא תלויה בהמשך האמון במהלך המדיני מול איראן ובתגובה של הנפט. ספייסאיקס (SPCX), גוגל (GOOGL) וסקטור הבינה המלאכותית יכולים לייצר תנועה נקודתית מעבר למדדים. אם הגאפ בחוזים לא יתרחב אחרי הפתיחה, השוק עלול לעבור מהר לבדיקת רוחב ועומק הקונים.",
-    "summary_points": [
-      "החוזים מגיעים לפתיחה בעליות, עם נאסד״ק 100 חזק יותר מהדאו",
-      "הירידה בנפט מציבה את עסקת ארה״ב-איראן כגורם המרכזי לסנטימנט הבוקר",
-      "ספייסאיקס (SPCX) נשארת מוקד תנודתי אחרי פתיחה מעל מחיר ההנפקה והכנה לקרן ממונפת",
-      "גוגל (GOOGL) עשויה לקבל תשומת לב דרך החזקותיה בספייסאיקס, חברת Anthropic וחברת Waymo",
-      "מגבלות היצוא על מודלי חברת Anthropic מוסיפות רגישות רגולטורית לסקטור הבינה המלאכותית"
-    ]
-  }
+  ]
 }
