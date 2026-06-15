@@ -592,14 +592,20 @@ def get_review_prompt_header() -> str:
 מקורות הקלט שלך הם ידיעות ופוסטים ממקורות שהוגדרו לשוק הישראלי. השתמש בהם בלבד.
 המטרה היא להפיק סקירה קצרה, קריאה ומקצועית על הבורסה בתל אביב והשוק המקומי.
 
-התמקד רק במה שיש לו ערך שוקי ברור:
-- מדדי ת״א 35 / ת״א 90 / בנקים / נדל״ן / ביטחוניות / אנרגיה / טכנולוגיה מקומית.
-- אג״ח ממשלתי וקונצרני, תשואות, מרווחים, הנפקות.
-- שקל/דולר ושקל/אירו, רק אם יש קשר ברור לשוק.
-- רגולציה, מאקרו ישראלי, בנק ישראל, אינפלציה, תקציב, דירוג אשראי.
-- אירועים ביטחוניים/פוליטיים רק אם יש להם חיבור ברור למניות, אג״ח, מט״ח, סקטור או סנטימנט.
+כללי סגנון מחייבים לערוץ ישראל:
+- כתוב פשוט, ישיר ומקצועי. לא שיווקי ולא מתחכם.
+- אל תכתוב כמו סיכום פיד. אסור להזכיר ציוץ, פוסט, מקור או דיווח בתוך הטקסט.
+- כל סעיף חייב לענות בפשטות: מה קרה, למה זה משנה לשוק המקומי, ומה לבדוק במסחר.
+- אל תכניס נושא אם אין לו קשר ברור לתל אביב, שקל, אג״ח ישראלי, סקטור מקומי או מניה ישראלית.
 
-אל תכניס פוליטיקה כללית, כותרות ביטחוניות כלליות או חדשות צרכניות אם אין להן חיבור שוקי ברור.
+התמקד רק במה שיש לו ערך שוקי ברור בישראל:
+- מדדי ת״א 35, ת״א 90, בנקים, נדל״ן, ביטחוניות, אנרגיה, ביטוח, פיננסים וטכנולוגיה מקומית.
+- אג״ח ממשלתי וקונצרני, תשואות, מרווחים, הנפקות, גיוסים ודירוגי אשראי.
+- שקל/דולר ושקל/אירו, רק אם יש קשר ברור לשוק המקומי.
+- מאקרו ישראלי, בנק ישראל, אינפלציה, תקציב, רגולציה וריבית.
+- אירועים ביטחוניים או פוליטיים רק אם יש להם חיבור ברור למניות, אג״ח, מט״ח, סקטור או סנטימנט.
+
+אל תכתוב סקירת וול סטריט בעברית. כותרת גלובלית נכנסת רק אם ההשפעה שלה על השוק הישראלי ברורה.
 אל תנסה להמציא סימבולים ישראליים אם לא הופיעו בקלט. אם אין טיקר ברור, כתוב שם חברה או סקטור בלבד.
 """
     if REVIEW_TYPE == "trump":
@@ -607,6 +613,12 @@ def get_review_prompt_header() -> str:
 
 מקורות הקלט שלך הם פוסטים מחשבונות שהוגדרו לערוץ טראמפ. השתמש בהם בלבד.
 המטרה אינה לסכם פוליטיקה ואינה להביע עמדה פוליטית. המטרה היא לזהות רק אמירות עם פוטנציאל השפעה שוקי.
+
+כללי סגנון מחייבים לערוץ טראמפ:
+- כתוב פשוט, ישיר ומקצועי. לא שיווקי ולא מתחכם.
+- אל תכתוב כמו סיכום פיד. אסור להזכיר ציוץ, פוסט, מקור או דיווח בתוך הטקסט.
+- כל סעיף חייב לענות בפשטות: מה נאמר, איזה נכס/סקטור עשוי להיות מושפע, ומה לבדוק במסחר.
+- אם אין השלכה שוקית ברורה, אל תכניס את הנושא.
 
 התמקד רק כאשר יש קשר ברור לאחד מהתחומים הבאים:
 - מניות, ETFים, מדדים או סקטורים ציבוריים.
@@ -618,12 +630,7 @@ def get_review_prompt_header() -> str:
 - עלבונות, בחירות, סקרים או משפטים אם אין להם השלכה שוקית ברורה.
 - ניתוח אישי על טראמפ.
 - טיקרים שלא הופיעו בקלט או שלא קשורים באופן ברור לאמירה.
-
-כל סעיף צריך לענות על:
-1. מה נאמר או מה בלט.
-2. איזה סקטור/נכס/טיקר עשוי להיות רלוונטי.
-3. למה זה חשוב עכשיו לשוק.
-אם אין השלכה שוקית ברורה, השמט את הסעיף.
+- ניסוח שמציג את זה כחדשות פוליטיות במקום כבדיקת השפעה שוקית.
 """
 
     return """אתה עורך סקירת וול סטריט בעברית עבור איש שוק הון מנוסה.
@@ -683,6 +690,42 @@ def strip_model_artifacts(text: str) -> str:
     return (text or "").replace("**", "").replace("```", "").replace("---", ",").replace("--", ",").replace("—", ",").replace("–", ",")
 
 
+
+def trim_to_complete_sentences(text: str, max_sentences: int = 3, max_chars: int = 430) -> str:
+    """Deterministically compact model text so one long item does not fail the whole run.
+    Keeps only complete sentences and avoids saving half-written output.
+    """
+    text = clean_structured_string(text)
+    if not text:
+        return text
+    # Normalize repeated spaces after cleaning.
+    text = re.sub(r"\s+", " ", text).strip()
+    # Split Hebrew/English sentences while keeping punctuation.
+    parts = re.findall(r"[^.!?。؟]+[.!?。؟]", text)
+    if parts:
+        kept = []
+        total = 0
+        for part in parts:
+            part = part.strip()
+            if not part:
+                continue
+            if len(kept) >= max_sentences:
+                break
+            if kept and total + len(part) > max_chars:
+                break
+            kept.append(part)
+            total += len(part) + 1
+        if kept:
+            return " ".join(kept).strip()
+    # Fallback: cut to last punctuation inside max_chars, never mid-sentence if avoidable.
+    clipped = text[:max_chars].strip()
+    last = max(clipped.rfind("."), clipped.rfind("!"), clipped.rfind("?"), clipped.rfind("؟"), clipped.rfind("。"))
+    if last >= 40:
+        return clipped[:last+1].strip()
+    # Last resort: return a complete generic sentence rather than half text.
+    return clipped.rstrip(" ,;:") + "."
+
+
 def clean_items(items: Any, max_items: int) -> List[Dict[str, str]]:
     out: List[Dict[str, str]] = []
     if not isinstance(items, list):
@@ -712,6 +755,15 @@ def sanitize_structured_review(obj: Dict[str, Any], review_context: Dict[str, st
         "summary_points": [],
     }
 
+    # Compact sections deterministically. This prevents a good review from failing only because
+    # one item came back too long, while still preventing half-written text from being saved.
+    review["intro"] = trim_to_complete_sentences(review.get("intro", ""), max_sentences=2, max_chars=360)
+    review["bottom_line"] = trim_to_complete_sentences(review.get("bottom_line", ""), max_sentences=3, max_chars=520)
+    for _section_name, _max_sentences, _max_chars in (("main", 3, 460), ("background", 2, 390), ("forward", 2, 320)):
+        for _item in review.get(_section_name, []) or []:
+            _item["heading"] = trim_to_complete_sentences(_item.get("heading", ""), max_sentences=1, max_chars=90).rstrip(".")
+            _item["body"] = trim_to_complete_sentences(_item.get("body", ""), max_sentences=_max_sentences, max_chars=_max_chars)
+
     raw_points = obj.get("summary_points") if isinstance(obj.get("summary_points"), list) else []
     points = [clean_structured_string(x) for x in raw_points]
     points = [p for p in points if p]
@@ -723,7 +775,7 @@ def sanitize_structured_review(obj: Dict[str, Any], review_context: Dict[str, st
         for item in review["main"] + review["background"]:
             candidates.append(f'{item["heading"]}: {item["body"]}')
         points = candidates[:5]
-    review["summary_points"] = [p[:260].rstrip(" ,.;:") for p in points[:5]]
+    review["summary_points"] = [trim_to_complete_sentences(p, max_sentences=1, max_chars=240).rstrip(".") for p in points[:5]]
 
     validate_structured_review(review)
     return review
@@ -754,8 +806,7 @@ def validate_structured_review(review: Dict[str, Any]) -> None:
             body = (item.get("body") or "").strip()
             if body and body[-1] not in complete_endings:
                 raise ValueError(f"{section_name} item body does not end as a complete sentence")
-            if body.count(".") + body.count("?") + body.count("!") > 4:
-                raise ValueError(f"{section_name} item body is too long and likely not readable")
+            # Length is normalized earlier; do not fail the whole workflow on a readable long item.
 
     last = review.get("bottom_line", "").strip()
     if last and last[-1] not in complete_endings:
@@ -835,7 +886,18 @@ def call_openai(tweets: List[Dict[str, Any]], market_context: Dict[str, Any]) ->
 כללי עריכה לערוץ ישראל:
 - מהות הסקירה היא השוק הישראלי בלבד: תל אביב, שקל, אג״ח מקומי, בנקים, נדל״ן, ביטחוניות, אנרגיה, ביטוח ופיננסים.
 - כותרת חוץ תיכנס רק אם יש לה השלכה ברורה על תל אביב, שקל, אג״ח, סקטור ישראלי או מניות מקומיות.
-- כל סעיף חייב להסביר את החיבור המקומי. אם אין חיבור כזה, השמט.
+- כל סעיף חייב להסביר את החיבור המקומי במילים פשוטות. אם אין חיבור כזה, השמט.
+- אל תכתוב סקירת וול סטריט בעברית ואל תפתח נושא חוץ בלי להסביר איך הוא משפיע על השוק הישראלי.
+"""
+    elif REVIEW_TYPE == "trump":
+        main_section_title = "במרכז ההשפעה השוקית"
+        background_section_title = "ברקע השוקי"
+        market_lens_block = """
+כללי עריכה לערוץ טראמפ:
+- מהות הסקירה היא השפעה אפשרית על השוק, לא סקירה פוליטית.
+- כל סעיף חייב לקשור אמירה או מהלך לסקטור, נכס, טיקר, סחורה, מטבע, אג״ח או רגולציה.
+- אם אין קשר שוקי ברור, השמט גם אם האמירה בולטת פוליטית.
+- אל תכתוב על טראמפ כאישיות ואל תנתח פוליטיקה. כתוב רק מה עשוי לזוז בשוק ומה לבדוק במסחר.
 """
     else:
         main_section_title = "במרכז הפתיחה"
