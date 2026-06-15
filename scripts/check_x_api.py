@@ -22,7 +22,7 @@ FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY", "").strip()
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.5").strip()
 MAX_TWEETS_PER_ACCOUNT = int(os.environ.get("MAX_TWEETS_PER_ACCOUNT", "4"))
 MAX_TWEETS_FOR_REVIEW = int(os.environ.get("MAX_TWEETS_FOR_REVIEW", "12"))
-MAX_OUTPUT_TOKENS = int(os.environ.get("OPENAI_MAX_OUTPUT_TOKENS", "5000"))
+MAX_OUTPUT_TOKENS = int(os.environ.get("OPENAI_MAX_OUTPUT_TOKENS", "5500"))
 
 if not TWITTER_API_KEY:
     raise SystemExit("Missing GitHub secret: TWITTER_API_KEY")
@@ -54,6 +54,32 @@ BAD_NUMERIC_PATTERNS = [
     re.compile(r"\b0\.\s*(?:$|[א-ת])"),
 ]
 FUTURES_PERCENT_RE = re.compile(r"חוז(?:ה|ים|י)[^\.\n]{0,70}\d+(?:\.\d+)?\s*%")
+
+# Phrases that sound like generic market commentary rather than real market mechanism.
+# These are intentionally narrow: they block the bad style we saw without rejecting every normal sentence.
+SHALLOW_MARKET_PHRASES = [
+    "השוק עשוי להמשיך להעדיף מניות על פני נפט",
+    "השוק מעדיף מניות על פני נפט",
+    "המשקיעים יעדיפו מניות",
+    "השוק יאהב את זה",
+    "זה חיובי לשוק",
+    "זה שלילי לשוק",
+    "זה רע לסנטימנט",
+    "זה טוב לסנטימנט",
+    "השווקים מחכים לראות",
+]
+
+GEOPOLITICAL_TERMS = ["איראן", "הורמוז", "מיצרי הורמוז", "לבנון", "ביירות", "הפסקת אש", "מלחמה", "תקיפה", "הסכם"]
+MARKET_MECHANISM_TERMS = ["נפט", "אינפלציה", "תשואות", "ריבית", "דולר", "חוזים", "מדדים", "סנטימנט", "פרמיית סיכון"]
+
+
+def has_geo_context(text: str) -> bool:
+    return any(t in text for t in GEOPOLITICAL_TERMS)
+
+
+def has_market_mechanism(text: str) -> bool:
+    hits = sum(1 for t in MARKET_MECHANISM_TERMS if t in text)
+    return hits >= 2
 
 
 def read_accounts() -> List[str]:
@@ -430,6 +456,9 @@ def validate_review(review: Dict[str, Any], facts: Dict[str, Any]) -> None:
     hits = [p for p in FORBIDDEN_PHRASES if p and p in blob]
     if hits:
         raise ValueError(f"forbidden phrases: {hits}")
+    shallow_hits = [p for p in SHALLOW_MARKET_PHRASES if p and p in blob]
+    if shallow_hits:
+        raise ValueError(f"shallow market phrasing: {shallow_hits}")
     if "$" in blob:
         raise ValueError("dollar sign ticker format is forbidden")
     for pat in BAD_NUMERIC_PATTERNS:
@@ -451,8 +480,15 @@ def validate_review(review: Dict[str, Any], facts: Dict[str, Any]) -> None:
                 raise ValueError(f"{section} body starts with English/ticker")
             if not ends_complete(item.get("body", "")):
                 raise ValueError(f"{section} body incomplete")
-            if len(item.get("body", "")) > 520:
+            body_text = item.get("body", "")
+            if len(body_text) > 520:
                 raise ValueError(f"{section} body too long")
+            # If geopolitics is used, the paragraph must explain a market transmission channel.
+            # This blocks vague conclusions such as "the market prefers stocks over oil".
+            if has_geo_context(body_text) and not has_market_mechanism(body_text):
+                raise ValueError(f"{section} geopolitical paragraph lacks market mechanism")
+    if has_geo_context(review.get("bottom_line", "")) and not has_market_mechanism(review.get("bottom_line", "")):
+        raise ValueError("bottom_line geopolitical sentence lacks market mechanism")
     if review.get("forward_title") and review["forward_title"] not in {"לקראת המסחר הקרוב", "לקראת השבוע הקרוב"}:
         raise ValueError("bad forward title")
 
@@ -471,6 +507,13 @@ def build_prompt(tweets: List[Dict[str, Any]], facts: Dict[str, Any], ctx: Dict[
 - משפטים קצרים. בלי התחכמות ובלי מילים מנופחות.
 - להסביר ברור: מה קרה, למה זה משנה, מה לבדוק במסחר.
 - אסור להשתמש בביטויים: שכבת ערך, מסגרת חדשה, שיח ביטחוני, עדשת ביטחון לאומי, נכסי צמיחה עתירי נרטיב, תמחור נרטיבי.
+- אסור לכתוב משפטי שוק כלליים כמו: השוק מעדיף מניות על פני נפט, השוק יאהב את זה, זה חיובי לשוק, זה רע לסנטימנט, המשקיעים יעדיפו מניות.
+
+חובה להסביר מנגנון שוקי:
+- כל פסקה חייבת להסביר למה הנושא משנה לשוק, לא רק לתאר מה קרה.
+- אם אתה כותב על גיאופוליטיקה, איראן, הורמוז או נפט, חובה להסביר את שרשרת ההשפעה: גיאופוליטיקה → נפט → אינפלציה → תשואות/ריבית → סנטימנט במניות.
+- דוגמה לא טובה: השוק עשוי להמשיך להעדיף מניות על פני נפט.
+- דוגמה טובה: ירידה בסיכון סביב הורמוז עשויה להפחית לחץ על מחירי הנפט, להקל על חששות אינפלציה, ולתמוך בסנטימנט במניות.
 
 מבנה חובה:
 1. פתיח של שני משפטים: מה שאלת השוק המרכזית.
@@ -484,6 +527,7 @@ def build_prompt(tweets: List[Dict[str, Any]], facts: Dict[str, Any], ctx: Dict[
 - פסקה אחת מתחת, 2 משפטים קצרים לכל היותר.
 - בלי Markdown. אסור ###, ##, #, **, נקודה 1.
 - כל כותרת וכל פסקה מתחילות בעברית, לא באנגלית ולא בטיקר.
+- סעיפי "לקראת המסחר הקרוב" חייבים להיות טריגרים ברורים: אם X קורה, מה זה יסמן במסחר. לא לכתוב "לעקוב אחרי" בלי הסבר.
 
 טיקרים:
 - אין להשתמש בסימן דולר.
